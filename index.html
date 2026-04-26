@@ -55,6 +55,7 @@
         .navbar {
             background-color: rgba(10, 10, 13, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color);
             display: flex; justify-content: center; padding: 15px; gap: 20px; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            align-items: center;
         }
         .nav-btn {
             background: transparent; border: 1px solid var(--border-color); color: var(--text-muted);
@@ -68,6 +69,15 @@
         .btn-save:hover { background-color: #2a7a48; color: #fff; box-shadow: 0 0 15px rgba(74, 222, 128, 0.2); }
         .btn-reset { border-color: var(--danger-color); color: var(--danger-color); }
         .btn-reset:hover { background-color: var(--danger-color); color: #fff; box-shadow: 0 0 15px rgba(168, 50, 50, 0.2); }
+
+        /* Botão Copiar Minimalista */
+        .btn-copy {
+            background: transparent; border: none; color: var(--text-muted);
+            padding: 10px 15px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
+            font-weight: 400; font-size: 0.65rem; font-family: 'Montserrat', sans-serif;
+            opacity: 0.6; transition: all 0.3s ease;
+        }
+        .btn-copy:hover { opacity: 1; color: var(--text-main); }
 
         .loader { display: none; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid #fff; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -175,6 +185,17 @@
         .modal-box { background: var(--panel-surface); border: 1px solid var(--accent-color); padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; box-shadow: 0 0 30px var(--accent-glow); }
         .god-grid-item { width: 45px; height: 45px; cursor: pointer; border-radius: 6px; border: 2px solid transparent; transition: 0.2s; object-fit: cover; background-color: #000; }
         .god-grid-item:hover { border-color: var(--accent-color); transform: scale(1.1); box-shadow: 0 0 10px var(--accent-glow); }
+
+        /* --- MODO VISUALIZAÇÃO (ESPECTADOR) --- */
+        body.is-viewer .admin-only, 
+        body.is-viewer .btn-advance, 
+        body.is-viewer .btn-promote { display: none !important; }
+        body.is-viewer input, 
+        body.is-viewer [contenteditable="true"] { pointer-events: none !important; border: none !important; outline: none !important; }
+        body.is-viewer .god-select-btn { cursor: default !important; }
+        body.is-viewer .navbar .btn-save, 
+        body.is-viewer .navbar .btn-reset,
+        body.is-viewer .btn-copy { display: none !important; }
     </style>
 </head>
 <body>
@@ -183,10 +204,11 @@
         <button class="nav-btn active" onclick="switchTab('page-main', this)">Painel Principal</button>
         <button class="nav-btn" onclick="switchTab('page-matches', this)">Confrontos de Grupos</button>
         <div style="width: 1px; height: 30px; background: var(--border-color); margin: 0 10px;"></div>
-        <button class="nav-btn btn-save" onclick="saveTournament()">
+        <button class="nav-btn btn-save admin-only" onclick="saveTournament()">
             Salvar na Nuvem <span class="loader" id="saveLoader"></span>
         </button>
-        <button class="nav-btn btn-reset" onclick="resetTournament()">Resetar Dados</button>
+        <button class="nav-btn btn-reset admin-only" onclick="resetTournament()">Resetar Dados</button>
+        <button class="btn-copy admin-only" onclick="copiarLinkPublico(this)" title="Copiar link bloqueado para espectadores">Link Público</button>
     </div>
 
     <div id="page-main" class="container page active">
@@ -194,7 +216,7 @@
             <img src="header.png" alt="Era das Tavernas" class="header-image" onerror="this.style.display='none'">
         </div>
 
-        <div class="panel">
+        <div class="panel admin-only">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
                 <h2 style="margin:0;">Configuração de Sorteio</h2>
                 <button class="nav-btn" style="padding: 6px 16px; font-size: 0.7rem;" onclick="toggleSetup()" id="btnToggleSetup">Recolher</button>
@@ -233,7 +255,7 @@
                 <div class="panel">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap:15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
                         <h2 style="margin:0;">Mata-Mata Final</h2>
-                        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <div class="admin-only" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                             <select id="bracketSize" style="width:110px; margin:0;">
                                 <option value="4">Top 4</option>
                                 <option value="8" selected>Top 8</option>
@@ -264,28 +286,34 @@
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="hades_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Hades</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="poseidon_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Poseidon</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="demeter_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Deméter</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
+                                
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="tsukuyomi_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Tsukuyomi</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="amaterasu_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Amaterasu</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="susanoo_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Susanoo</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
+                                
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="fuxi_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Fuxi</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="nuwa_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Nuwa</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="shennong_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Shennong</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
+                                
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="thor_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Thor</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="odin_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Odin</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="loki_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Loki</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="freyr_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Freyr</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
+                                
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="isis_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Ísis</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="ra_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Rá</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="set_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Set</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
+                                
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="cronos_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Cronos</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="gaia_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Gaia</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="urano_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Urano</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
+                                
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="quetzalcoatl_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Quetzalcoatl</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="tezcatlipoca_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Tezcatlipoca</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                                 <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="huitzilopochtli_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Huitzilopochtli</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                             </tbody>
                         </table>
-                        <button class="nav-btn" style="width:100%; margin-top:15px; border-style: dashed;" onclick="addGodRow()">Adicionar Linha</button>
+                        <button class="nav-btn admin-only" style="width:100%; margin-top:15px; border-style: dashed;" onclick="addGodRow()">Adicionar Linha</button>
                     </div>
                 </div>
             </div>
@@ -323,6 +351,27 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // --- LÓGICA DE VISUALIZAÇÃO E BOTÃO COPIAR ---
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('view')) {
+            document.body.classList.add('is-viewer');
+        }
+
+        function copiarLinkPublico(btn) {
+            const url = window.location.origin + window.location.pathname + '?view';
+            navigator.clipboard.writeText(url).then(() => {
+                const textoOriginal = btn.innerText;
+                btn.innerText = "Copiado!";
+                btn.style.opacity = "1";
+                btn.style.color = "var(--accent-color)";
+                setTimeout(() => { 
+                    btn.innerText = textoOriginal; 
+                    btn.style.opacity = "0.6";
+                    btn.style.color = "var(--text-muted)";
+                }, 2000);
+            });
+        }
+
 
         // ======= LÓGICA DO SITE =======
         const listaDeuses = [
@@ -353,6 +402,7 @@
         let godTargetElement = null;
 
         function abrirModalDeuses(el) {
+            if(document.body.classList.contains('is-viewer')) return;
             godTargetElement = el;
             document.getElementById('godModal').style.display = 'flex';
         }
@@ -401,7 +451,7 @@
 
         function switchTab(pageId, btn) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.navbar .nav-btn:not(.btn-save):not(.btn-reset)').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.navbar .nav-btn:not(.btn-save):not(.btn-reset):not(.btn-copy)').forEach(b => b.classList.remove('active'));
             document.getElementById(pageId).classList.add('active'); btn.classList.add('active');
         }
 
@@ -438,7 +488,7 @@
             grupos.forEach((grupo, idx) => {
                 let html = `<div class="panel" style="padding:25px;"><h3 style="margin-bottom: 20px; font-size:1.2rem;">Grupo ${String.fromCharCode(65 + idx)}</h3><table><thead><tr><th>Status</th><th style="text-align:left">Jogador</th><th>V</th><th>D</th><th>Pts</th></tr></thead><tbody id="tbody-grupo-${idx}">`;
                 grupo.forEach(p => {
-                    html += `<tr class="${p.seed ? 'seed-row' : ''}" data-player="${p.nome}"><td><button class="btn-promote" onclick="togglePromote(this, '${p.nome}')">Promover</button></td><td style="text-align:left; font-weight:600;">${p.nome}</td><td class="cell-v" contenteditable="true" oninput="calcPtsManual(this, ${idx})">0</td><td class="cell-d" contenteditable="true">0</td><td class="cell-pts" style="font-weight:bold; color:var(--accent-color)">0</td></tr>`;
+                    html += `<tr class="${p.seed ? 'seed-row' : ''}" data-player="${p.nome}"><td><button class="btn-promote admin-only" onclick="togglePromote(this, '${p.nome}')">Promover</button></td><td style="text-align:left; font-weight:600;">${p.nome}</td><td class="cell-v" contenteditable="true" oninput="calcPtsManual(this, ${idx})">0</td><td class="cell-d" contenteditable="true">0</td><td class="cell-pts" style="font-weight:bold; color:var(--accent-color)">0</td></tr>`;
                 });
                 html += `</tbody></table></div>`; container.innerHTML += html;
             });
