@@ -93,14 +93,6 @@
         }
         .panel::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--border-highlight), transparent); }
 
-        .content-with-sidebar { display: flex; flex-direction: column; gap: 30px; }
-        @media (min-width: 1200px) {
-            .content-with-sidebar { flex-direction: row; align-items: flex-start; }
-            .content-main { flex: 1; min-width: 0; }
-            .content-sidebar { width: 400px; flex-shrink: 0; }
-            .content-sidebar.elo-sidebar { width: 340px; }
-        }
-
         .setup-grid { display: grid; grid-template-columns: 1fr 1fr 250px; gap: 30px; transition: 0.3s; }
         label { display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
 
@@ -280,7 +272,6 @@
         }
 
         /* === EFEITOS DE RASTRO E HOVER === */
-        
         .glow-box, .b-match:hover, .champion-box:hover {
             border-color: var(--accent-color) !important;
             box-shadow: 0 0 15px var(--accent-glow) !important;
@@ -355,6 +346,15 @@
         body.is-viewer .navbar .btn-save, 
         body.is-viewer .navbar .btn-reset,
         body.is-viewer .navbar .btn-copy { display: none !important; }
+
+        /* Estilo da Sidebar quando mostrada em telas menores que 1200px na aba Mata-Mata */
+        .content-with-sidebar { display: flex; flex-direction: column; gap: 30px; }
+        @media (min-width: 1200px) {
+            .content-with-sidebar { flex-direction: row; align-items: flex-start; }
+            .content-main { flex: 1; min-width: 0; }
+            .content-sidebar { width: 400px; flex-shrink: 0; }
+            .content-sidebar.elo-sidebar { width: 340px; }
+        }
     </style>
 </head>
 <body>
@@ -411,13 +411,13 @@
             <div class="groups-grid" id="groupsDisplay"></div>
         </div>
 
-        <!-- NOVO: RANKING ELO E ESTATÍSTICAS DE GODS LADO A LADO -->
+        <!-- RANKING ELO E ESTATÍSTICAS DE GODS LADO A LADO -->
         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-top: 40px;">
             
             <!-- RANKING ELO -->
             <div class="panel">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
-                    <h3 style="margin:0; font-size: 1.2rem; color: var(--accent-color); font-family: 'Montserrat', sans-serif; letter-spacing: 1px; font-weight: 600;">🏆 Ranking ELO</h3>
+                    <h3 style="margin:0; font-size: 1.2rem; color: var(--accent-color); font-family: 'Cinzel', serif; letter-spacing: 2px; font-weight: 600;">Ranking ELO</h3>
                 </div>
                 
                 <div id="eloContent" style="margin-top: 15px; height: 700px; overflow-y: auto; padding-right: 5px;">
@@ -439,11 +439,11 @@
             <!-- ESTATÍSTICAS DE GODS -->
             <div class="panel">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
-                    <h3 style="margin:0; font-size: 1.2rem; color: var(--text-muted); font-family: 'Montserrat', sans-serif; letter-spacing: 1px;">Estatísticas de Gods</h3>
-                    <button class="nav-btn" style="padding: 4px 12px; font-size: 0.65rem;" onclick="toggleStats()" id="btnToggleStats">Mostrar</button>
+                    <h3 style="margin:0; font-size: 1.2rem; color: var(--accent-color); font-family: 'Cinzel', serif; letter-spacing: 2px; font-weight: 600;">Estatísticas de Deuses</h3>
+                    <button class="nav-btn active" style="padding: 4px 12px; font-size: 0.65rem;" onclick="toggleStats()" id="btnToggleStats">Recolher</button>
                 </div>
                 
-                <div id="statsContent" style="display: none; margin-top: 15px; height: 700px; overflow-y: auto; padding-right: 5px;">
+                <div id="statsContent" style="display: block; margin-top: 15px; height: 700px; overflow-y: auto; padding-right: 5px;">
                     <table>
                         <thead>
                             <tr><th style="text-align:left;">God</th><th title="Jogos">J</th><th title="Vitórias">V</th><th title="Derrotas">D</th><th title="Uso Geral">Uso</th><th title="Winrate">WR</th></tr>
