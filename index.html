@@ -250,6 +250,10 @@
                             <option value="2">2 Grupos</option>
                             <option value="4" selected>4 Grupos</option>
                             <option value="8">8 Grupos</option>
+                            <option value="12">12 Grupos</option>
+                            <option value="16">16 Grupos</option>
+                            <option value="24">24 Grupos</option>
+                            <option value="32">32 Grupos</option>
                         </select>
                         <input type="number" id="playersPerGroup" value="3" min="2" max="8" style="flex: 1;" title="Jogadores por Grupo">
                     </div>
@@ -679,11 +683,9 @@
                 wContainer.appendChild(roundDiv);
             }
 
-            // Losers Bracket (Simplificado para criação de containers manuais de Double Elim)
-            // A matemática exata de Double Elim cria rounds extras. Para tamanho dinâmico usaremos roundsW * 2 - 1
+            // Losers Bracket
             let roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1; 
             for(let i=0; i < roundsL; i++) {
-                // Cálculo aproximado de matches por round para criar a estrutura visual
                 let matchesNum = size / Math.pow(2, Math.floor(i/2) + 1 + (i%2));
                 if (matchesNum < 1) matchesNum = 1;
                 
@@ -749,7 +751,6 @@
             gerarChave(copiaPromovidos);
         }
 
-        // Funções manuais para Double Elim (Avancar W / L)
         function avancarWinner(btn, slotIdx) {
             const matchDiv = btn.closest('.b-match');
             const players = matchDiv.querySelectorAll('.b-player');
