@@ -159,14 +159,32 @@
         .stage-title { color: var(--accent-color); font-family: 'Cinzel', serif; text-align: center; letter-spacing: 3px; text-shadow: 0 0 10px var(--accent-glow); margin-bottom: 25px; }
         .format-badge { background: rgba(212, 175, 55, 0.15); border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); z-index: 10; letter-spacing: 1px; }
 
-        /* LINK DE STREAM */
+        /* LINK DE STREAM COM CORES DINÂMICAS */
         .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; align-items: center; z-index: 20; }
-        .viewer-stream-link { display: flex; align-items: center; gap: 5px; color: #ff4444; font-size: 0.7rem; text-decoration: none; font-weight: bold; letter-spacing: 1px; background: rgba(255,0,0,0.1); padding: 2px 8px; border-radius: 12px; border: 1px solid rgba(255,0,0,0.3); transition: 0.3s; text-transform: uppercase; }
-        .viewer-stream-link:hover { background: rgba(255,0,0,0.3); transform: scale(1.05); }
-        .viewer-stream-link::before { content: ''; display: inline-block; width: 6px; height: 6px; background: #ff4444; border-radius: 50%; animation: pulseLive 1.5s infinite; }
-        @keyframes pulseLive { 0% { box-shadow: 0 0 0 0 rgba(255,68,68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(255,68,68, 0); } 100% { box-shadow: 0 0 0 0 rgba(255,68,68, 0); } }
+        .viewer-stream-link { 
+            --live-color: #ff4d4d; /* Variável para trocar de cor via JS */
+            display: flex; align-items: center; justify-content: center; gap: 5px; 
+            color: var(--live-color); font-size: 0.65rem; text-decoration: none; 
+            font-weight: bold; letter-spacing: 1px; 
+            background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 12px; 
+            border: 1px solid var(--border-color); transition: 0.3s; text-transform: uppercase; 
+        }
+        .viewer-stream-link:hover { 
+            border-color: var(--live-color); transform: scale(1.05); 
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+        .viewer-stream-link::before { 
+            content: ''; display: inline-block; width: 6px; height: 6px; 
+            background: var(--live-color); border-radius: 50%; 
+            animation: pulseLive 1.5s infinite; 
+        }
+        @keyframes pulseLive { 
+            0% { transform: scale(0.8); opacity: 1; } 
+            50% { transform: scale(1.5); opacity: 0.3; } 
+            100% { transform: scale(0.8); opacity: 1; } 
+        }
 
-        /* PLACAR GLOBAL (AGORA READ-ONLY VISUAL) */
+        /* PLACAR GLOBAL (READ-ONLY) */
         .match-score { display: flex; align-items: center; gap: 15px; background: #000; padding: 5px 15px; border-radius: 6px; border: 1px solid var(--border-color); }
         .match-score input { width: 30px; background: transparent; border: none; color: var(--accent-color); text-align: center; font-size: 1.5rem; font-weight: 700; padding: 0; font-family: 'Cinzel', serif; pointer-events: none; }
         .match-score span { color: var(--text-muted); font-size: 0.8rem; font-weight: 300; }
@@ -231,7 +249,7 @@
         body.is-viewer .admin-only, body.is-viewer .btn-advance, body.is-viewer .btn-promote { display: none !important; }
         body.is-viewer input, body.is-viewer [contenteditable="true"], body.is-viewer textarea, body.is-viewer select { pointer-events: none !important; border: none !important; outline: none !important; background: transparent !important; }
         body.is-viewer .god-select-btn { cursor: default !important; border-style: solid !important; }
-        body.is-viewer .win-toggle { display: none !important; } /* Esconde o V dos viewers */
+        body.is-viewer .win-toggle { display: none !important; }
         body.is-viewer .navbar .btn-save, body.is-viewer .navbar .btn-reset, body.is-viewer .navbar .btn-copy { display: none !important; }
 
     </style>
@@ -248,6 +266,7 @@
         <button class="btn-copy admin-only" onclick="copiarLinkPublico(this)" title="Copiar link para os espectadores">Link Público</button>
     </div>
 
+    <!-- PAINEL PRINCIPAL -->
     <div id="page-main" class="container page active">
         <div class="header-container"><img src="header.png" alt="Era das Tavernas" class="header-image" onerror="this.style.display='none'"></div>
 
@@ -278,6 +297,7 @@
             <div class="groups-grid" id="groupsDisplay"></div>
         </div>
 
+        <!-- ELO E GODS -->
         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-top: 40px;">
             <div class="panel">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
@@ -331,12 +351,14 @@
         <div class="footer">DESENVOLVIDO POR [CAOK] PAIN</div>
     </div>
 
+    <!-- TAVERNAS OF MORTALS (GRUPOS) -->
     <div id="page-matches" class="container page">
         <h2 class="stage-title">TAVERNAS OF MORTALS</h2>
         <div id="matchesGroupsContainer" style="margin-top: 20px;"><p style="text-align:center; color:var(--text-muted); font-style: italic;">Aguardando geração dos grupos no painel principal.</p></div>
         <div class="footer">DESENVOLVIDO POR [CAOK] PAIN</div>
     </div>
 
+    <!-- MATA-MATA: DEMIGODS & TITANS -->
     <div id="page-bracket" class="container page" style="max-width: 1800px;">
         <div class="header-container"><img src="header.png" alt="Era das Tavernas" class="header-image" onerror="this.style.display='none'"></div>
         
@@ -370,6 +392,7 @@
         <div class="footer">DESENVOLVIDO POR [CAOK] PAIN</div>
     </div>
 
+    <!-- MODAL DE DEUSES -->
     <div id="godModal" class="modal-overlay" onclick="fecharModalDeuses(event)">
         <div class="modal-box" onclick="event.stopPropagation()">
             <h3 style="margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Selecione o Deus</h3>
@@ -473,10 +496,7 @@
             const allTogglesForGame = card.querySelectorAll(`.win-toggle[data-game="${gameIdx}"]`);
             const wasActive = btn.classList.contains('is-winner');
             
-            // Remove a vitória de ambos para garantir que só 1 vença aquele "Game"
             allTogglesForGame.forEach(t => t.classList.remove('is-winner'));
-            
-            // Se não estava ativo antes, agora marca como vitória
             if(!wasActive) { btn.classList.add('is-winner'); }
             
             calcularPlacarGlobal(card);
@@ -492,7 +512,6 @@
             if(score1) { score1.value = p1Wins; score1.setAttribute('value', p1Wins); }
             if(score2) { score2.value = p2Wins; score2.setAttribute('value', p2Wins); }
             
-            // Verifica o bloqueio de Bo3 e atualiza ELO e Tabela de Grupos
             verificarBloqueioBoX(card, p1Wins, p2Wins);
             
             const groupIdx = card.dataset.group;
@@ -505,20 +524,15 @@
         }
 
         function verificarBloqueioBoX(card, p1Wins, p2Wins) {
-            // Conta quantos botões de vitória existem para o P1 (para saber se é Bo3, Bo5 ou Bo7)
             const totalGames = card.querySelectorAll(`.win-toggle[data-player="1"]`).length;
             const majority = Math.ceil(totalGames / 2);
-            
             const isMatchOver = (p1Wins >= majority || p2Wins >= majority);
             
-            // Todos os slots de jogo
             for(let i=0; i < totalGames; i++) {
                 const toggles = card.querySelectorAll(`.win-toggle[data-game="${i}"]`);
                 const isGameResolved = (toggles[0]?.classList.contains('is-winner') || toggles[1]?.classList.contains('is-winner'));
+                const godSlots = card.querySelectorAll(`.game${i}-slot.${card.querySelector('.win-toggle').dataset.match}-slot`);
                 
-                const godSlots = card.querySelectorAll(`.game${i}-slot`);
-                
-                // Se o match acabou, e este jogo específico NÂO foi jogado, nós travamos o slot.
                 if(isMatchOver && !isGameResolved) {
                     godSlots.forEach(slot => {
                         slot.classList.add('locked');
@@ -528,7 +542,9 @@
                     toggles.forEach(t => t.style.display = 'none');
                 } else {
                     godSlots.forEach(slot => slot.classList.remove('locked'));
-                    toggles.forEach(t => t.style.display = 'block');
+                    toggles.forEach(t => {
+                        if(!document.body.classList.contains('is-viewer')) t.style.display = 'block';
+                    });
                 }
             }
         }
@@ -543,7 +559,7 @@
                 
                 if(g) {
                     const toggle = wrapper.querySelector('.win-toggle');
-                    if(!toggle) return; // Se por acaso não tiver toggle
+                    if(!toggle) return; 
 
                     const gameIdx = toggle.dataset.game;
                     const matchCard = wrapper.closest('.match-card') || wrapper.closest('.b-match');
@@ -558,7 +574,6 @@
                         if(t !== toggle && t.classList.contains('is-winner')) oppWon = true;
                     });
 
-                    // Só contabiliza as estatísticas se o jogo realmente teve um vencedor definido
                     if(gameResolved) {
                         godStats[g].j++;
                         if(thisWon) godStats[g].v++;
@@ -587,7 +602,6 @@
                 row.dataset.j = stats.j; row.dataset.v = stats.v; row.dataset.wr = wr;
             });
 
-            // Ordenação (Mais Vitórias, Maior Winrate, Mais Jogos)
             rows.sort((a, b) => {
                 const vA = parseInt(a.dataset.v), vB = parseInt(b.dataset.v);
                 const wrA = parseFloat(a.dataset.wr), wrB = parseFloat(b.dataset.wr);
@@ -601,7 +615,7 @@
         }
 
         // =======================
-        // FUNÇÕES DE LINK DE LIVE
+        // FUNÇÕES DE LINK DE LIVE E ÍCONES SVG
         // =======================
         function addStreamLink(btn) {
             const card = btn.closest('.match-card') || btn.closest('.b-match');
@@ -611,6 +625,7 @@
             if(novaUrl !== null) {
                 card.setAttribute('data-stream', novaUrl);
                 renderStreamLinks();
+                saveTournament(); 
             }
         }
 
@@ -623,13 +638,26 @@
                     if(streamUrl && streamUrl.trim() !== "") {
                         viewerLink.href = streamUrl;
                         viewerLink.style.display = 'flex';
+                        
+                        let iconHtml = 'LIVE';
+                        let color = '#ff4d4d'; // default
+                        
+                        if(streamUrl.toLowerCase().includes('twitch.tv')) {
+                            iconHtml = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right:2px;"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg> TWITCH`;
+                            color = '#b9a3e3'; // Roxo da Twitch claro
+                        } else if (streamUrl.toLowerCase().includes('youtube.com') || streamUrl.toLowerCase().includes('youtu.be')) {
+                            iconHtml = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right:2px;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> YOUTUBE`;
+                            color = '#ff4d4d'; // Vermelho do YT
+                        }
+                        
+                        viewerLink.innerHTML = iconHtml;
+                        viewerLink.style.setProperty('--live-color', color);
                     } else {
                         viewerLink.style.display = 'none';
                     }
                 }
             });
         }
-
 
         // =======================
         // NAVEGAÇÃO E SETUP
@@ -720,10 +748,9 @@
             let tally = {}; rows.forEach(row => tally[row.dataset.player] = { v: 0, d: 0 });
 
             matchCards.forEach(card => {
-                const inputs = card.querySelectorAll('input[type="number"]');
-                const s1 = parseInt(inputs[0].value) || 0, s2 = parseInt(inputs[1].value) || 0;
+                const s1 = parseInt(card.querySelector('.score-p1').value) || 0;
+                const s2 = parseInt(card.querySelector('.score-p2').value) || 0;
                 
-                // Só conta a vitória pro grupo se houver algum ponto lançado
                 if (s1 > 0 || s2 > 0) {
                     if(s1 > s2) { tally[card.dataset.p1].v++; tally[card.dataset.p2].d++; } 
                     else if(s2 > s1) { tally[card.dataset.p2].v++; tally[card.dataset.p1].d++; }
@@ -775,7 +802,7 @@
                         matchesHtml += `
                         <div class="match-card" data-group="${idx}" data-p1="${grupo[i].nome}" data-p2="${grupo[j].nome}">
                             <div class="stream-controls">
-                                <button class="nav-btn admin-only" style="padding: 2px 6px; font-size: 0.6rem; border-style:dashed;" onclick="addStreamLink(this)">🎥 Link</button>
+                                <button class="nav-btn admin-only" style="padding: 2px 6px; font-size: 0.5rem; border-style:dashed;" onclick="addStreamLink(this)">🎥 Link</button>
                                 <a href="#" class="viewer-stream-link" target="_blank" style="display:none;">LIVE</a>
                             </div>
                             <div class="match-player">
@@ -835,7 +862,6 @@
             
             let roundsW = Math.log2(size);
             
-            // Winners Bracket
             for(let i=0; i < roundsW; i++) {
                 let matchesNum = size / Math.pow(2, i+1);
                 let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
@@ -867,7 +893,6 @@
                 wContainer.appendChild(roundDiv);
             }
 
-            // Losers Bracket
             let roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1; 
             for(let i=0; i < roundsL; i++) {
                 let matchesNum = size / Math.pow(2, Math.floor(i/2) + 1 + (i%2));
@@ -897,7 +922,6 @@
                 lContainer.appendChild(roundDiv);
             }
 
-            // Grand Finals (Bo7)
             fContainer.innerHTML = `
                 <div class="bracket-round round-champion" style="min-width: 400px;">
                     <h4 class="round-title" style="color:#FFD700;">GRAND FINALS</h4>
@@ -1114,7 +1138,9 @@
             if(btnSave) btnSave.style.display = 'inline-block';
 
             try {
-                // A estrutura de HTML salvará as classes 'is-winner' e 'data-stream' automaticamente
+                document.querySelectorAll('input:not(.score-input)').forEach(input => input.setAttribute('value', input.value));
+                document.querySelectorAll('.score-input').forEach(input => input.setAttribute('value', input.value));
+                
                 const data = {
                     seeds: document.getElementById('seedsInput')?.value || '',
                     regulars: document.getElementById('regularsInput')?.value || '',
