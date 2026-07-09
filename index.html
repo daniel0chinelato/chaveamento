@@ -231,6 +231,7 @@
         <button class="btn-copy admin-only" onclick="copiarLinkPublico(this)" title="Copiar link para os espectadores">Link Público</button>
     </div>
 
+    <!-- PAINEL PRINCIPAL -->
     <div id="page-main" class="container page active">
         <div class="header-container"><img src="header.png" alt="Era das Tavernas" class="header-image" onerror="this.style.display='none'"></div>
 
@@ -245,17 +246,9 @@
                 <div><label>Jogadores Regulares (Linha por Linha)</label><textarea id="regularsInput" rows="5" placeholder="Jogador C&#10;Jogador D..."></textarea></div>
                 <div>
                     <label>Estrutura do Torneio</label>
-                    <div style="display: flex; gap: 10px;">
-                        <select id="numGroups" style="flex: 1;">
-                            <option value="2">2 Grupos</option>
-                            <option value="4" selected>4 Grupos</option>
-                            <option value="8">8 Grupos</option>
-                            <option value="12">12 Grupos</option>
-                            <option value="16">16 Grupos</option>
-                            <option value="24">24 Grupos</option>
-                            <option value="32">32 Grupos</option>
-                        </select>
-                        <input type="number" id="playersPerGroup" value="3" min="2" max="8" style="flex: 1;" title="Jogadores por Grupo">
+                    <div style="display: flex; gap: 10px; align-items: center; background-color: var(--panel-surface); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <label style="margin:0; text-transform:none; letter-spacing:0; flex: 2; font-size: 0.85rem;">Jogadores por Grupo:</label>
+                        <input type="number" id="playersPerGroup" value="3" min="2" style="flex: 1; padding: 8px; margin: 0; text-align: center;">
                     </div>
                     <button class="action-btn" style="margin-top:25px;" onclick="gerarTorneio()">Sortear Chaves</button>
                 </div>
@@ -269,6 +262,7 @@
             <div class="groups-grid" id="groupsDisplay"></div>
         </div>
 
+        <!-- ELO E GODS -->
         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-top: 40px;">
             <div class="panel">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
@@ -291,6 +285,7 @@
                     <table>
                         <thead><tr><th style="text-align:left;">God</th><th title="Jogos">J</th><th title="Vitórias">V</th><th title="Derrotas">D</th><th title="Uso Geral">Uso</th><th title="Winrate">WR</th></tr></thead>
                         <tbody id="godsTable">
+                            <!-- Os Gods Padrões de Age of Mythology Retold -->
                             <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="zeus_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Zeus</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                             <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="hades_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Hades</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
                             <tr class="god-row" data-v="0" data-wr="0" data-j="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="poseidon_icon.png" class="god-icon" onerror="this.style.display='none'"><span contenteditable="true">Poseidon</span></div></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td><input type="number" value="0" class="stat-input" oninput="this.setAttribute('value', this.value); calcGods()"></td><td class="g-d">0</td><td class="g-u" style="color:var(--accent-color);">0%</td><td class="g-w" style="font-weight:bold;">0%</td></tr>
@@ -323,12 +318,14 @@
         <div class="footer">DESENVOLVIDO POR [CAOK] PAIN</div>
     </div>
 
+    <!-- TAVERNAS OF MORTALS (GRUPOS) -->
     <div id="page-matches" class="container page">
         <h2 class="stage-title">TAVERNAS OF MORTALS</h2>
         <div id="matchesGroupsContainer" style="margin-top: 20px;"><p style="text-align:center; color:var(--text-muted); font-style: italic;">Aguardando geração dos grupos no painel principal.</p></div>
         <div class="footer">DESENVOLVIDO POR [CAOK] PAIN</div>
     </div>
 
+    <!-- MATA-MATA: DEMIGODS & TITANS -->
     <div id="page-bracket" class="container page" style="max-width: 1800px;">
         <div class="header-container"><img src="header.png" alt="Era das Tavernas" class="header-image" onerror="this.style.display='none'"></div>
         
@@ -362,6 +359,7 @@
         <div class="footer">DESENVOLVIDO POR [CAOK] PAIN</div>
     </div>
 
+    <!-- MODAL DE DEUSES -->
     <div id="godModal" class="modal-overlay" onclick="fecharModalDeuses(event)">
         <div class="modal-box" onclick="event.stopPropagation()">
             <h3 style="margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Selecione o Deus</h3>
@@ -475,31 +473,30 @@
         function gerarTorneio() {
             const seeds = document.getElementById('seedsInput').value.split('\n').filter(n => n.trim() !== '');
             const regulars = document.getElementById('regularsInput').value.split('\n').filter(n => n.trim() !== '');
-            const numG = parseInt(document.getElementById('numGroups').value);
             const pPerGroup = parseInt(document.getElementById('playersPerGroup').value);
             
-            if (seeds.length + regulars.length < 2) return alert("Insira os jogadores!");
+            const totalJogadores = seeds.length + regulars.length;
+            if (totalJogadores < 2) return alert("Insira os jogadores!");
+            if (pPerGroup < 2) return alert("O número mínimo de jogadores por grupo é 2!");
+
+            // Calcula automaticamente a quantidade de grupos baseada nos inscritos e vagas por grupo
+            const numG = Math.ceil(totalJogadores / pPerGroup);
 
             shuffle(seeds); shuffle(regulars);
             const grupos = Array.from({ length: numG }, () => []);
             
-            // Distribuir jogadores respeitando o limite do grupo
+            // Junta todos e distribui igualmente um a um em estilo Round Robin
             let todosJogadores = [...seeds.map(n => ({nome: n, seed: true})), ...regulars.map(n => ({nome: n, seed: false}))];
-            let currentGroup = 0;
             
+            let currentGroup = 0;
             todosJogadores.forEach(p => {
-                if(grupos[currentGroup].length < pPerGroup) { grupos[currentGroup].push(p); }
-                else {
-                    let achou = false;
-                    for(let i=0; i<numG; i++) {
-                        if(grupos[i].length < pPerGroup) { grupos[i].push(p); achou = true; break; }
-                    }
-                    if(!achou) console.warn("Mais jogadores do que vagas. Sobrou: ", p.nome);
-                }
+                grupos[currentGroup].push(p);
                 currentGroup = (currentGroup + 1) % numG;
             });
 
-            renderizarGrupos(grupos); gerarConfrontosGrupos(grupos);
+            renderizarGrupos(grupos); 
+            gerarConfrontosGrupos(grupos);
+            
             document.getElementById('setupContent').style.display = 'none';
             document.getElementById('btnToggleSetup').innerText = 'Expandir';
             document.getElementById('btnToggleSetup').classList.add('active');
@@ -589,7 +586,7 @@
 
         function gerarConfrontosGrupos(grupos) {
             const container = document.getElementById('matchesGroupsContainer'); 
-            container.innerHTML = '<h2 class="stage-title">TAVERNAS OF MORTALS</h2>';
+            container.innerHTML = '';
 
             grupos.forEach((grupo, idx) => {
                 let matchesHtml = '';
@@ -816,7 +813,130 @@
         function calcGods() { atualizarTodosOsGods(); }
 
         function calcularEloGeral() {
-            // Lógica mantida da versão anterior
+            try {
+                let eloData = {};
+
+                document.querySelectorAll('#groupsDisplay tbody tr').forEach(row => {
+                    let pName = row.dataset.player;
+                    if (pName) {
+                        pName = pName.trim();
+                        let isSeed = row.classList.contains('seed-row');
+                        eloData[pName] = { nome: pName, isSeed: isSeed, elo: 1000 };
+                    }
+                });
+
+                if (Object.keys(eloData).length === 0) {
+                    let sInput = document.getElementById('seedsInput');
+                    let rInput = document.getElementById('regularsInput');
+                    if(sInput && rInput) {
+                        let s = sInput.value.split('\n').filter(x => x.trim() !== '');
+                        let r = rInput.value.split('\n').filter(x => x.trim() !== '');
+                        s.forEach(n => eloData[n.trim()] = { nome: n.trim(), isSeed: true, elo: 1000 });
+                        r.forEach(n => eloData[n.trim()] = { nome: n.trim(), isSeed: false, elo: 1000 });
+                    }
+                }
+
+                document.querySelectorAll('.match-card').forEach(card => {
+                    let p1 = card.dataset.p1 ? card.dataset.p1.trim() : null;
+                    let p2 = card.dataset.p2 ? card.dataset.p2.trim() : null;
+                    if (!p1 || !p2) return;
+
+                    let inputs = card.querySelectorAll('input[type="number"]');
+                    if (inputs.length < 2) return;
+
+                    let val1 = inputs[0].value || inputs[0].getAttribute('value');
+                    let val2 = inputs[1].value || inputs[1].getAttribute('value');
+
+                    if (val1 !== "" && val2 !== "" && val1 !== null && val2 !== null) {
+                        let s1 = parseInt(val1);
+                        let s2 = parseInt(val2);
+
+                        if (!isNaN(s1) && !isNaN(s2) && s1 !== s2) {
+                            let winner = s1 > s2 ? p1 : p2;
+                            let loser = s1 > s2 ? p2 : p1;
+
+                            if (eloData[winner] && eloData[loser]) {
+                                let wSeed = eloData[winner].isSeed === true;
+                                let lSeed = eloData[loser].isSeed === true;
+
+                                if (!wSeed && !lSeed) { eloData[winner].elo += 10; eloData[loser].elo -= 10; }
+                                else if (!wSeed && lSeed) { eloData[winner].elo += 15; eloData[loser].elo -= 15; }
+                                else if (wSeed && !lSeed) { eloData[winner].elo += 5; eloData[loser].elo -= 5; }
+                                else if (wSeed && lSeed) { eloData[winner].elo += 10; eloData[loser].elo -= 10; }
+                            }
+                        }
+                    }
+                });
+
+                if (typeof jogadoresPromovidos !== 'undefined') {
+                    jogadoresPromovidos.forEach(p => {
+                        let pName = p.trim();
+                        if (eloData[pName]) eloData[pName].elo += 25;
+                    });
+                }
+
+                document.querySelectorAll('.b-match').forEach(match => {
+                    let players = match.querySelectorAll('.b-player');
+                    if (players.length === 2) {
+                        let p1Div = players[0];
+                        let p2Div = players[1];
+                        
+                        let p1Span = p1Div.querySelector('.p-name');
+                        let p2Span = p2Div.querySelector('.p-name');
+                        if (!p1Span || !p2Span) return;
+
+                        let p1Name = p1Span.innerText.trim();
+                        let p2Name = p2Span.innerText.trim();
+
+                        if (p1Name && p1Name !== "TBD" && !eloData[p1Name]) eloData[p1Name] = { nome: p1Name, isSeed: false, elo: 1000 };
+                        if (p2Name && p2Name !== "TBD" && !eloData[p2Name]) eloData[p2Name] = { nome: p2Name, isSeed: false, elo: 1000 };
+
+                        let p1Win = p1Div.classList.contains('winner-slot');
+                        let p2Win = p2Div.classList.contains('winner-slot');
+
+                        if (p1Win && !p2Win) {
+                            if (eloData[p1Name]) eloData[p1Name].elo += 30;
+                            if (eloData[p2Name]) eloData[p2Name].elo -= 15;
+                        } else if (p2Win && !p1Win) {
+                            if (eloData[p2Name]) eloData[p2Name].elo += 30;
+                            if (eloData[p1Name]) eloData[p1Name].elo -= 15;
+                        }
+                    }
+                });
+
+                let eloArray = Object.values(eloData);
+                eloArray.sort((a, b) => b.elo - a.elo);
+
+                let tbody = document.getElementById('eloTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    if (eloArray.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted); font-style: italic; font-size: 0.8rem; padding: 15px;">Aguardando geração dos grupos...</td></tr>`;
+                    } else {
+                        eloArray.forEach((p, index) => {
+                            let statusBadge = p.isSeed 
+                                ? '<span style="color:var(--accent-color); font-size:0.55rem; letter-spacing: 0.5px; text-transform: uppercase;">Cabeça de Chave</span>' 
+                                : '<span style="color:var(--text-muted); font-size:0.55rem; letter-spacing: 0.5px; text-transform: uppercase;">Regular</span>';
+                            
+                            let posColor = "var(--text-main)";
+                            if(index === 0) posColor = "#FFD700"; 
+                            else if (index === 1) posColor = "#C0C0C0"; 
+                            else if (index === 2) posColor = "#CD7F32"; 
+
+                            tbody.innerHTML += `
+                            <tr style="transition: 0.3s; background-color: var(--panel-surface);">
+                                <td style="font-weight:bold; font-size:1.1rem; color:${posColor}; text-align: center; border-radius: 6px 0 0 6px; padding: 8px 5px;">${index + 1}º</td>
+                                <td style="text-align:left; font-weight:700; font-size:0.9rem; line-height: 1.2; padding: 8px 5px;">
+                                    ${p.nome}<br>${statusBadge}
+                                </td>
+                                <td style="font-weight:bold; font-family:'Cinzel', serif; color:var(--accent-color); font-size:1.2rem; text-align: center; border-radius: 0 6px 6px 0; padding: 8px 5px;">${p.elo}</td>
+                            </tr>`;
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Erro no ELO:", error);
+            }
         }
 
         function saveTournament() {
@@ -831,7 +951,6 @@
                 const data = {
                     seeds: document.getElementById('seedsInput')?.value || '',
                     regulars: document.getElementById('regularsInput')?.value || '',
-                    numGroups: document.getElementById('numGroups')?.value || '4',
                     playersPerGroup: document.getElementById('playersPerGroup')?.value || '3',
                     groupsDisplay: document.getElementById('groupsDisplay')?.innerHTML || '',
                     groupsSectionVisible: document.getElementById('groupsSection')?.style.display || 'none',
@@ -859,7 +978,6 @@
                 
                 if(data.seeds) document.getElementById('seedsInput').value = data.seeds; 
                 if(data.regulars) document.getElementById('regularsInput').value = data.regulars;
-                if(data.numGroups) document.getElementById('numGroups').value = data.numGroups; 
                 if(data.playersPerGroup) document.getElementById('playersPerGroup').value = data.playersPerGroup;
                 
                 if(data.groupsDisplay) document.getElementById('groupsDisplay').innerHTML = data.groupsDisplay;
