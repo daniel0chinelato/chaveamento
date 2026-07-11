@@ -126,6 +126,7 @@
         .match-card:hover { transform: scale(1.01); border-color: var(--border-highlight); }
         .match-player { flex: 1; text-align: center; font-weight: 600; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center;}
         
+        /* SISTEMA DE DEUSES E VITÓRIAS INDIVIDUAIS */
         .god-slots-container { display: flex; gap: 8px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
         .god-slot-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; }
         
@@ -156,16 +157,42 @@
         .win-toggle.is-winner { background: #4ade80; color: #000; border-color: #4ade80; font-weight: bold; box-shadow: 0 0 8px rgba(74, 222, 128, 0.4); }
 
         .stage-title { color: var(--accent-color); font-family: 'Cinzel', serif; text-align: center; letter-spacing: 3px; text-shadow: 0 0 10px var(--accent-glow); margin-bottom: 25px; }
+        
+        /* SOLUÇÃO INTELIGENTE DO MD3/MD5: Posicionado à esquerda para não conflitar com a live */
         .format-badge { background: rgba(212, 175, 55, 0.15); border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; position: absolute; top: -12px; left: 15px; z-index: 10; letter-spacing: 1px; font-weight: bold; }
 
+        /* MÚLTIPLOS LINKS DE STREAM COM CORES DINÂMICAS */
         .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: center; width: 80%; }
-        .stream-badge { font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; background: #222; color: #fff; text-decoration: none; border: 1px solid var(--border-color); }
-        .stream-badge:hover { border-color: var(--accent-color); }
+        
+        .viewer-stream-link { 
+            --live-color: #ff4d4d; 
+            display: flex; align-items: center; justify-content: center; gap: 5px; 
+            color: var(--live-color); font-size: 0.65rem; text-decoration: none; 
+            font-weight: bold; letter-spacing: 1px; 
+            background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 12px; 
+            border: 1px solid var(--border-color); transition: 0.3s; text-transform: uppercase; 
+        }
+        .viewer-stream-link:hover { 
+            border-color: var(--live-color); transform: scale(1.05); 
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+        .viewer-stream-link::before { 
+            content: ''; display: inline-block; width: 6px; height: 6px; 
+            background: var(--live-color); border-radius: 50%; 
+            animation: pulseLive 1.5s infinite; 
+        }
+        @keyframes pulseLive { 
+            0% { transform: scale(0.8); opacity: 1; } 
+            50% { transform: scale(1.5); opacity: 0.3; } 
+            100% { transform: scale(0.8); opacity: 1; } 
+        }
 
+        /* PLACAR GLOBAL (READ-ONLY) */
         .match-score { display: flex; align-items: center; gap: 15px; background: #000; padding: 5px 15px; border-radius: 6px; border: 1px solid var(--border-color); }
         .match-score input { width: 30px; background: transparent; border: none; color: var(--accent-color); text-align: center; font-size: 1.5rem; font-weight: 700; padding: 0; font-family: 'Cinzel', serif; pointer-events: none; }
         .match-score span { color: var(--text-muted); font-size: 0.8rem; font-weight: 300; }
 
+        /* MATA-MATA */
         .bracket-container { display: flex; overflow-x: auto; padding: 70px 20px 20px 20px; cursor: grab; min-height: 450px; align-items: stretch; gap: 0; }
         .bracket-container:active { cursor: grabbing; }
         .bracket-container::-webkit-scrollbar { height: 6px; }
@@ -174,6 +201,7 @@
         .bracket-round { display: flex; flex-direction: column; min-width: 320px; padding-right: 60px; position: relative; }
         .bracket-round:last-child { padding-right: 0; min-width: 270px; }
         
+        /* TÍTULOS EDITÁVEIS */
         .round-title { position: absolute; top: -50px; left: 0; width: calc(100% - 60px); text-align: center; margin: 0; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; z-index: 10; border-bottom: 1px dashed transparent; outline: none; transition: 0.3s; }
         .round-title:focus { color: var(--accent-color); border-bottom: 1px dashed var(--accent-color); }
         .bracket-round:last-child .round-title { width: 100%; }
@@ -187,6 +215,10 @@
         .bracket-round:not(:last-child) .match-wrapper:only-of-type::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
 
         .glow-box, .b-match:hover, .champion-box:hover { border-color: var(--accent-color) !important; box-shadow: 0 0 15px var(--accent-glow) !important; transform: scale(1.02); z-index: 10 !important; }
+        .glow-incoming::before, .match-wrapper:hover::before { background-color: var(--accent-color) !important; box-shadow: 0 0 8px var(--accent-glow); }
+        .glow-outgoing:only-of-type::after, .match-wrapper:only-of-type:hover::after { background-color: var(--accent-color) !important; box-shadow: 0 0 8px var(--accent-glow); }
+        .glow-outgoing:nth-of-type(odd):not(:only-of-type)::after, .glow-outgoing:nth-of-type(even):not(:only-of-type)::after, .match-wrapper:nth-of-type(odd):not(:only-of-type):hover::after, .match-wrapper:nth-of-type(even):not(:only-of-type):hover::after { border-color: var(--accent-color) !important; filter: drop-shadow(0 0 4px var(--accent-color)); }
+
         .b-player { padding: 12px 15px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; transition: all 0.3s; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .b-player:last-child { border-bottom: none; }
         .b-player-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
@@ -822,10 +854,448 @@
             renderStreamLinks();
         }
 
-        function calcularEloGeral() { /* Mantido igual */ }
-        function saveTournament() { /* Mantido igual */ }
-        function loadTournament() { /* Mantido igual */ }
-        function resetTournament() { /* Mantido igual */ }
+        // =======================
+        // MATA-MATA (DOUBLE ELIM)
+        // =======================
+        function gerarSlotHtml(pName, idx, maxSlots, matchId) {
+            let godBtns = '';
+            for(let i=0; i<maxSlots; i++) {
+                godBtns += `<div class="god-slot-wrapper">
+                    <div class="god-select-btn game${i}-slot ${matchId}-slot" style="width:20px; height:20px;" data-god="" onclick="abrirModalDeuses(this)"></div>
+                    <button class="win-toggle admin-only" style="font-size:0.55rem; padding: 1px 0;" data-match="${matchId}" data-game="${i}" data-player="${idx+1}" onclick="toggleVitoria(this)">V</button>
+                </div>`;
+            }
+            return `
+            <div class="b-player" data-slot="${idx}">
+                <div class="b-player-info">
+                    <span class="p-name" contenteditable="true" oninput="calcularEloGeral()">${pName}</span>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="number" class="score-input score-p${idx+1}" value="0">
+                        <button class="btn-advance" onclick="avancarWinner(this, ${idx})">W</button>
+                        <button class="btn-advance btn-loser" onclick="avancarLoser(this, ${idx})">L</button>
+                    </div>
+                </div>
+                <div class="god-slots-container" style="justify-content: flex-start; margin-top:5px;">${godBtns}</div>
+            </div>`;
+        }
+
+        function gerarChave(jogadoresIniciais = []) {
+            const size = parseInt(document.getElementById('bracketSize').value);
+            const wContainer = document.getElementById('winnersBracketDisplay');
+            const lContainer = document.getElementById('losersBracketDisplay');
+            const fContainer = document.getElementById('grandFinalsDisplay');
+            wContainer.innerHTML = ''; lContainer.innerHTML = ''; fContainer.innerHTML = '';
+            
+            let roundsW = Math.log2(size);
+            
+            // --- WINNERS BRACKET ---
+            for(let i=0; i < roundsW; i++) {
+                let matchesNum = size / Math.pow(2, i+1);
+                let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
+                
+                let title = i === roundsW - 1 ? "Final (Vencedores)" : (i === roundsW - 2 ? "Semifinal (Vencedores)" : "Round " + (i+1));
+                let isBo5 = i >= roundsW - 2;
+                let slots = isBo5 ? 5 : 3;
+                roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true" onblur="saveTournament()">${title}</h4>`;
+
+                for(let j=0; j < matchesNum; j++) {
+                    let p1 = "TBD", p2 = "TBD";
+                    if (i === 0 && jogadoresIniciais.length > 0) {
+                        p1 = jogadoresIniciais.shift() || "TBD"; p2 = jogadoresIniciais.shift() || "TBD";
+                    }
+                    const mId = `w_${i}_${j}`;
+                    roundDiv.innerHTML += `
+                        <div class="match-wrapper">
+                            ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}
+                            <div class="b-match" data-bracket="W" data-round="${i}" data-match="${j}">
+                                <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
+                                    <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
+                                </div>
+                                ${gerarSlotHtml(p1, 0, slots, mId)}
+                                ${gerarSlotHtml(p2, 1, slots, mId)}
+                            </div>
+                        </div>`;
+                }
+                wContainer.appendChild(roundDiv);
+            }
+
+            // --- LOSERS BRACKET ---
+            let roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1; 
+            for(let i=0; i < roundsL; i++) {
+                // Formula correta de quantidade de partidas para a repescagem
+                let matchesNum = size / Math.pow(2, Math.floor(i/2) + 2);
+                if (matchesNum < 1) matchesNum = 1;
+                
+                let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
+                let title = i === roundsL - 1 ? "Final (Repescagem)" : "Round " + (i+1) + " (Repescagem)";
+                let isBo5 = i >= roundsL - 2;
+                let slots = isBo5 ? 5 : 3;
+                roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true" onblur="saveTournament()">${title}</h4>`;
+
+                for(let j=0; j < matchesNum; j++) {
+                    const mId = `l_${i}_${j}`;
+                    roundDiv.innerHTML += `
+                        <div class="match-wrapper">
+                            ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}
+                            <div class="b-match" data-bracket="L" data-round="${i}" data-match="${j}">
+                                <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
+                                    <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
+                                </div>
+                                ${gerarSlotHtml("TBD", 0, slots, mId)}
+                                ${gerarSlotHtml("TBD", 1, slots, mId)}
+                            </div>
+                        </div>`;
+                }
+                lContainer.appendChild(roundDiv);
+            }
+
+            // --- GRAND FINALS ---
+            fContainer.innerHTML = `
+                <div class="bracket-round round-champion" style="min-width: 400px;">
+                    <h4 class="round-title" style="color:#FFD700;" contenteditable="true" onblur="saveTournament()">GRAND FINALS (TITANS)</h4>
+                    <div class="match-wrapper" style="justify-content: center; padding-top: 30px;">
+                        <span class="format-badge" style="background:#FFD700; color:#000; left: 15px;">MD7</span>
+                        <div class="b-match glow-box" style="border-color:#FFD700;" data-bracket="F" data-round="0" data-match="0">
+                            <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
+                                <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
+                            </div>
+                            ${gerarSlotHtml("Winner Finalist", 0, 7, "f_0_0")}
+                            ${gerarSlotHtml("Loser Finalist", 1, 7, "f_0_0")}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            attachHoverEvents();
+            renderStreamLinks();
+        }
+
+        // =======================
+        // LÓGICA DE ROTEAÇÃO AUTOMÁTICA (MATA-MATA)
+        // =======================
+        function avancarWinner(btn, slotIdx) {
+            const matchDiv = btn.closest('.b-match');
+            resolverPartida(matchDiv, slotIdx);
+        }
+
+        function avancarLoser(btn, slotIdx) {
+            const matchDiv = btn.closest('.b-match');
+            // Se o usuário clicou 'L' no jogador 0, significa que o Vencedor foi o jogador 1.
+            const winnerSlotIdx = slotIdx === 0 ? 1 : 0;
+            resolverPartida(matchDiv, winnerSlotIdx);
+        }
+
+        function resolverPartida(matchDiv, winnerSlotIdx) {
+            const players = matchDiv.querySelectorAll('.b-player');
+            const loserSlotIdx = winnerSlotIdx === 0 ? 1 : 0;
+
+            // Define estilos visuais
+            players[winnerSlotIdx].classList.add('winner-slot');
+            players[winnerSlotIdx].classList.remove('loser-slot');
+            players[loserSlotIdx].classList.add('loser-slot');
+            players[loserSlotIdx].classList.remove('winner-slot');
+
+            // Nomes dos jogadores
+            const winnerName = players[winnerSlotIdx].querySelector('.p-name').innerText.trim();
+            const loserName = players[loserSlotIdx].querySelector('.p-name').innerText.trim();
+
+            const bracket = matchDiv.getAttribute('data-bracket');
+            const r = parseInt(matchDiv.getAttribute('data-round'));
+            const m = parseInt(matchDiv.getAttribute('data-match'));
+            const size = parseInt(document.getElementById('bracketSize').value);
+            
+            const roundsW = Math.log2(size);
+            const roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1;
+
+            function moveTo(targetBracket, targetR, targetM, targetSlot, pName) {
+                const targetMatch = document.querySelector(`.b-match[data-bracket="${targetBracket}"][data-round="${targetR}"][data-match="${targetM}"]`);
+                if(targetMatch) {
+                    const playerSlot = targetMatch.querySelectorAll('.b-player')[targetSlot];
+                    if(playerSlot) {
+                        playerSlot.querySelector('.p-name').innerText = pName;
+                        playerSlot.classList.remove('winner-slot', 'loser-slot');
+                    }
+                }
+            }
+
+            if (bracket === 'W') {
+                // Roteia Vencedor pela chave de Vencedores
+                if (r < roundsW - 1) {
+                    moveTo('W', r + 1, Math.floor(m / 2), m % 2, winnerName);
+                } else {
+                    moveTo('F', 0, 0, 0, winnerName); // Cai no topo da Grand Final
+                }
+
+                // Roteia Perdedor para a Repescagem (Losers Bracket)
+                if (r === 0) {
+                    // Losers do primeiro round caem no primeiro round da repescagem
+                    moveTo('L', 0, Math.floor(m / 2), m % 2, loserName);
+                } else {
+                    // Matematica cruzada para evitar jogar contra a mesma pessoa de novo imediatamente
+                    const lRound = r * 2 - 1;
+                    let matchesInRound = size / Math.pow(2, r + 1);
+                    let crossM = (matchesInRound - 1) - m;
+                    if (crossM < 0 || isNaN(crossM)) crossM = m; 
+                    moveTo('L', lRound, crossM, 0, loserName);
+                }
+
+            } else if (bracket === 'L') {
+                // Roteia Vencedor pela chave de Repescagem
+                if (r < roundsL - 1) {
+                    if (r % 2 === 0) {
+                        // Rodadas pares não reduzem pela metade
+                        moveTo('L', r + 1, m, 1, winnerName);
+                    } else {
+                        // Rodadas ímpares aglutinam (reduzem pela metade)
+                        moveTo('L', r + 1, Math.floor(m / 2), m % 2, winnerName);
+                    }
+                } else {
+                    moveTo('F', 0, 0, 1, winnerName); // Cai na parte de baixo da Grand Final
+                }
+                // O Perdedor da L bracket é eliminado, não fazemos nada.
+            }
+
+            calcularEloGeral();
+            saveTournament();
+        }
+
+        // --- SISTEMA INTELIGENTE DE RASTRO ---
+        function attachHoverEvents() {
+            const wrappers = document.querySelectorAll('.match-wrapper');
+            wrappers.forEach(wrapper => {
+                wrapper.addEventListener('mouseenter', (e) => {
+                    const matchBox = e.currentTarget.querySelector('.b-match');
+                    if (matchBox && matchBox.getAttribute('data-bracket') === 'W') {
+                        const r = parseInt(matchBox.getAttribute('data-round'));
+                        const m = parseInt(matchBox.getAttribute('data-match'));
+                        if (r > 0) {
+                            const p1 = document.querySelector(`.b-match[data-bracket="W"][data-round="${r-1}"][data-match="${m*2}"]`);
+                            const p2 = document.querySelector(`.b-match[data-bracket="W"][data-round="${r-1}"][data-match="${m*2+1}"]`);
+                            if(p1) { p1.classList.add('glow-box'); p1.closest('.match-wrapper').classList.add('glow-outgoing'); }
+                            if(p2) { p2.classList.add('glow-box'); p2.closest('.match-wrapper').classList.add('glow-outgoing'); }
+                        }
+                    }
+                });
+                wrapper.addEventListener('mouseleave', () => { document.querySelectorAll('.glow-box, .glow-outgoing').forEach(el => el.classList.remove('glow-box', 'glow-outgoing')); });
+            });
+        }
+
+        function puxarPromovidos() {
+            if(jogadoresPromovidos.length === 0) return alert("Nenhum jogador classificado!");
+            let copiaPromovidos = [...jogadoresPromovidos]; shuffle(copiaPromovidos); 
+            gerarChave(copiaPromovidos);
+        }
+
+        function initDragToScroll() {
+            document.querySelectorAll('.bracket-container').forEach(slider => {
+                let isDown = false, startX, scrollLeft;
+                slider.addEventListener('mousedown', (e) => {
+                    if(e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.getAttribute('contenteditable') === 'true') return;
+                    isDown = true; slider.style.cursor = 'grabbing';
+                    startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft;
+                });
+                slider.addEventListener('mouseleave', () => { isDown = false; slider.style.cursor = 'grab'; });
+                slider.addEventListener('mouseup', () => { isDown = false; slider.style.cursor = 'grab'; });
+                slider.addEventListener('mousemove', (e) => {
+                    if (!isDown) return; e.preventDefault();
+                    const x = e.pageX - slider.offsetLeft;
+                    slider.scrollLeft = scrollLeft - (x - startX) * 1.5;
+                });
+            });
+        }
+
+        function calcularEloGeral() {
+            try {
+                let eloData = {};
+
+                document.querySelectorAll('#groupsDisplay tbody tr').forEach(row => {
+                    let pName = row.dataset.player;
+                    if (pName) {
+                        pName = pName.trim();
+                        let isSeed = row.classList.contains('seed-row');
+                        eloData[pName] = { nome: pName, isSeed: isSeed, elo: 1000 };
+                    }
+                });
+
+                if (Object.keys(eloData).length === 0) {
+                    let sInput = document.getElementById('seedsInput');
+                    let rInput = document.getElementById('regularsInput');
+                    if(sInput && rInput) {
+                        let s = sInput.value.split('\n').filter(x => x.trim() !== '');
+                        let r = rInput.value.split('\n').filter(x => x.trim() !== '');
+                        s.forEach(n => eloData[n.trim()] = { nome: n.trim(), isSeed: true, elo: 1000 });
+                        r.forEach(n => eloData[n.trim()] = { nome: n.trim(), isSeed: false, elo: 1000 });
+                    }
+                }
+
+                document.querySelectorAll('.match-card').forEach(card => {
+                    let p1 = card.dataset.p1 ? card.dataset.p1.trim() : null;
+                    let p2 = card.dataset.p2 ? card.dataset.p2.trim() : null;
+                    if (!p1 || !p2) return;
+
+                    let inputs = card.querySelectorAll('input[type="number"]');
+                    if (inputs.length < 2) return;
+
+                    let val1 = inputs[0].value || inputs[0].getAttribute('value');
+                    let val2 = inputs[1].value || inputs[1].getAttribute('value');
+
+                    if (val1 !== "" && val2 !== "" && val1 !== null && val2 !== null) {
+                        let s1 = parseInt(val1);
+                        let s2 = parseInt(val2);
+
+                        if (!isNaN(s1) && !isNaN(s2) && s1 !== s2) {
+                            let winner = s1 > s2 ? p1 : p2;
+                            let loser = s1 > s2 ? p2 : p1;
+
+                            if (eloData[winner] && eloData[loser]) {
+                                let wSeed = eloData[winner].isSeed === true;
+                                let lSeed = eloData[loser].isSeed === true;
+
+                                if (!wSeed && !lSeed) { eloData[winner].elo += 10; eloData[loser].elo -= 10; }
+                                else if (!wSeed && lSeed) { eloData[winner].elo += 15; eloData[loser].elo -= 15; }
+                                else if (wSeed && !lSeed) { eloData[winner].elo += 5; eloData[loser].elo -= 5; }
+                                else if (wSeed && lSeed) { eloData[winner].elo += 10; eloData[loser].elo -= 10; }
+                            }
+                        }
+                    }
+                });
+
+                if (typeof jogadoresPromovidos !== 'undefined') {
+                    jogadoresPromovidos.forEach(p => {
+                        let pName = p.trim();
+                        if (eloData[pName]) eloData[pName].elo += 25;
+                    });
+                }
+
+                document.querySelectorAll('.b-match').forEach(match => {
+                    let players = match.querySelectorAll('.b-player');
+                    if (players.length === 2) {
+                        let p1Div = players[0];
+                        let p2Div = players[1];
+                        
+                        let p1Span = p1Div.querySelector('.p-name');
+                        let p2Span = p2Div.querySelector('.p-name');
+                        if (!p1Span || !p2Span) return;
+
+                        let p1Name = p1Span.innerText.trim();
+                        let p2Name = p2Span.innerText.trim();
+
+                        if (p1Name && p1Name !== "TBD" && !eloData[p1Name]) eloData[p1Name] = { nome: p1Name, isSeed: false, elo: 1000 };
+                        if (p2Name && p2Name !== "TBD" && !eloData[p2Name]) eloData[p2Name] = { nome: p2Name, isSeed: false, elo: 1000 };
+
+                        let p1Win = p1Div.classList.contains('winner-slot');
+                        let p2Win = p2Div.classList.contains('winner-slot');
+
+                        if (p1Win && !p2Win) {
+                            if (eloData[p1Name]) eloData[p1Name].elo += 30;
+                            if (eloData[p2Name]) eloData[p2Name].elo -= 15;
+                        } else if (p2Win && !p1Win) {
+                            if (eloData[p2Name]) eloData[p2Name].elo += 30;
+                            if (eloData[p1Name]) eloData[p1Name].elo -= 15;
+                        }
+                    }
+                });
+
+                let eloArray = Object.values(eloData);
+                eloArray.sort((a, b) => b.elo - a.elo);
+
+                let tbody = document.getElementById('eloTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    if (eloArray.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted); font-style: italic; font-size: 0.8rem; padding: 15px;">Aguardando geração dos grupos...</td></tr>`;
+                    } else {
+                        eloArray.forEach((p, index) => {
+                            let statusBadge = p.isSeed 
+                                ? '<span style="color:var(--accent-color); font-size:0.55rem; letter-spacing: 0.5px; text-transform: uppercase;">Cabeça de Chave</span>' 
+                                : '<span style="color:var(--text-muted); font-size:0.55rem; letter-spacing: 0.5px; text-transform: uppercase;">Regular</span>';
+                            
+                            let posColor = "var(--text-main)";
+                            if(index === 0) posColor = "#FFD700"; 
+                            else if (index === 1) posColor = "#C0C0C0"; 
+                            else if (index === 2) posColor = "#CD7F32"; 
+
+                            tbody.innerHTML += `
+                            <tr style="transition: 0.3s; background-color: var(--panel-surface);">
+                                <td style="font-weight:bold; font-size:1.1rem; color:${posColor}; text-align: center; border-radius: 6px 0 0 6px; padding: 8px 5px;">${index + 1}º</td>
+                                <td style="text-align:left; font-weight:700; font-size:0.9rem; line-height: 1.2; padding: 8px 5px;">
+                                    ${p.nome}<br>${statusBadge}
+                                </td>
+                                <td style="font-weight:bold; font-family:'Cinzel', serif; color:var(--accent-color); font-size:1.2rem; text-align: center; border-radius: 0 6px 6px 0; padding: 8px 5px;">${p.elo}</td>
+                            </tr>`;
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Erro no ELO:", error);
+            }
+        }
+
+        function saveTournament() {
+            if(document.body.classList.contains('is-viewer')) return; 
+            const btnSave = document.getElementById('saveLoader');
+            if(btnSave) btnSave.style.display = 'inline-block';
+
+            try {
+                document.querySelectorAll('input:not(.score-input)').forEach(input => input.setAttribute('value', input.value));
+                document.querySelectorAll('.score-input').forEach(input => input.setAttribute('value', input.value));
+                
+                const data = {
+                    seeds: document.getElementById('seedsInput')?.value || '',
+                    regulars: document.getElementById('regularsInput')?.value || '',
+                    playersPerGroup: document.getElementById('playersPerGroup')?.value || '3',
+                    groupsDisplay: document.getElementById('groupsDisplay')?.innerHTML || '',
+                    groupsSectionVisible: document.getElementById('groupsSection')?.style.display || 'none',
+                    godsTable: document.getElementById('godsTable')?.innerHTML || '',
+                    matchesGroupsContainer: document.getElementById('matchesGroupsContainer')?.innerHTML || '',
+                    promotedList: jogadoresPromovidos || [],
+                    bracketSize: document.getElementById('bracketSize')?.value || '8',
+                    winnersDisplay: document.getElementById('winnersBracketDisplay')?.innerHTML || '',
+                    losersDisplay: document.getElementById('losersBracketDisplay')?.innerHTML || '',
+                    finalsDisplay: document.getElementById('grandFinalsDisplay')?.innerHTML || '',
+                };
+
+                db.ref('tavernas_data').set(data)
+                  .then(() => { if(btnSave) btnSave.style.display = 'none'; alert("Torneio salvo com Sucesso!"); })
+                  .catch((e) => { if(btnSave) btnSave.style.display = 'none'; alert("Erro Firebase: " + e.message); });
+
+            } catch(e) { if(btnSave) btnSave.style.display = 'none'; alert("Erro interno: " + e.message); }
+        }
+
+        function loadTournament() {
+            db.ref('tavernas_data').once('value').then((snapshot) => {
+                const data = snapshot.val();
+                if (!data) { if(!document.body.classList.contains('is-viewer')) gerarChave(); initDragToScroll(); return; }
+                
+                if(data.seeds) document.getElementById('seedsInput').value = data.seeds; 
+                if(data.regulars) document.getElementById('regularsInput').value = data.regulars;
+                if(data.playersPerGroup) document.getElementById('playersPerGroup').value = data.playersPerGroup;
+                
+                if(data.groupsDisplay) document.getElementById('groupsDisplay').innerHTML = data.groupsDisplay;
+                if(data.groupsSectionVisible) document.getElementById('groupsSection').style.display = data.groupsSectionVisible; 
+                if(data.godsTable) document.getElementById('godsTable').innerHTML = data.godsTable;
+                if(data.matchesGroupsContainer) document.getElementById('matchesGroupsContainer').innerHTML = data.matchesGroupsContainer;
+                
+                if(data.winnersDisplay) document.getElementById('winnersBracketDisplay').innerHTML = data.winnersDisplay;
+                if(data.losersDisplay) document.getElementById('losersBracketDisplay').innerHTML = data.losersDisplay;
+                if(data.finalsDisplay) document.getElementById('grandFinalsDisplay').innerHTML = data.finalsDisplay;
+                
+                jogadoresPromovidos = data.promotedList || [];
+                if(data.bracketSize) document.getElementById('bracketSize').value = data.bracketSize;
+                
+                attachHoverEvents(); calcularEloGeral(); initDragToScroll(); renderStreamLinks();
+            }).catch(e => {
+                if(!document.body.classList.contains('is-viewer')) gerarChave();
+                initDragToScroll();
+            });
+        }
+
+        function resetTournament() {
+            if(confirm("Tem certeza que deseja apagar TODOS os dados da Nuvem? Isso não pode ser desfeito.")) {
+                db.ref('tavernas_data').remove().then(() => { location.reload(); });
+            }
+        }
+
         window.onload = () => { renderizarGodGrid(); loadTournament(); };
     </script>
 </body>
