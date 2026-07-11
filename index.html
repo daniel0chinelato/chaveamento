@@ -162,7 +162,6 @@
         .format-badge { background: rgba(212, 175, 55, 0.15); border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; position: absolute; top: -12px; left: 15px; z-index: 10; letter-spacing: 1px; font-weight: bold; }
 
         /* MÚLTIPLOS LINKS DE STREAM COM CORES DINÂMICAS */
-        /* Na fase de grupos ele fica no centro, mas no mata-mata o inline-style empurra para a direita */
         .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: center; width: 80%; }
         
         .viewer-stream-link { 
@@ -889,6 +888,7 @@
             
             let roundsW = Math.log2(size);
             
+            // --- WINNERS BRACKET ---
             for(let i=0; i < roundsW; i++) {
                 let matchesNum = size / Math.pow(2, i+1);
                 let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
@@ -906,7 +906,7 @@
                     const mId = `w_${i}_${j}`;
                     roundDiv.innerHTML += `
                         <div class="match-wrapper">
-                            ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge" style="color:#aaa; border-color:#aaa;">MD3</span>'}
+                            ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}
                             <div class="b-match" data-bracket="W" data-round="${i}" data-match="${j}">
                                 <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                     <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
@@ -919,9 +919,11 @@
                 wContainer.appendChild(roundDiv);
             }
 
+            // --- LOSERS BRACKET ---
             let roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1; 
             for(let i=0; i < roundsL; i++) {
-                let matchesNum = size / Math.pow(2, Math.floor(i/2) + 1 + (i%2));
+                // Formula correta de quantidade de partidas para a repescagem
+                let matchesNum = size / Math.pow(2, Math.floor(i/2) + 2);
                 if (matchesNum < 1) matchesNum = 1;
                 
                 let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
@@ -934,7 +936,7 @@
                     const mId = `l_${i}_${j}`;
                     roundDiv.innerHTML += `
                         <div class="match-wrapper">
-                            ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge" style="color:#aaa; border-color:#aaa;">MD3</span>'}
+                            ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}
                             <div class="b-match" data-bracket="L" data-round="${i}" data-match="${j}">
                                 <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                     <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
@@ -947,11 +949,12 @@
                 lContainer.appendChild(roundDiv);
             }
 
+            // --- GRAND FINALS ---
             fContainer.innerHTML = `
                 <div class="bracket-round round-champion" style="min-width: 400px;">
                     <h4 class="round-title" style="color:#FFD700;" contenteditable="true" onblur="saveTournament()">GRAND FINALS (TITANS)</h4>
                     <div class="match-wrapper" style="justify-content: center; padding-top: 30px;">
-                        <span class="format-badge" style="background:#FFD700; color:#000; left: 50%; transform: translateX(-50%);">MD7</span>
+                        <span class="format-badge" style="background:#FFD700; color:#000; left: 15px;">MD7</span>
                         <div class="b-match glow-box" style="border-color:#FFD700;" data-bracket="F" data-round="0" data-match="0">
                             <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                 <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
@@ -965,6 +968,95 @@
             
             attachHoverEvents();
             renderStreamLinks();
+        }
+
+        // =======================
+        // LÓGICA DE ROTEAÇÃO AUTOMÁTICA (MATA-MATA)
+        // =======================
+        function avancarWinner(btn, slotIdx) {
+            const matchDiv = btn.closest('.b-match');
+            resolverPartida(matchDiv, slotIdx);
+        }
+
+        function avancarLoser(btn, slotIdx) {
+            const matchDiv = btn.closest('.b-match');
+            // Se o usuário clicou 'L' no jogador 0, significa que o Vencedor foi o jogador 1.
+            const winnerSlotIdx = slotIdx === 0 ? 1 : 0;
+            resolverPartida(matchDiv, winnerSlotIdx);
+        }
+
+        function resolverPartida(matchDiv, winnerSlotIdx) {
+            const players = matchDiv.querySelectorAll('.b-player');
+            const loserSlotIdx = winnerSlotIdx === 0 ? 1 : 0;
+
+            // Define estilos visuais
+            players[winnerSlotIdx].classList.add('winner-slot');
+            players[winnerSlotIdx].classList.remove('loser-slot');
+            players[loserSlotIdx].classList.add('loser-slot');
+            players[loserSlotIdx].classList.remove('winner-slot');
+
+            // Nomes dos jogadores
+            const winnerName = players[winnerSlotIdx].querySelector('.p-name').innerText.trim();
+            const loserName = players[loserSlotIdx].querySelector('.p-name').innerText.trim();
+
+            const bracket = matchDiv.getAttribute('data-bracket');
+            const r = parseInt(matchDiv.getAttribute('data-round'));
+            const m = parseInt(matchDiv.getAttribute('data-match'));
+            const size = parseInt(document.getElementById('bracketSize').value);
+            
+            const roundsW = Math.log2(size);
+            const roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1;
+
+            function moveTo(targetBracket, targetR, targetM, targetSlot, pName) {
+                const targetMatch = document.querySelector(`.b-match[data-bracket="${targetBracket}"][data-round="${targetR}"][data-match="${targetM}"]`);
+                if(targetMatch) {
+                    const playerSlot = targetMatch.querySelectorAll('.b-player')[targetSlot];
+                    if(playerSlot) {
+                        playerSlot.querySelector('.p-name').innerText = pName;
+                        playerSlot.classList.remove('winner-slot', 'loser-slot');
+                    }
+                }
+            }
+
+            if (bracket === 'W') {
+                // Roteia Vencedor pela chave de Vencedores
+                if (r < roundsW - 1) {
+                    moveTo('W', r + 1, Math.floor(m / 2), m % 2, winnerName);
+                } else {
+                    moveTo('F', 0, 0, 0, winnerName); // Cai no topo da Grand Final
+                }
+
+                // Roteia Perdedor para a Repescagem (Losers Bracket)
+                if (r === 0) {
+                    // Losers do primeiro round caem no primeiro round da repescagem
+                    moveTo('L', 0, Math.floor(m / 2), m % 2, loserName);
+                } else {
+                    // Matematica cruzada para evitar jogar contra a mesma pessoa de novo imediatamente
+                    const lRound = r * 2 - 1;
+                    let matchesInRound = size / Math.pow(2, r + 1);
+                    let crossM = (matchesInRound - 1) - m;
+                    if (crossM < 0 || isNaN(crossM)) crossM = m; 
+                    moveTo('L', lRound, crossM, 0, loserName);
+                }
+
+            } else if (bracket === 'L') {
+                // Roteia Vencedor pela chave de Repescagem
+                if (r < roundsL - 1) {
+                    if (r % 2 === 0) {
+                        // Rodadas pares não reduzem pela metade
+                        moveTo('L', r + 1, m, 1, winnerName);
+                    } else {
+                        // Rodadas ímpares aglutinam (reduzem pela metade)
+                        moveTo('L', r + 1, Math.floor(m / 2), m % 2, winnerName);
+                    }
+                } else {
+                    moveTo('F', 0, 0, 1, winnerName); // Cai na parte de baixo da Grand Final
+                }
+                // O Perdedor da L bracket é eliminado, não fazemos nada.
+            }
+
+            calcularEloGeral();
+            saveTournament();
         }
 
         // --- SISTEMA INTELIGENTE DE RASTRO ---
@@ -992,23 +1084,6 @@
             if(jogadoresPromovidos.length === 0) return alert("Nenhum jogador classificado!");
             let copiaPromovidos = [...jogadoresPromovidos]; shuffle(copiaPromovidos); 
             gerarChave(copiaPromovidos);
-        }
-
-        function avancarWinner(btn, slotIdx) {
-            const matchDiv = btn.closest('.b-match');
-            const players = matchDiv.querySelectorAll('.b-player');
-            players.forEach(p => p.classList.remove('winner-slot'));
-            players[slotIdx].classList.add('winner-slot');
-            players[slotIdx].classList.remove('loser-slot');
-            calcularEloGeral();
-        }
-
-        function avancarLoser(btn, slotIdx) {
-            const matchDiv = btn.closest('.b-match');
-            const players = matchDiv.querySelectorAll('.b-player');
-            players[slotIdx].classList.add('loser-slot');
-            players[slotIdx].classList.remove('winner-slot');
-            calcularEloGeral();
         }
 
         function initDragToScroll() {
