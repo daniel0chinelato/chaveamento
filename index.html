@@ -157,10 +157,14 @@
         .win-toggle.is-winner { background: #4ade80; color: #000; border-color: #4ade80; font-weight: bold; box-shadow: 0 0 8px rgba(74, 222, 128, 0.4); }
 
         .stage-title { color: var(--accent-color); font-family: 'Cinzel', serif; text-align: center; letter-spacing: 3px; text-shadow: 0 0 10px var(--accent-glow); margin-bottom: 25px; }
-        .format-badge { background: rgba(212, 175, 55, 0.15); border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); z-index: 10; letter-spacing: 1px; }
+        
+        /* SOLUÇÃO INTELIGENTE DO MD3/MD5: Posicionado à esquerda para não conflitar com a live */
+        .format-badge { background: rgba(212, 175, 55, 0.15); border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; position: absolute; top: -12px; left: 15px; z-index: 10; letter-spacing: 1px; font-weight: bold; }
 
         /* MÚLTIPLOS LINKS DE STREAM COM CORES DINÂMICAS */
+        /* Na fase de grupos ele fica no centro, mas no mata-mata o inline-style empurra para a direita */
         .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: center; width: 80%; }
+        
         .viewer-stream-link { 
             --live-color: #ff4d4d; 
             display: flex; align-items: center; justify-content: center; gap: 5px; 
@@ -379,7 +383,7 @@
                 </div>
             </div>
             
-            <p class="admin-only" style="font-size:0.7rem; color:var(--text-muted); margin-bottom: 0; text-align: right; font-style: italic;">Dica: Arraste a tela para os lados.</p>
+            <p class="admin-only" style="font-size:0.7rem; color:var(--text-muted); margin-bottom: 0; text-align: right; font-style: italic;">Dica: Arraste a tela para os lados. Clique nos títulos das rodadas para editar seus nomes.</p>
             
             <h2 class="stage-title" style="margin-top: 30px; font-size: 1.5rem;">TAVERNAS OF DEMIGODS & TITANS</h2>
             
@@ -892,7 +896,7 @@
                 let title = i === roundsW - 1 ? "Final (Vencedores)" : (i === roundsW - 2 ? "Semifinal (Vencedores)" : "Round " + (i+1));
                 let isBo5 = i >= roundsW - 2;
                 let slots = isBo5 ? 5 : 3;
-                roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true">${title}</h4>`;
+                roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true" onblur="saveTournament()">${title}</h4>`;
 
                 for(let j=0; j < matchesNum; j++) {
                     let p1 = "TBD", p2 = "TBD";
@@ -902,9 +906,9 @@
                     const mId = `w_${i}_${j}`;
                     roundDiv.innerHTML += `
                         <div class="match-wrapper">
-                            ${isBo5 ? '<span class="format-badge">Bo5</span>' : '<span class="format-badge" style="color:#aaa; border-color:#aaa;">Bo3</span>'}
+                            ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge" style="color:#aaa; border-color:#aaa;">MD3</span>'}
                             <div class="b-match" data-bracket="W" data-round="${i}" data-match="${j}">
-                                <div class="stream-controls" style="top:-10px;">
+                                <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                     <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                                 </div>
                                 ${gerarSlotHtml(p1, 0, slots, mId)}
@@ -924,15 +928,15 @@
                 let title = i === roundsL - 1 ? "Final (Repescagem)" : "Round " + (i+1) + " (Repescagem)";
                 let isBo5 = i >= roundsL - 2;
                 let slots = isBo5 ? 5 : 3;
-                roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true">${title}</h4>`;
+                roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true" onblur="saveTournament()">${title}</h4>`;
 
                 for(let j=0; j < matchesNum; j++) {
                     const mId = `l_${i}_${j}`;
                     roundDiv.innerHTML += `
                         <div class="match-wrapper">
-                            ${isBo5 ? '<span class="format-badge">Bo5</span>' : '<span class="format-badge" style="color:#aaa; border-color:#aaa;">Bo3</span>'}
+                            ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge" style="color:#aaa; border-color:#aaa;">MD3</span>'}
                             <div class="b-match" data-bracket="L" data-round="${i}" data-match="${j}">
-                                <div class="stream-controls" style="top:-10px;">
+                                <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                     <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                                 </div>
                                 ${gerarSlotHtml("TBD", 0, slots, mId)}
@@ -945,11 +949,11 @@
 
             fContainer.innerHTML = `
                 <div class="bracket-round round-champion" style="min-width: 400px;">
-                    <h4 class="round-title" style="color:#FFD700;" contenteditable="true">GRAND FINALS (TITANS)</h4>
+                    <h4 class="round-title" style="color:#FFD700;" contenteditable="true" onblur="saveTournament()">GRAND FINALS (TITANS)</h4>
                     <div class="match-wrapper" style="justify-content: center; padding-top: 30px;">
-                        <span class="format-badge" style="background:#FFD700; color:#000;">Bo7</span>
+                        <span class="format-badge" style="background:#FFD700; color:#000; left: 50%; transform: translateX(-50%);">MD7</span>
                         <div class="b-match glow-box" style="border-color:#FFD700;" data-bracket="F" data-round="0" data-match="0">
-                            <div class="stream-controls" style="top:-10px;">
+                            <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                 <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                             </div>
                             ${gerarSlotHtml("Winner Finalist", 0, 7, "f_0_0")}
