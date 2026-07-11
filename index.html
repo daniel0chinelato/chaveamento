@@ -159,10 +159,10 @@
         .stage-title { color: var(--accent-color); font-family: 'Cinzel', serif; text-align: center; letter-spacing: 3px; text-shadow: 0 0 10px var(--accent-glow); margin-bottom: 25px; }
         .format-badge { background: rgba(212, 175, 55, 0.15); border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); z-index: 10; letter-spacing: 1px; }
 
-        /* LINK DE STREAM COM CORES DINÂMICAS */
-        .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; align-items: center; z-index: 20; }
+        /* MÚLTIPLOS LINKS DE STREAM COM CORES DINÂMICAS */
+        .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: center; width: 80%; }
         .viewer-stream-link { 
-            --live-color: #ff4d4d; /* Variável para trocar de cor via JS */
+            --live-color: #ff4d4d; 
             display: flex; align-items: center; justify-content: center; gap: 5px; 
             color: var(--live-color); font-size: 0.65rem; text-decoration: none; 
             font-weight: bold; letter-spacing: 1px; 
@@ -615,46 +615,67 @@
         }
 
         // =======================
-        // FUNÇÕES DE LINK DE LIVE E ÍCONES SVG
+        // FUNÇÕES DE MULTIPLOS LINKS (LIVE) E SVG
         // =======================
         function addStreamLink(btn) {
             const card = btn.closest('.match-card') || btn.closest('.b-match');
-            const urlAtual = card.getAttribute('data-stream') || "";
-            const novaUrl = prompt("Insira o link da Live (YouTube ou Twitch):", urlAtual);
             
-            if(novaUrl !== null) {
-                card.setAttribute('data-stream', novaUrl);
-                renderStreamLinks();
-                saveTournament(); 
+            let streams = [];
+            try { streams = JSON.parse(card.getAttribute('data-streams') || "[]"); } catch(e) {}
+            
+            const numLinks = streams.length;
+            const input = prompt(`Adicionar link de transmissão (Twitch, YouTube, etc).\n\nPara remover todos os links desta partida, digite "limpar".\n\n(Links atuais: ${numLinks})`);
+            
+            if(input === null) return; 
+            
+            if(input.trim().toLowerCase() === 'limpar') {
+                streams = [];
+            } else if(input.trim() !== "") {
+                streams.push(input.trim());
             }
+            
+            card.setAttribute('data-streams', JSON.stringify(streams));
+            renderStreamLinks();
+            saveTournament(); 
         }
 
         function renderStreamLinks() {
             document.querySelectorAll('.match-card, .b-match').forEach(card => {
-                const streamUrl = card.getAttribute('data-stream');
-                const viewerLink = card.querySelector('.viewer-stream-link');
-                
-                if(viewerLink) {
-                    if(streamUrl && streamUrl.trim() !== "") {
-                        viewerLink.href = streamUrl;
-                        viewerLink.style.display = 'flex';
-                        
-                        let iconHtml = 'LIVE';
-                        let color = '#ff4d4d'; // default
-                        
-                        if(streamUrl.toLowerCase().includes('twitch.tv')) {
-                            iconHtml = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right:2px;"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg> TWITCH`;
-                            color = '#b9a3e3'; // Roxo da Twitch claro
-                        } else if (streamUrl.toLowerCase().includes('youtube.com') || streamUrl.toLowerCase().includes('youtu.be')) {
-                            iconHtml = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right:2px;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> YOUTUBE`;
-                            color = '#ff4d4d'; // Vermelho do YT
-                        }
-                        
-                        viewerLink.innerHTML = iconHtml;
-                        viewerLink.style.setProperty('--live-color', color);
-                    } else {
-                        viewerLink.style.display = 'none';
-                    }
+                const streamData = card.getAttribute('data-streams');
+                const controls = card.querySelector('.stream-controls');
+                if(!controls) return;
+
+                const addBtn = controls.querySelector('.add-stream-btn');
+                controls.innerHTML = '';
+                if(addBtn) controls.appendChild(addBtn);
+
+                if(streamData) {
+                    try {
+                        const links = JSON.parse(streamData);
+                        links.forEach((streamUrl, idx) => {
+                            if(streamUrl && streamUrl.trim() !== "") {
+                                let iconHtml = 'LIVE ' + (idx + 1);
+                                let color = '#ff4d4d'; 
+                                
+                                if(streamUrl.toLowerCase().includes('twitch.tv')) {
+                                    iconHtml = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right:2px;"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg> TWITCH`;
+                                    color = '#b9a3e3'; 
+                                } else if (streamUrl.toLowerCase().includes('youtube.com') || streamUrl.toLowerCase().includes('youtu.be')) {
+                                    iconHtml = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right:2px;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> YOUTUBE`;
+                                    color = '#ff4d4d'; 
+                                }
+
+                                const a = document.createElement('a');
+                                a.href = streamUrl;
+                                a.target = '_blank';
+                                a.className = 'viewer-stream-link';
+                                a.innerHTML = iconHtml;
+                                a.style.setProperty('--live-color', color);
+                                
+                                controls.appendChild(a);
+                            }
+                        });
+                    } catch(e) { console.error("Erro lendo streams:", e) }
                 }
             });
         }
@@ -802,8 +823,7 @@
                         matchesHtml += `
                         <div class="match-card" data-group="${idx}" data-p1="${grupo[i].nome}" data-p2="${grupo[j].nome}">
                             <div class="stream-controls">
-                                <button class="nav-btn admin-only" style="padding: 2px 6px; font-size: 0.5rem; border-style:dashed;" onclick="addStreamLink(this)">🎥 Link</button>
-                                <a href="#" class="viewer-stream-link" target="_blank" style="display:none;">LIVE</a>
+                                <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.6rem; border-style:dashed;" onclick="addStreamLink(this)">🎥 +</button>
                             </div>
                             <div class="match-player">
                                 <div style="margin-bottom:5px;">${grupo[i].nome}</div>
@@ -882,8 +902,7 @@
                             ${isBo5 ? '<span class="format-badge">Bo5</span>' : '<span class="format-badge" style="color:#aaa; border-color:#aaa;">Bo3</span>'}
                             <div class="b-match" data-bracket="W" data-round="${i}" data-match="${j}">
                                 <div class="stream-controls" style="top:-10px;">
-                                    <button class="nav-btn admin-only" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 Link</button>
-                                    <a href="#" class="viewer-stream-link" target="_blank" style="display:none; font-size:0.6rem;">LIVE</a>
+                                    <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                                 </div>
                                 ${gerarSlotHtml(p1, 0, slots, mId)}
                                 ${gerarSlotHtml(p2, 1, slots, mId)}
@@ -911,8 +930,7 @@
                             ${isBo5 ? '<span class="format-badge">Bo5</span>' : '<span class="format-badge" style="color:#aaa; border-color:#aaa;">Bo3</span>'}
                             <div class="b-match" data-bracket="L" data-round="${i}" data-match="${j}">
                                 <div class="stream-controls" style="top:-10px;">
-                                    <button class="nav-btn admin-only" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 Link</button>
-                                    <a href="#" class="viewer-stream-link" target="_blank" style="display:none; font-size:0.6rem;">LIVE</a>
+                                    <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                                 </div>
                                 ${gerarSlotHtml("TBD", 0, slots, mId)}
                                 ${gerarSlotHtml("TBD", 1, slots, mId)}
@@ -929,8 +947,7 @@
                         <span class="format-badge" style="background:#FFD700; color:#000;">Bo7</span>
                         <div class="b-match glow-box" style="border-color:#FFD700;" data-bracket="F" data-round="0" data-match="0">
                             <div class="stream-controls" style="top:-10px;">
-                                <button class="nav-btn admin-only" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 Link</button>
-                                <a href="#" class="viewer-stream-link" target="_blank" style="display:none; font-size:0.6rem;">LIVE</a>
+                                <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                             </div>
                             ${gerarSlotHtml("Winner Finalist", 0, 7, "f_0_0")}
                             ${gerarSlotHtml("Loser Finalist", 1, 7, "f_0_0")}
