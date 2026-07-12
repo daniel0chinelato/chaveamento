@@ -922,7 +922,6 @@
             // --- LOSERS BRACKET ---
             let roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1; 
             for(let i=0; i < roundsL; i++) {
-                // Formula correta de quantidade de partidas para a repescagem
                 let matchesNum = size / Math.pow(2, Math.floor(i/2) + 2);
                 if (matchesNum < 1) matchesNum = 1;
                 
@@ -970,95 +969,6 @@
             renderStreamLinks();
         }
 
-        // =======================
-        // LÓGICA DE ROTEAÇÃO AUTOMÁTICA (MATA-MATA)
-        // =======================
-        function avancarWinner(btn, slotIdx) {
-            const matchDiv = btn.closest('.b-match');
-            resolverPartida(matchDiv, slotIdx);
-        }
-
-        function avancarLoser(btn, slotIdx) {
-            const matchDiv = btn.closest('.b-match');
-            // Se o usuário clicou 'L' no jogador 0, significa que o Vencedor foi o jogador 1.
-            const winnerSlotIdx = slotIdx === 0 ? 1 : 0;
-            resolverPartida(matchDiv, winnerSlotIdx);
-        }
-
-        function resolverPartida(matchDiv, winnerSlotIdx) {
-            const players = matchDiv.querySelectorAll('.b-player');
-            const loserSlotIdx = winnerSlotIdx === 0 ? 1 : 0;
-
-            // Define estilos visuais
-            players[winnerSlotIdx].classList.add('winner-slot');
-            players[winnerSlotIdx].classList.remove('loser-slot');
-            players[loserSlotIdx].classList.add('loser-slot');
-            players[loserSlotIdx].classList.remove('winner-slot');
-
-            // Nomes dos jogadores
-            const winnerName = players[winnerSlotIdx].querySelector('.p-name').innerText.trim();
-            const loserName = players[loserSlotIdx].querySelector('.p-name').innerText.trim();
-
-            const bracket = matchDiv.getAttribute('data-bracket');
-            const r = parseInt(matchDiv.getAttribute('data-round'));
-            const m = parseInt(matchDiv.getAttribute('data-match'));
-            const size = parseInt(document.getElementById('bracketSize').value);
-            
-            const roundsW = Math.log2(size);
-            const roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1;
-
-            function moveTo(targetBracket, targetR, targetM, targetSlot, pName) {
-                const targetMatch = document.querySelector(`.b-match[data-bracket="${targetBracket}"][data-round="${targetR}"][data-match="${targetM}"]`);
-                if(targetMatch) {
-                    const playerSlot = targetMatch.querySelectorAll('.b-player')[targetSlot];
-                    if(playerSlot) {
-                        playerSlot.querySelector('.p-name').innerText = pName;
-                        playerSlot.classList.remove('winner-slot', 'loser-slot');
-                    }
-                }
-            }
-
-            if (bracket === 'W') {
-                // Roteia Vencedor pela chave de Vencedores
-                if (r < roundsW - 1) {
-                    moveTo('W', r + 1, Math.floor(m / 2), m % 2, winnerName);
-                } else {
-                    moveTo('F', 0, 0, 0, winnerName); // Cai no topo da Grand Final
-                }
-
-                // Roteia Perdedor para a Repescagem (Losers Bracket)
-                if (r === 0) {
-                    // Losers do primeiro round caem no primeiro round da repescagem
-                    moveTo('L', 0, Math.floor(m / 2), m % 2, loserName);
-                } else {
-                    // Matematica cruzada para evitar jogar contra a mesma pessoa de novo imediatamente
-                    const lRound = r * 2 - 1;
-                    let matchesInRound = size / Math.pow(2, r + 1);
-                    let crossM = (matchesInRound - 1) - m;
-                    if (crossM < 0 || isNaN(crossM)) crossM = m; 
-                    moveTo('L', lRound, crossM, 0, loserName);
-                }
-
-            } else if (bracket === 'L') {
-                // Roteia Vencedor pela chave de Repescagem
-                if (r < roundsL - 1) {
-                    if (r % 2 === 0) {
-                        // Rodadas pares não reduzem pela metade
-                        moveTo('L', r + 1, m, 1, winnerName);
-                    } else {
-                        // Rodadas ímpares aglutinam (reduzem pela metade)
-                        moveTo('L', r + 1, Math.floor(m / 2), m % 2, winnerName);
-                    }
-                } else {
-                    moveTo('F', 0, 0, 1, winnerName); // Cai na parte de baixo da Grand Final
-                }
-                // O Perdedor da L bracket é eliminado, não fazemos nada.
-            }
-
-            calcularEloGeral();
-            saveTournament();
-        }
-
         // --- SISTEMA INTELIGENTE DE RASTRO ---
         function attachHoverEvents() {
             const wrappers = document.querySelectorAll('.match-wrapper');
@@ -1084,6 +994,81 @@
             if(jogadoresPromovidos.length === 0) return alert("Nenhum jogador classificado!");
             let copiaPromovidos = [...jogadoresPromovidos]; shuffle(copiaPromovidos); 
             gerarChave(copiaPromovidos);
+        }
+
+        function avancarWinner(btn, slotIdx) {
+            const matchDiv = btn.closest('.b-match');
+            resolverPartida(matchDiv, slotIdx);
+        }
+
+        function avancarLoser(btn, slotIdx) {
+            const matchDiv = btn.closest('.b-match');
+            const winnerSlotIdx = slotIdx === 0 ? 1 : 0;
+            resolverPartida(matchDiv, winnerSlotIdx);
+        }
+
+        function resolverPartida(matchDiv, winnerSlotIdx) {
+            const players = matchDiv.querySelectorAll('.b-player');
+            const loserSlotIdx = winnerSlotIdx === 0 ? 1 : 0;
+
+            players[winnerSlotIdx].classList.add('winner-slot');
+            players[winnerSlotIdx].classList.remove('loser-slot');
+            players[loserSlotIdx].classList.add('loser-slot');
+            players[loserSlotIdx].classList.remove('winner-slot');
+
+            const winnerName = players[winnerSlotIdx].querySelector('.p-name').innerText.trim();
+            const loserName = players[loserSlotIdx].querySelector('.p-name').innerText.trim();
+
+            const bracket = matchDiv.getAttribute('data-bracket');
+            const r = parseInt(matchDiv.getAttribute('data-round'));
+            const m = parseInt(matchDiv.getAttribute('data-match'));
+            const size = parseInt(document.getElementById('bracketSize').value);
+            
+            const roundsW = Math.log2(size);
+            const roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1;
+
+            function moveTo(targetBracket, targetR, targetM, targetSlot, pName) {
+                const targetMatch = document.querySelector(`.b-match[data-bracket="${targetBracket}"][data-round="${targetR}"][data-match="${targetM}"]`);
+                if(targetMatch) {
+                    const playerSlot = targetMatch.querySelectorAll('.b-player')[targetSlot];
+                    if(playerSlot) {
+                        playerSlot.querySelector('.p-name').innerText = pName;
+                        playerSlot.classList.remove('winner-slot', 'loser-slot');
+                    }
+                }
+            }
+
+            if (bracket === 'W') {
+                if (r < roundsW - 1) {
+                    moveTo('W', r + 1, Math.floor(m / 2), m % 2, winnerName);
+                } else {
+                    moveTo('F', 0, 0, 0, winnerName);
+                }
+
+                if (r === 0) {
+                    moveTo('L', 0, Math.floor(m / 2), m % 2, loserName);
+                } else {
+                    const lRound = r * 2 - 1;
+                    let matchesInRound = size / Math.pow(2, r + 1);
+                    let crossM = (matchesInRound - 1) - m;
+                    if (crossM < 0 || isNaN(crossM)) crossM = m; 
+                    moveTo('L', lRound, crossM, 0, loserName);
+                }
+
+            } else if (bracket === 'L') {
+                if (r < roundsL - 1) {
+                    if (r % 2 === 0) {
+                        moveTo('L', r + 1, m, 1, winnerName);
+                    } else {
+                        moveTo('L', r + 1, Math.floor(m / 2), m % 2, winnerName);
+                    }
+                } else {
+                    moveTo('F', 0, 0, 1, winnerName); 
+                }
+            }
+
+            calcularEloGeral();
+            saveTournament();
         }
 
         function initDragToScroll() {
@@ -1256,7 +1241,7 @@
                 };
 
                 db.ref('tavernas_data').set(data)
-                  .then(() => { if(btnSave) btnSave.style.display = 'none'; alert("Torneio salvo com Sucesso!"); })
+                  .then(() => { if(btnSave) btnSave.style.display = 'none'; })
                   .catch((e) => { if(btnSave) btnSave.style.display = 'none'; alert("Erro Firebase: " + e.message); });
 
             } catch(e) { if(btnSave) btnSave.style.display = 'none'; alert("Erro interno: " + e.message); }
