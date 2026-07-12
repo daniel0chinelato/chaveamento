@@ -158,10 +158,10 @@
 
         .stage-title { color: var(--accent-color); font-family: 'Cinzel', serif; text-align: center; letter-spacing: 3px; text-shadow: 0 0 10px var(--accent-glow); margin-bottom: 25px; }
         
-        /* SOLUÇÃO INTELIGENTE DO MD3/MD5: Posicionado à esquerda para não conflitar com a live */
+        /* SOLUÇÃO INTELIGENTE DO MD3/MD5: Posicionado à esquerda */
         .format-badge { background: rgba(212, 175, 55, 0.15); border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; position: absolute; top: -12px; left: 15px; z-index: 10; letter-spacing: 1px; font-weight: bold; }
 
-        /* MÚLTIPLOS LINKS DE STREAM COM CORES DINÂMICAS */
+        /* MÚLTIPLOS LINKS DE STREAM */
         .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: center; width: 80%; }
         
         .viewer-stream-link { 
@@ -218,6 +218,13 @@
         .glow-incoming::before, .match-wrapper:hover::before { background-color: var(--accent-color) !important; box-shadow: 0 0 8px var(--accent-glow); }
         .glow-outgoing:only-of-type::after, .match-wrapper:only-of-type:hover::after { background-color: var(--accent-color) !important; box-shadow: 0 0 8px var(--accent-glow); }
         .glow-outgoing:nth-of-type(odd):not(:only-of-type)::after, .glow-outgoing:nth-of-type(even):not(:only-of-type)::after, .match-wrapper:nth-of-type(odd):not(:only-of-type):hover::after, .match-wrapper:nth-of-type(even):not(:only-of-type):hover::after { border-color: var(--accent-color) !important; filter: drop-shadow(0 0 4px var(--accent-color)); }
+
+        /* INTELIGÊNCIA VISUAL: DESTINO DO PERDEDOR */
+        .loser-drop-label { font-size: 0.55rem; color: var(--danger-color); text-align: center; padding: 4px; background: rgba(168, 50, 50, 0.05); border-top: 1px solid rgba(168, 50, 50, 0.1); border-radius: 0 0 8px 8px; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; opacity: 0.5; transition: 0.3s; pointer-events: none; }
+        .b-match:hover .loser-drop-label { opacity: 1; background: rgba(168, 50, 50, 0.15); border-color: rgba(168, 50, 50, 0.3); }
+        .glow-drop { border-color: var(--danger-color) !important; box-shadow: 0 0 15px rgba(168, 50, 50, 0.4) !important; transform: scale(1.02); z-index: 10 !important; }
+        .glow-drop::before { content: 'ALVO ⬇'; position: absolute; top: -18px; right: 10px; color: var(--danger-color); font-size: 0.6rem; font-weight: bold; letter-spacing: 1px; animation: bounceDrop 1s infinite;}
+        @keyframes bounceDrop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
 
         .b-player { padding: 12px 15px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; transition: all 0.3s; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .b-player:last-child { border-bottom: none; }
@@ -855,6 +862,18 @@
         }
 
         // =======================
+        // LÓGICA DE DESTINO DO PERDEDOR
+        // =======================
+        function getLoserDestination(r, m, size) {
+            if (r === 0) return { r: 0, m: Math.floor(m / 2) };
+            const lRound = r * 2 - 1;
+            let matchesInRound = size / Math.pow(2, r + 1);
+            let crossM = (matchesInRound - 1) - m;
+            if (crossM < 0 || isNaN(crossM)) crossM = m;
+            return { r: lRound, m: crossM };
+        }
+
+        // =======================
         // MATA-MATA (DOUBLE ELIM)
         // =======================
         function gerarSlotHtml(pName, idx, maxSlots, matchId) {
@@ -904,15 +923,18 @@
                         p1 = jogadoresIniciais.shift() || "TBD"; p2 = jogadoresIniciais.shift() || "TBD";
                     }
                     const mId = `w_${i}_${j}`;
+                    const dest = getLoserDestination(i, j, size);
+                    
                     roundDiv.innerHTML += `
                         <div class="match-wrapper">
                             ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}
-                            <div class="b-match" data-bracket="W" data-round="${i}" data-match="${j}">
+                            <div class="b-match" data-bracket="W" data-round="${i}" data-match="${j}" data-drop-r="${dest.r}" data-drop-m="${dest.m}">
                                 <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                     <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                                 </div>
                                 ${gerarSlotHtml(p1, 0, slots, mId)}
                                 ${gerarSlotHtml(p2, 1, slots, mId)}
+                                <div class="loser-drop-label">⬇ Cai p/ Repescagem R${dest.r + 1}</div>
                             </div>
                         </div>`;
                 }
@@ -978,15 +1000,25 @@
                     if (matchBox && matchBox.getAttribute('data-bracket') === 'W') {
                         const r = parseInt(matchBox.getAttribute('data-round'));
                         const m = parseInt(matchBox.getAttribute('data-match'));
+                        
                         if (r > 0) {
                             const p1 = document.querySelector(`.b-match[data-bracket="W"][data-round="${r-1}"][data-match="${m*2}"]`);
                             const p2 = document.querySelector(`.b-match[data-bracket="W"][data-round="${r-1}"][data-match="${m*2+1}"]`);
                             if(p1) { p1.classList.add('glow-box'); p1.closest('.match-wrapper').classList.add('glow-outgoing'); }
                             if(p2) { p2.classList.add('glow-box'); p2.closest('.match-wrapper').classList.add('glow-outgoing'); }
                         }
+
+                        const dropR = matchBox.getAttribute('data-drop-r');
+                        const dropM = matchBox.getAttribute('data-drop-m');
+                        if (dropR !== null && dropM !== null) {
+                            const dropTarget = document.querySelector(`.b-match[data-bracket="L"][data-round="${dropR}"][data-match="${dropM}"]`);
+                            if (dropTarget) dropTarget.classList.add('glow-drop');
+                        }
                     }
                 });
-                wrapper.addEventListener('mouseleave', () => { document.querySelectorAll('.glow-box, .glow-outgoing').forEach(el => el.classList.remove('glow-box', 'glow-outgoing')); });
+                wrapper.addEventListener('mouseleave', () => { 
+                    document.querySelectorAll('.glow-box, .glow-outgoing, .glow-drop').forEach(el => el.classList.remove('glow-box', 'glow-outgoing', 'glow-drop')); 
+                });
             });
         }
 
