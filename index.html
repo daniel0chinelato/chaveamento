@@ -126,7 +126,6 @@
         .match-card:hover { transform: scale(1.01); border-color: var(--border-highlight); }
         .match-player { flex: 1; text-align: center; font-weight: 600; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center;}
         
-        /* SISTEMA DE DEUSES E VITÓRIAS INDIVIDUAIS */
         .god-slots-container { display: flex; gap: 8px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
         .god-slot-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; }
         
@@ -158,7 +157,6 @@
 
         .stage-title { color: var(--accent-color); font-family: 'Cinzel', serif; text-align: center; letter-spacing: 3px; text-shadow: 0 0 10px var(--accent-glow); margin-bottom: 25px; }
         
-        /* SISTEMA DE IDENTIFICAÇÃO DE PARTIDAS E MÚLTIPLOS LINKS DE STREAM */
         .match-badges { position: absolute; top: -12px; left: 10px; display: flex; gap: 5px; z-index: 10; }
         .format-badge, .id-badge { background: #111; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.55rem; padding: 2px 6px; border-radius: 6px; letter-spacing: 1px; font-weight: bold; }
         .format-badge { border-color: var(--accent-color); color: var(--accent-color); background: rgba(212, 175, 55, 0.1); }
@@ -189,12 +187,10 @@
             100% { transform: scale(0.8); opacity: 1; } 
         }
 
-        /* PLACAR GLOBAL (READ-ONLY) */
         .match-score { display: flex; align-items: center; gap: 15px; background: #000; padding: 5px 15px; border-radius: 6px; border: 1px solid var(--border-color); }
         .match-score input { width: 30px; background: transparent; border: none; color: var(--accent-color); text-align: center; font-size: 1.5rem; font-weight: 700; padding: 0; font-family: 'Cinzel', serif; pointer-events: none; }
         .match-score span { color: var(--text-muted); font-size: 0.8rem; font-weight: 300; }
 
-        /* MATA-MATA */
         .bracket-container { display: flex; overflow-x: auto; padding: 70px 20px 20px 20px; cursor: grab; min-height: 450px; align-items: stretch; gap: 0; }
         .bracket-container:active { cursor: grabbing; }
         .bracket-container::-webkit-scrollbar { height: 6px; }
@@ -203,12 +199,15 @@
         .bracket-round { display: flex; flex-direction: column; min-width: 320px; padding-right: 60px; position: relative; }
         .bracket-round:last-child { padding-right: 0; min-width: 270px; }
         
-        /* TÍTULOS EDITÁVEIS */
         .round-title { position: absolute; top: -50px; left: 0; width: calc(100% - 60px); text-align: center; margin: 0; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; z-index: 10; border-bottom: 1px dashed transparent; outline: none; transition: 0.3s; }
         .round-title:focus { color: var(--accent-color); border-bottom: 1px dashed var(--accent-color); }
         .bracket-round:last-child .round-title { width: 100%; }
 
         .match-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 10px 0; }
+        
+        /* RESPONSIVIDADE CHALLONGE: CLASSE BYE-WRAPPER */
+        .bye-wrapper { visibility: hidden; pointer-events: none; }
+        
         .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.3s ease; width: 100%; margin: 0; padding-top: 15px;}
 
         .bracket-round:not(:first-child) .match-wrapper::before { content: ''; position: absolute; left: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
@@ -221,15 +220,15 @@
         .glow-outgoing:only-of-type::after, .match-wrapper:only-of-type:hover::after { background-color: var(--accent-color) !important; box-shadow: 0 0 8px var(--accent-glow); }
         .glow-outgoing:nth-of-type(odd):not(:only-of-type)::after, .glow-outgoing:nth-of-type(even):not(:only-of-type)::after, .match-wrapper:nth-of-type(odd):not(:only-of-type):hover::after, .match-wrapper:nth-of-type(even):not(:only-of-type):hover::after { border-color: var(--accent-color) !important; filter: drop-shadow(0 0 4px var(--accent-color)); }
 
-        /* INTELIGÊNCIA VISUAL: DESTINO DO PERDEDOR */
+        /* INTELIGÊNCIA VISUAL: DESTINO DO PERDEDOR APRIMORADO */
         .loser-drop-label { 
-            font-size: 0.6rem; color: #ff6b6b; text-align: center; padding: 6px; 
-            background: #000000; border-top: 1px solid rgba(255, 107, 107, 0.4); 
+            font-size: 0.65rem; color: #ff6b6b; text-align: center; padding: 6px; 
+            background: #000 !important; border-top: 2px solid #ff4444; 
             border-radius: 0 0 8px 8px; text-transform: uppercase; letter-spacing: 1px; 
-            margin-top: 5px; opacity: 0.8; transition: 0.3s; pointer-events: none; 
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); font-weight: bold;
+            margin-top: 5px; opacity: 1; transition: 0.3s; pointer-events: none; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.8); font-weight: bold;
         }
-        .b-match:hover .loser-drop-label { opacity: 1; background: #1a0505; color: #ffcccc; }
+        .b-match:hover .loser-drop-label { background: #1a0505 !important; color: #fff; border-color: #ff0000; }
         .glow-drop { border-color: var(--danger-color) !important; box-shadow: 0 0 20px rgba(255, 68, 68, 0.6) !important; transform: scale(1.02); z-index: 10 !important; }
         .glow-drop::before { content: 'ALVO ⬇'; position: absolute; top: -24px; right: 10px; color: #ff4444; font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; animation: bounceDrop 1s infinite;}
         @keyframes bounceDrop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
@@ -877,21 +876,62 @@
             return { r: lRound, m: crossM };
         }
 
+        function processByes() {
+            let changed = false;
+            document.querySelectorAll('.b-match:not(.bye-processed)').forEach(match => {
+                let players = match.querySelectorAll('.p-name');
+                if(players.length < 2) return;
+                
+                let p1 = players[0].innerText.trim();
+                let p2 = players[1].innerText.trim();
+
+                if ((p1 === "BYE" && p2 !== "BYE" && p2 !== "TBD") || 
+                    (p2 === "BYE" && p1 !== "BYE" && p1 !== "TBD") || 
+                    (p1 === "BYE" && p2 === "BYE")) {
+                    
+                    match.classList.add('bye-processed');
+                    match.closest('.match-wrapper').classList.add('bye-wrapper');
+                    
+                    let winnerIdx = 0;
+                    if (p1 === "BYE" && p2 !== "BYE" && p2 !== "TBD") winnerIdx = 1;
+                    if (p2 === "BYE" && p1 !== "BYE" && p1 !== "TBD") winnerIdx = 0;
+                    
+                    resolverPartida(match, winnerIdx, true); 
+                    changed = true;
+                }
+            });
+            if(changed) saveTournament();
+        }
+
         function puxarPromovidos() {
             if(jogadoresPromovidos.length === 0) return alert("Nenhum jogador classificado!");
             let copia = [...jogadoresPromovidos];
             shuffle(copia); 
 
-            // Lógica Challonge: Encontra a próxima potência de 2
             let neededSize = 2;
             while(neededSize < copia.length) neededSize *= 2;
 
-            // Preenche os espaços vazios com BYE
-            while(copia.length < neededSize) {
-                copia.push("BYE");
+            let matchPairs = Array.from({length: neededSize/2}, () => ["TBD", "TBD"]);
+            let byesToAssign = neededSize - copia.length;
+            let step = Math.floor((neededSize/2) / byesToAssign) || 1;
+            
+            for(let i=0; i<byesToAssign; i++) {
+                let matchIdx = (i * step) % (neededSize/2);
+                while(matchPairs[matchIdx][1] === "BYE") {
+                    matchIdx = (matchIdx + 1) % (neededSize/2);
+                }
+                matchPairs[matchIdx][1] = "BYE";
             }
+            
+            let pIdx = 0;
+            for(let i=0; i<neededSize/2; i++) {
+                if(matchPairs[i][0] === "TBD" && pIdx < copia.length) matchPairs[i][0] = copia[pIdx++];
+                if(matchPairs[i][1] === "TBD" && pIdx < copia.length) matchPairs[i][1] = copia[pIdx++];
+            }
+            
+            let finalArray = [];
+            matchPairs.forEach(pair => finalArray.push(pair[0], pair[1]));
 
-            // Atualiza o select invisivelmente para manter coerência estrutural
             let select = document.getElementById('bracketSize');
             let optionExists = Array.from(select.options).some(opt => parseInt(opt.value) === neededSize);
             if (!optionExists) {
@@ -902,7 +942,8 @@
             }
             select.value = neededSize;
 
-            gerarChave(copia);
+            gerarChave(finalArray);
+            setTimeout(processByes, 100);
         }
 
         // =======================
@@ -1034,6 +1075,7 @@
             
             attachHoverEvents();
             renderStreamLinks();
+            setTimeout(processByes, 100);
         }
 
         // --- SISTEMA INTELIGENTE DE RASTRO ---
@@ -1078,7 +1120,7 @@
             resolverPartida(matchDiv, winnerSlotIdx);
         }
 
-        function resolverPartida(matchDiv, winnerSlotIdx) {
+        function resolverPartida(matchDiv, winnerSlotIdx, isAutoBye = false) {
             const players = matchDiv.querySelectorAll('.b-player');
             const loserSlotIdx = winnerSlotIdx === 0 ? 1 : 0;
 
@@ -1105,14 +1147,6 @@
                     if(playerSlot) {
                         playerSlot.querySelector('.p-name').innerText = pName;
                         playerSlot.classList.remove('winner-slot', 'loser-slot');
-                        
-                        // Lógica de "Auto-Avanço" caso seja o jogador BYE caindo
-                        if(pName === "BYE" && targetBracket === "W") {
-                             const btnVitoriaOp = targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.btn-advance');
-                             if(btnVitoriaOp && targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.p-name').innerText !== "TBD") {
-                                 setTimeout(() => btnVitoriaOp.click(), 100);
-                             }
-                        }
                     }
                 }
             }
@@ -1146,8 +1180,11 @@
                 }
             }
 
-            calcularEloGeral();
-            saveTournament();
+            if(!isAutoBye) {
+                calcularEloGeral();
+                saveTournament();
+            }
+            setTimeout(processByes, 50);
         }
 
         function initDragToScroll() {
@@ -1231,7 +1268,7 @@
                     });
                 }
 
-                document.querySelectorAll('.b-match').forEach(match => {
+                document.querySelectorAll('.b-match:not(.bye-processed)').forEach(match => {
                     let players = match.querySelectorAll('.b-player');
                     if (players.length === 2) {
                         let p1Div = players[0];
@@ -1347,7 +1384,17 @@
                 if(data.finalsDisplay) document.getElementById('grandFinalsDisplay').innerHTML = data.finalsDisplay;
                 
                 jogadoresPromovidos = data.promotedList || [];
-                if(data.bracketSize) document.getElementById('bracketSize').value = data.bracketSize;
+                if(data.bracketSize) {
+                    let select = document.getElementById('bracketSize');
+                    let optionExists = Array.from(select.options).some(opt => parseInt(opt.value) === parseInt(data.bracketSize));
+                    if (!optionExists) {
+                        let newOpt = document.createElement('option');
+                        newOpt.value = data.bracketSize;
+                        newOpt.innerText = `Top ${data.bracketSize}`;
+                        select.appendChild(newOpt);
+                    }
+                    select.value = data.bracketSize;
+                }
                 
                 attachHoverEvents(); calcularEloGeral(); initDragToScroll(); renderStreamLinks();
             }).catch(e => {
