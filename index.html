@@ -158,10 +158,12 @@
 
         .stage-title { color: var(--accent-color); font-family: 'Cinzel', serif; text-align: center; letter-spacing: 3px; text-shadow: 0 0 10px var(--accent-glow); margin-bottom: 25px; }
         
-        /* SOLUÇÃO INTELIGENTE DO MD3/MD5: Posicionado à esquerda */
-        .format-badge { background: rgba(212, 175, 55, 0.15); border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; position: absolute; top: -12px; left: 15px; z-index: 10; letter-spacing: 1px; font-weight: bold; }
+        /* SISTEMA DE IDENTIFICAÇÃO DE PARTIDAS E MÚLTIPLOS LINKS DE STREAM */
+        .match-badges { position: absolute; top: -12px; left: 10px; display: flex; gap: 5px; z-index: 10; }
+        .format-badge, .id-badge { background: #111; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.55rem; padding: 2px 6px; border-radius: 6px; letter-spacing: 1px; font-weight: bold; }
+        .format-badge { border-color: var(--accent-color); color: var(--accent-color); background: rgba(212, 175, 55, 0.1); }
+        .id-badge { border-color: #555; color: #bbb; background: #050505; font-family: monospace; }
 
-        /* MÚLTIPLOS LINKS DE STREAM */
         .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: center; width: 80%; }
         
         .viewer-stream-link { 
@@ -220,10 +222,16 @@
         .glow-outgoing:nth-of-type(odd):not(:only-of-type)::after, .glow-outgoing:nth-of-type(even):not(:only-of-type)::after, .match-wrapper:nth-of-type(odd):not(:only-of-type):hover::after, .match-wrapper:nth-of-type(even):not(:only-of-type):hover::after { border-color: var(--accent-color) !important; filter: drop-shadow(0 0 4px var(--accent-color)); }
 
         /* INTELIGÊNCIA VISUAL: DESTINO DO PERDEDOR */
-        .loser-drop-label { font-size: 0.55rem; color: var(--danger-color); text-align: center; padding: 4px; background: rgba(168, 50, 50, 0.05); border-top: 1px solid rgba(168, 50, 50, 0.1); border-radius: 0 0 8px 8px; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; opacity: 0.5; transition: 0.3s; pointer-events: none; }
-        .b-match:hover .loser-drop-label { opacity: 1; background: rgba(168, 50, 50, 0.15); border-color: rgba(168, 50, 50, 0.3); }
-        .glow-drop { border-color: var(--danger-color) !important; box-shadow: 0 0 15px rgba(168, 50, 50, 0.4) !important; transform: scale(1.02); z-index: 10 !important; }
-        .glow-drop::before { content: 'ALVO ⬇'; position: absolute; top: -18px; right: 10px; color: var(--danger-color); font-size: 0.6rem; font-weight: bold; letter-spacing: 1px; animation: bounceDrop 1s infinite;}
+        .loser-drop-label { 
+            font-size: 0.6rem; color: #ff6b6b; text-align: center; padding: 6px; 
+            background: #000000; border-top: 1px solid rgba(255, 107, 107, 0.4); 
+            border-radius: 0 0 8px 8px; text-transform: uppercase; letter-spacing: 1px; 
+            margin-top: 5px; opacity: 0.8; transition: 0.3s; pointer-events: none; 
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); font-weight: bold;
+        }
+        .b-match:hover .loser-drop-label { opacity: 1; background: #1a0505; color: #ffcccc; }
+        .glow-drop { border-color: var(--danger-color) !important; box-shadow: 0 0 20px rgba(255, 68, 68, 0.6) !important; transform: scale(1.02); z-index: 10 !important; }
+        .glow-drop::before { content: 'ALVO ⬇'; position: absolute; top: -24px; right: 10px; color: #ff4444; font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; animation: bounceDrop 1s infinite;}
         @keyframes bounceDrop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
 
         .b-player { padding: 12px 15px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; transition: all 0.3s; border-bottom: 1px solid rgba(255,255,255,0.03); }
@@ -379,13 +387,10 @@
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap:15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 10px;">
                 <h2 style="margin:0;">Mata-Mata Final</h2>
                 <div class="admin-only" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                    <select id="bracketSize" style="width:110px; margin:0;">
-                        <option value="4">Top 4</option>
-                        <option value="8" selected>Top 8</option>
-                        <option value="16">Top 16</option>
+                    <select id="bracketSize" style="width:110px; margin:0; display:none;">
+                        <!-- Options injetadas dinamicamente -->
                     </select>
-                    <button class="nav-btn" style="margin:0; padding:8px 12px;" onclick="gerarChave()">Gerar Chave</button>
-                    <button class="nav-btn" style="margin:0; padding:8px 12px; background:var(--accent-color); color:#000; border-color:var(--accent-color);" onclick="puxarPromovidos()">Importar Top</button>
+                    <button class="nav-btn" style="margin:0; padding:8px 12px; background:var(--accent-color); color:#000; border-color:var(--accent-color);" onclick="puxarPromovidos()">Importar Top (Automático)</button>
                 </div>
             </div>
             
@@ -712,7 +717,6 @@
             document.getElementById(pageId).classList.add('active'); btn.classList.add('active');
         }
 
-        let jogadoresPromovidos = [];
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; }
             return array;
@@ -862,7 +866,7 @@
         }
 
         // =======================
-        // LÓGICA DE DESTINO DO PERDEDOR
+        // LÓGICA DE DESTINO DO PERDEDOR E CHAVE DINÂMICA
         // =======================
         function getLoserDestination(r, m, size) {
             if (r === 0) return { r: 0, m: Math.floor(m / 2) };
@@ -871,6 +875,34 @@
             let crossM = (matchesInRound - 1) - m;
             if (crossM < 0 || isNaN(crossM)) crossM = m;
             return { r: lRound, m: crossM };
+        }
+
+        function puxarPromovidos() {
+            if(jogadoresPromovidos.length === 0) return alert("Nenhum jogador classificado!");
+            let copia = [...jogadoresPromovidos];
+            shuffle(copia); 
+
+            // Lógica Challonge: Encontra a próxima potência de 2
+            let neededSize = 2;
+            while(neededSize < copia.length) neededSize *= 2;
+
+            // Preenche os espaços vazios com BYE
+            while(copia.length < neededSize) {
+                copia.push("BYE");
+            }
+
+            // Atualiza o select invisivelmente para manter coerência estrutural
+            let select = document.getElementById('bracketSize');
+            let optionExists = Array.from(select.options).some(opt => parseInt(opt.value) === neededSize);
+            if (!optionExists) {
+                let newOpt = document.createElement('option');
+                newOpt.value = neededSize;
+                newOpt.innerText = `Top ${neededSize}`;
+                select.appendChild(newOpt);
+            }
+            select.value = neededSize;
+
+            gerarChave(copia);
         }
 
         // =======================
@@ -924,17 +956,22 @@
                     }
                     const mId = `w_${i}_${j}`;
                     const dest = getLoserDestination(i, j, size);
+                    const destDisplayId = `L${dest.r + 1}-M${dest.m + 1}`;
+                    const matchDisplayId = `W${i+1}-M${j+1}`;
                     
                     roundDiv.innerHTML += `
                         <div class="match-wrapper">
-                            ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}
+                            <div class="match-badges">
+                                ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}
+                                <span class="id-badge">${matchDisplayId}</span>
+                            </div>
                             <div class="b-match" data-bracket="W" data-round="${i}" data-match="${j}" data-drop-r="${dest.r}" data-drop-m="${dest.m}">
                                 <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                     <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                                 </div>
                                 ${gerarSlotHtml(p1, 0, slots, mId)}
                                 ${gerarSlotHtml(p2, 1, slots, mId)}
-                                <div class="loser-drop-label">⬇ Cai p/ Repescagem R${dest.r + 1}</div>
+                                <div class="loser-drop-label">⬇ Cai p/ ${destDisplayId}</div>
                             </div>
                         </div>`;
                 }
@@ -955,9 +992,14 @@
 
                 for(let j=0; j < matchesNum; j++) {
                     const mId = `l_${i}_${j}`;
+                    const matchDisplayId = `L${i+1}-M${j+1}`;
+                    
                     roundDiv.innerHTML += `
                         <div class="match-wrapper">
-                            ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}
+                            <div class="match-badges">
+                                ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}
+                                <span class="id-badge">${matchDisplayId}</span>
+                            </div>
                             <div class="b-match" data-bracket="L" data-round="${i}" data-match="${j}">
                                 <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                     <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
@@ -975,7 +1017,10 @@
                 <div class="bracket-round round-champion" style="min-width: 400px;">
                     <h4 class="round-title" style="color:#FFD700;" contenteditable="true" onblur="saveTournament()">GRAND FINALS (TITANS)</h4>
                     <div class="match-wrapper" style="justify-content: center; padding-top: 30px;">
-                        <span class="format-badge" style="background:#FFD700; color:#000; left: 15px;">MD7</span>
+                        <div class="match-badges" style="left: 50%; transform: translateX(-50%);">
+                            <span class="format-badge" style="background:#FFD700; color:#000;">MD7</span>
+                            <span class="id-badge">GF</span>
+                        </div>
                         <div class="b-match glow-box" style="border-color:#FFD700;" data-bracket="F" data-round="0" data-match="0">
                             <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                 <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
@@ -1022,12 +1067,6 @@
             });
         }
 
-        function puxarPromovidos() {
-            if(jogadoresPromovidos.length === 0) return alert("Nenhum jogador classificado!");
-            let copiaPromovidos = [...jogadoresPromovidos]; shuffle(copiaPromovidos); 
-            gerarChave(copiaPromovidos);
-        }
-
         function avancarWinner(btn, slotIdx) {
             const matchDiv = btn.closest('.b-match');
             resolverPartida(matchDiv, slotIdx);
@@ -1066,6 +1105,14 @@
                     if(playerSlot) {
                         playerSlot.querySelector('.p-name').innerText = pName;
                         playerSlot.classList.remove('winner-slot', 'loser-slot');
+                        
+                        // Lógica de "Auto-Avanço" caso seja o jogador BYE caindo
+                        if(pName === "BYE" && targetBracket === "W") {
+                             const btnVitoriaOp = targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.btn-advance');
+                             if(btnVitoriaOp && targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.p-name').innerText !== "TBD") {
+                                 setTimeout(() => btnVitoriaOp.click(), 100);
+                             }
+                        }
                     }
                 }
             }
@@ -1127,7 +1174,7 @@
 
                 document.querySelectorAll('#groupsDisplay tbody tr').forEach(row => {
                     let pName = row.dataset.player;
-                    if (pName) {
+                    if (pName && pName !== "BYE") {
                         pName = pName.trim();
                         let isSeed = row.classList.contains('seed-row');
                         eloData[pName] = { nome: pName, isSeed: isSeed, elo: 1000 };
@@ -1148,7 +1195,7 @@
                 document.querySelectorAll('.match-card').forEach(card => {
                     let p1 = card.dataset.p1 ? card.dataset.p1.trim() : null;
                     let p2 = card.dataset.p2 ? card.dataset.p2.trim() : null;
-                    if (!p1 || !p2) return;
+                    if (!p1 || !p2 || p1 === "BYE" || p2 === "BYE") return;
 
                     let inputs = card.querySelectorAll('input[type="number"]');
                     if (inputs.length < 2) return;
@@ -1196,6 +1243,8 @@
 
                         let p1Name = p1Span.innerText.trim();
                         let p2Name = p2Span.innerText.trim();
+
+                        if(p1Name === "BYE" || p2Name === "BYE") return;
 
                         if (p1Name && p1Name !== "TBD" && !eloData[p1Name]) eloData[p1Name] = { nome: p1Name, isSeed: false, elo: 1000 };
                         if (p2Name && p2Name !== "TBD" && !eloData[p2Name]) eloData[p2Name] = { nome: p2Name, isSeed: false, elo: 1000 };
