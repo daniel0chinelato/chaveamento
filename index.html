@@ -219,15 +219,27 @@
 
         .match-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 15px 0; }
         
-        /* RESPONSIVIDADE: CLASSE BYE-WRAPPER (Invisível) */
-        .bye-wrapper { visibility: hidden; pointer-events: none; opacity: 0; height: 0; padding: 0; margin: 0; border: none; }
-        
         .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.3s ease; width: 100%; margin: 0; padding-top: 20px;}
 
-        .bracket-round:not(:first-child) .match-wrapper:not(.bye-wrapper)::before { content: ''; position: absolute; left: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
-        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(odd):not(:only-of-type):not(.bye-wrapper)::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 50%; border-top: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 6px 0 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
-        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(even):not(:only-of-type):not(.bye-wrapper)::after { content: ''; position: absolute; right: -30px; bottom: 50%; width: 30px; height: 50%; border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 0 6px 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
-        .bracket-round:not(:last-child) .match-wrapper:only-of-type:not(.bye-wrapper)::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
+        /* CONEXÕES DE LINHAS */
+        .bracket-round:not(:first-child) .match-wrapper::before { content: ''; position: absolute; left: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
+        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(odd):not(:only-of-type)::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 50%; border-top: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 6px 0 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
+        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(even):not(:only-of-type)::after { content: ''; position: absolute; right: -30px; bottom: 50%; width: 30px; height: 50%; border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 0 6px 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
+        .bracket-round:not(:last-child) .match-wrapper:only-of-type::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
+
+        /* BYE INTELIGENTE (CAIXA FANTASMA MAS PRESENTE NA GEOMETRIA) */
+        .b-match.is-bye {
+            background: rgba(255,255,255,0.02);
+            border: 1px dashed #333; opacity: 0.5; box-shadow: none;
+        }
+        .b-match.is-bye:hover { transform: none; box-shadow: none; border-color: #444; }
+        .b-match.is-bye .stream-controls, .b-match.is-bye .mata-gods, .b-match.is-bye .loser-drop-label { display: none !important; }
+        .b-match.is-bye .score-input { display: none; }
+        .b-match.is-bye .btn-advance { display: none !important; }
+        
+        .b-player.is-empty .p-name { color: #555; text-decoration: line-through; }
+        .b-match.is-bye .winner-slot { background: transparent; border-left-color: #555; }
+        .b-match.is-bye .winner-slot .p-name { color: #888; font-weight: normal; }
 
         .glow-box, .b-match:hover, .champion-box:hover { border-color: var(--accent-color) !important; box-shadow: 0 0 15px var(--accent-glow) !important; transform: scale(1.02); z-index: 10 !important; }
         .glow-incoming::before, .match-wrapper:hover::before { background-color: var(--accent-color) !important; box-shadow: 0 0 8px var(--accent-glow); }
@@ -614,6 +626,7 @@
         function verificarBloqueioBoX(card, p1Wins, p2Wins) {
             const totalGames = card.querySelectorAll(`.win-toggle[data-player="1"]`).length;
             if(totalGames === 0) return;
+
             const majority = Math.ceil(totalGames / 2);
             const isMatchOver = (p1Wins >= majority || p2Wins >= majority);
             
@@ -624,9 +637,7 @@
                 const godSlots = card.querySelectorAll(`.game${i}-slot.${matchIdBase}-slot`);
                 
                 if(isMatchOver && !isGameResolved) {
-                    godSlots.forEach(slot => {
-                        slot.classList.add('locked'); slot.dataset.god = ""; slot.setAttribute('data-god', ""); slot.style.backgroundImage = "none";
-                    });
+                    godSlots.forEach(slot => { slot.classList.add('locked'); slot.dataset.god = ""; slot.setAttribute('data-god', ""); slot.style.backgroundImage = "none"; });
                     toggles.forEach(t => t.style.display = 'none');
                 } else {
                     godSlots.forEach(slot => slot.classList.remove('locked'));
@@ -661,6 +672,7 @@
 
             const tbody = document.getElementById('godsTable'); if(!tbody) return;
             const rows = Array.from(tbody.querySelectorAll('.god-row'));
+            
             rows.forEach(row => {
                 const godName = row.querySelector('td span').innerText.trim();
                 const stats = godStats[godName] || {j:0, v:0, d:0};
@@ -672,14 +684,9 @@
                 row.querySelector('.g-w').innerText = wr.toFixed(1) + '%';
                 row.dataset.j = stats.j; row.dataset.v = stats.v; row.dataset.wr = wr;
             });
-
             rows.sort((a, b) => {
-                const vA = parseInt(a.dataset.v), vB = parseInt(b.dataset.v);
-                const wrA = parseFloat(a.dataset.wr), wrB = parseFloat(b.dataset.wr);
-                const jA = parseInt(a.dataset.j), jB = parseInt(b.dataset.j);
-                if (vB !== vA) return vB - vA;
-                if (wrB !== wrA) return wrB - wrA;
-                return jB - jA;
+                const vA = parseInt(a.dataset.v), vB = parseInt(b.dataset.v), wrA = parseFloat(a.dataset.wr), wrB = parseFloat(b.dataset.wr), jA = parseInt(a.dataset.j), jB = parseInt(b.dataset.j);
+                if (vB !== vA) return vB - vA; if (wrB !== wrA) return wrB - wrA; return jB - jA;
             });
             rows.forEach(r => tbody.appendChild(r));
         }
@@ -881,39 +888,8 @@
         }
 
         // =======================
-        // MATA-MATA (VISUAL CLÁSSICO)
+        // LÓGICA DE DESTINO DO PERDEDOR E CHAVE DINÂMICA
         // =======================
-        
-        function gerarOriginsL(size) {
-            let origins = {};
-            const roundsW = Math.log2(size);
-            const roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1;
-            
-            for(let i=0; i < roundsW; i++) {
-                let matchesNum = size / Math.pow(2, i+1);
-                for(let j=0; j < matchesNum; j++) {
-                    if (i === 0) { origins[`0_${Math.floor(j/2)}_${j%2}`] = `Perd. W1-M${j+1}`; } 
-                    else {
-                        const lRound = i * 2 - 1; let crossM = (matchesNum - 1) - j;
-                        if (crossM < 0 || isNaN(crossM)) crossM = j;
-                        origins[`${lRound}_${crossM}_0`] = `Perd. W${i+1}-M${j+1}`;
-                    }
-                }
-            }
-            for(let i=1; i < roundsL; i++) {
-                let matchesNum = size / Math.pow(2, Math.floor(i/2) + 2);
-                if (matchesNum < 1) matchesNum = 1;
-                for(let j=0; j < matchesNum; j++) {
-                    if (i % 2 !== 0) { origins[`${i}_${j}_1`] = `Venc. L${i}-M${j+1}`; } 
-                    else {
-                        origins[`${i}_${j}_0`] = `Venc. L${i}-M${j*2+1}`;
-                        origins[`${i}_${j}_1`] = `Venc. L${i}-M${j*2+2}`;
-                    }
-                }
-            }
-            return origins;
-        }
-
         function getLoserDestinationText(r, m, size) {
             if (r === 0) return `L1-M${Math.floor(m/2) + 1}`;
             const lRound = r * 2 - 1;
@@ -929,15 +905,14 @@
                 let players = match.querySelectorAll('.p-name');
                 if(players.length < 2) return;
                 
-                let p1 = players[0].innerText.trim();
-                let p2 = players[1].innerText.trim();
+                let p1 = players[0].innerText.trim(), p2 = players[1].innerText.trim();
 
                 if ((p1 === "BYE" && p2 !== "BYE" && p2 !== "TBD" && !p2.startsWith("Perd.") && !p2.startsWith("Venc.")) || 
                     (p2 === "BYE" && p1 !== "BYE" && p1 !== "TBD" && !p1.startsWith("Perd.") && !p1.startsWith("Venc.")) || 
                     (p1 === "BYE" && p2 === "BYE")) {
                     
                     match.classList.add('bye-processed');
-                    match.closest('.match-wrapper').classList.add('bye-wrapper');
+                    match.classList.add('is-bye');
                     
                     let winnerIdx = 0;
                     if (p1 === "BYE" && p2 !== "BYE") winnerIdx = 1;
@@ -1029,8 +1004,7 @@
                 let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
                 
                 let title = i === roundsW - 1 ? "Final (Vencedores)" : (i === roundsW - 2 ? "Semifinal (Vencedores)" : "Round " + (i+1));
-                let isBo5 = i >= roundsW - 2;
-                let slots = isBo5 ? 5 : 3;
+                let isBo5 = i >= roundsW - 2; let slots = isBo5 ? 5 : 3;
                 roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true" onblur="saveTournament()">${title}</h4>`;
 
                 for(let j=0; j < matchesNum; j++) {
@@ -1039,13 +1013,13 @@
                         p1 = jogadoresIniciais.shift() || "TBD"; p2 = jogadoresIniciais.shift() || "TBD";
                     }
                     const mId = `w_${i}_${j}`;
-                    
+                    const matchDisplayId = `W${i+1}-M${j+1}`;
                     const destText = getLoserDestinationText(i, j, size);
+                    
                     const dropR = (i === 0) ? 0 : (i * 2 - 1);
                     let crossM = j;
                     if(i > 0) { let mInR = size / Math.pow(2, i+1); crossM = (mInR - 1) - j; if (crossM < 0 || isNaN(crossM)) crossM = j; }
-                    const matchDisplayId = `W${i+1}-M${j+1}`;
-
+                    
                     roundDiv.innerHTML += `
                         <div class="match-wrapper">
                             <div class="match-badges">
@@ -1073,8 +1047,7 @@
                 
                 let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
                 let title = i === roundsL - 1 ? "Final (Repescagem)" : "Round " + (i+1) + " (Repescagem)";
-                let isBo5 = i >= roundsL - 2;
-                let slots = isBo5 ? 5 : 3;
+                let isBo5 = i >= roundsL - 2; let slots = isBo5 ? 5 : 3;
                 roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true" onblur="saveTournament()">${title}</h4>`;
 
                 for(let j=0; j < matchesNum; j++) {
@@ -1082,7 +1055,7 @@
                     const matchDisplayId = `L${i+1}-M${j+1}`;
                     let p1 = mapOrigins[`${i}_${j}_0`] || "TBD";
                     let p2 = mapOrigins[`${i}_${j}_1`] || "TBD";
-
+                    
                     roundDiv.innerHTML += `
                         <div class="match-wrapper">
                             <div class="match-badges">
@@ -1123,6 +1096,7 @@
             
             attachHoverEvents();
             renderStreamLinks();
+            setTimeout(processByes, 100);
         }
 
         // --- SISTEMA INTELIGENTE DE RASTRO ---
@@ -1156,16 +1130,8 @@
             });
         }
 
-        function avancarWinner(btn, slotIdx) {
-            const matchDiv = btn.closest('.b-match');
-            resolverPartida(matchDiv, slotIdx);
-        }
-
-        function avancarLoser(btn, slotIdx) {
-            const matchDiv = btn.closest('.b-match');
-            const winnerSlotIdx = slotIdx === 0 ? 1 : 0;
-            resolverPartida(matchDiv, winnerSlotIdx);
-        }
+        function avancarWinner(btn, slotIdx) { resolverPartida(btn.closest('.b-match'), slotIdx); }
+        function avancarLoser(btn, slotIdx) { resolverPartida(btn.closest('.b-match'), slotIdx === 0 ? 1 : 0); }
 
         function resolverPartida(matchDiv, winnerSlotIdx, isAutoBye = false) {
             const players = matchDiv.querySelectorAll('.b-player');
@@ -1176,8 +1142,10 @@
             players[loserSlotIdx].classList.add('loser-slot');
             players[loserSlotIdx].classList.remove('winner-slot');
 
-            const winnerName = players[winnerSlotIdx].querySelector('.p-name').innerText.trim();
-            const loserName = players[loserSlotIdx].querySelector('.p-name').innerText.trim();
+            const winnerNameSpan = players[winnerSlotIdx].querySelector('.p-name');
+            const loserNameSpan = players[loserSlotIdx].querySelector('.p-name');
+            const winnerName = winnerNameSpan.innerText.trim();
+            const loserName = loserNameSpan.innerText.trim();
 
             const bracket = matchDiv.getAttribute('data-bracket');
             const r = parseInt(matchDiv.getAttribute('data-round'));
@@ -1192,12 +1160,14 @@
                 if(targetMatch) {
                     const playerSlot = targetMatch.querySelectorAll('.b-player')[targetSlot];
                     if(playerSlot) {
-                        playerSlot.querySelector('.p-name').innerText = pName;
+                        const nameEl = playerSlot.querySelector('.p-name');
+                        nameEl.innerText = pName;
+                        nameEl.classList.remove('p-placeholder');
                         playerSlot.classList.remove('winner-slot', 'loser-slot');
                         playerSlot.classList.remove('is-empty');
                         
                         if(pName === "BYE" && targetBracket === "W") {
-                             const btnVitoriaOp = targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.btn-advance.w-btn') || targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('button[title="Avançar Vencedor"]');
+                             const btnVitoriaOp = targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.btn-advance.w') || targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('button[title="Avançar Vencedor"]');
                              if(btnVitoriaOp && targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.p-name').innerText !== "TBD") {
                                  setTimeout(() => btnVitoriaOp.click(), 100);
                              }
@@ -1227,6 +1197,7 @@
             setTimeout(processByes, 50);
         }
 
+        // --- Resto da Lógica (Nuvem, ELO) Mantida Intacta ---
         function initDragToScroll() {
             document.querySelectorAll('.bracket-container').forEach(slider => {
                 let isDown = false, startX, scrollLeft;
@@ -1308,7 +1279,7 @@
                     });
                 }
 
-                document.querySelectorAll('.b-match:not(.bye-processed)').forEach(match => {
+                document.querySelectorAll('.b-match:not(.is-bye)').forEach(match => {
                     let players = match.querySelectorAll('.b-player');
                     if (players.length === 2) {
                         let p1Div = players[0];
