@@ -14,16 +14,16 @@
 
     <style>
         :root {
-            --bg-color: #030304;
-            --panel-bg: #0a0a0d;
-            --panel-surface: #111115;
-            --border-color: rgba(255, 255, 255, 0.05);
-            --border-highlight: rgba(196, 161, 83, 0.3);
+            --bg-color: #050505;
+            --panel-bg: #0c0c0f;
+            --panel-surface: #141419;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(196, 161, 83, 0.4);
             --accent-color: #d4af37; 
-            --accent-glow: rgba(212, 175, 55, 0.15);
-            --text-main: #f0f0f0;
+            --accent-glow: rgba(212, 175, 55, 0.2);
+            --text-main: #f5f5f5;
             --text-muted: #888899;
-            --danger-color: #a83232;
+            --danger-color: #ff4d4d;
         }
 
         input[type="number"]::-webkit-inner-spin-button, 
@@ -32,12 +32,12 @@
 
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-color); }
-        ::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
 
         body {
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 0%, var(--panel-surface) 0%, transparent 70%);
+            background-image: radial-gradient(circle at 50% 0%, var(--panel-surface) 0%, transparent 80%);
             background-attachment: fixed;
             color: var(--text-main);
             font-family: 'Montserrat', sans-serif;
@@ -51,8 +51,8 @@
         .header-image { width: 100%; height: auto; max-height: 350px; object-fit: cover; border-radius: 12px; filter: drop-shadow(0 8px 25px var(--accent-glow)); }
 
         .navbar {
-            background-color: rgba(10, 10, 13, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color);
-            display: flex; justify-content: center; align-items: center; padding: 15px; gap: 20px; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background-color: rgba(12, 12, 15, 0.85); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: center; align-items: center; padding: 15px; gap: 20px; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
         .nav-btn {
             background: transparent; border: 1px solid var(--border-color); color: var(--text-muted);
@@ -65,7 +65,7 @@
         .btn-save { border-color: #2a7a48; color: #4ade80; display: flex; align-items: center; gap: 8px;}
         .btn-save:hover { background-color: #2a7a48; color: #fff; box-shadow: 0 0 15px rgba(74, 222, 128, 0.2); }
         .btn-reset { border-color: var(--danger-color); color: var(--danger-color); }
-        .btn-reset:hover { background-color: var(--danger-color); color: #fff; box-shadow: 0 0 15px rgba(168, 50, 50, 0.2); }
+        .btn-reset:hover { background-color: var(--danger-color); color: #fff; box-shadow: 0 0 15px rgba(255, 77, 77, 0.2); }
 
         .btn-copy {
             background: transparent; border: none; color: var(--text-muted);
@@ -84,8 +84,8 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .panel {
-            background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 35px; border-radius: 12px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.02); position: relative; overflow: hidden;
+            background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 12px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03); position: relative; overflow: hidden;
         }
         .panel::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--border-highlight), transparent); }
 
@@ -97,7 +97,7 @@
             border: 1px solid var(--border-color); padding: 15px; border-radius: 8px;
             box-sizing: border-box; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; resize: vertical; transition: 0.3s;
         }
-        textarea:focus, select:focus, .setup-grid input:focus { outline: none; border-color: var(--accent-color); background-color: #16161a; box-shadow: 0 0 0 3px var(--accent-glow); }
+        textarea:focus, select:focus, .setup-grid input:focus { outline: none; border-color: var(--accent-color); background-color: #1a1a20; box-shadow: 0 0 0 3px var(--accent-glow); }
 
         button.action-btn {
             background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), transparent); color: var(--accent-color); border: 1px solid var(--accent-color);
@@ -105,27 +105,33 @@
         }
         button.action-btn:hover { background: var(--accent-color); color: #000; transform: translateY(-2px); box-shadow: 0 5px 15px var(--accent-glow); }
 
+        /* Estilo CLEAN para as tabelas de Grupos com Drag & Drop */
         table { width: 100%; border-collapse: separate; border-spacing: 0 6px; margin-top: 10px; }
         th { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; padding: 10px 15px; border-bottom: 1px solid var(--border-color); }
-        td { padding: 12px 15px; background-color: var(--panel-surface); text-align: center; font-size: 0.9rem; transition: background-color 0.3s; }
-        tbody tr td:first-child { border-radius: 6px 0 0 6px; }
-        tbody tr td:last-child { border-radius: 0 6px 6px 0; }
+        td { padding: 12px 15px; background-color: var(--panel-surface); text-align: center; font-size: 0.9rem; transition: all 0.3s; border-top: 1px solid transparent; border-bottom: 1px solid transparent; }
+        tbody tr td:first-child { border-radius: 6px 0 0 6px; border-left: 1px solid transparent; }
+        tbody tr td:last-child { border-radius: 0 6px 6px 0; border-right: 1px solid transparent; }
         tbody tr:hover td { background-color: #1a1a20; }
         .seed-row td:first-child { box-shadow: inset 3px 0 0 var(--accent-color); }
-        .promoted td { background-color: rgba(212, 175, 55, 0.08); border-top: 1px solid rgba(212, 175, 55, 0.2); border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
+        .promoted td { background-color: rgba(212, 175, 55, 0.08); border-top: 1px solid rgba(212, 175, 55, 0.15); border-bottom: 1px solid rgba(212, 175, 55, 0.15); }
         
+        .drag-handle { cursor: grab; color: #555; font-size: 1.2rem; font-weight: bold; transition: 0.2s; user-select: none; }
+        .drag-handle:hover { color: var(--accent-color); }
+        .drag-handle:active { cursor: grabbing; }
+        tr.dragging td { opacity: 0.5; background-color: #222; border-color: var(--accent-color); }
+
         .btn-promote { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: all 0.3s; font-family: 'Montserrat', sans-serif; }
         .btn-promote:hover { border-color: var(--accent-color); color: var(--accent-color); }
         .promoted .btn-promote { background: var(--accent-color); color: #000; border-color: var(--accent-color); font-weight: 600; }
 
-        .groups-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
-        @media (max-width: 900px) { .groups-grid { grid-template-columns: 1fr; } }
-
+        .groups-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; }
+        
         .match-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 30px;}
         .match-card { background: var(--panel-surface); border: 1px solid var(--border-color); padding: 25px 20px 20px 20px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s; position: relative; }
-        .match-card:hover { transform: scale(1.01); border-color: var(--border-highlight); }
+        .match-card:hover { transform: scale(1.01); border-color: var(--border-highlight); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .match-player { flex: 1; text-align: center; font-weight: 600; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center;}
         
+        /* SISTEMA DE DEUSES E VITÓRIAS INDIVIDUAIS */
         .god-slots-container { display: flex; gap: 8px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
         .god-slot-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; }
         
@@ -140,12 +146,12 @@
         .god-select-btn[data-god]:not([data-god=""]) { border-style: solid; border-color: var(--border-color); }
         
         .god-select-btn.locked {
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
             background-color: #000 !important;
             background-image: none !important;
             cursor: not-allowed; pointer-events: none;
         }
-        .god-select-btn.locked::after { content: '🔒'; color: #888; font-size: 12px; display: block !important; }
+        .god-select-btn.locked::after { content: '🔒'; color: #666; font-size: 12px; display: block !important; }
 
         .win-toggle {
             width: 100%; font-size: 0.6rem; cursor: pointer; border: 1px solid var(--border-color);
@@ -157,19 +163,22 @@
 
         .stage-title { color: var(--accent-color); font-family: 'Cinzel', serif; text-align: center; letter-spacing: 3px; text-shadow: 0 0 10px var(--accent-glow); margin-bottom: 25px; }
         
+        /* SISTEMA DE IDENTIFICAÇÃO DE PARTIDAS (M1, W2, etc) */
         .match-badges { position: absolute; top: -12px; left: 10px; display: flex; gap: 5px; z-index: 10; }
-        .format-badge, .id-badge { background: #111; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.55rem; padding: 2px 6px; border-radius: 6px; letter-spacing: 1px; font-weight: bold; }
+        .format-badge, .id-badge { background: #111; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.6rem; padding: 2px 8px; border-radius: 8px; letter-spacing: 1px; font-weight: bold; }
         .format-badge { border-color: var(--accent-color); color: var(--accent-color); background: rgba(212, 175, 55, 0.1); }
-        .id-badge { border-color: #555; color: #bbb; background: #050505; font-family: monospace; }
+        .id-badge { border-color: #333; color: #bbb; background: #050505; font-family: monospace; }
 
-        .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: center; width: 80%; }
+        /* LINKS DE STREAM COM CORES DINÂMICAS */
+        .stream-controls { position: absolute; top: -14px; right: 10px; display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: flex-end; }
+        .match-card .stream-controls { top: 8px; left: 50%; transform: translateX(-50%); right: auto; justify-content: center; width: 80%; }
         
         .viewer-stream-link { 
             --live-color: #ff4d4d; 
             display: flex; align-items: center; justify-content: center; gap: 5px; 
             color: var(--live-color); font-size: 0.65rem; text-decoration: none; 
             font-weight: bold; letter-spacing: 1px; 
-            background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 12px; 
+            background: rgba(0,0,0,0.8); padding: 4px 10px; border-radius: 12px; 
             border: 1px solid var(--border-color); transition: 0.3s; text-transform: uppercase; 
         }
         .viewer-stream-link:hover { 
@@ -187,48 +196,54 @@
             100% { transform: scale(0.8); opacity: 1; } 
         }
 
+        /* PLACAR GLOBAL (READ-ONLY) */
         .match-score { display: flex; align-items: center; gap: 15px; background: #000; padding: 5px 15px; border-radius: 6px; border: 1px solid var(--border-color); }
         .match-score input { width: 30px; background: transparent; border: none; color: var(--accent-color); text-align: center; font-size: 1.5rem; font-weight: 700; padding: 0; font-family: 'Cinzel', serif; pointer-events: none; }
         .match-score span { color: var(--text-muted); font-size: 0.8rem; font-weight: 300; }
 
+        /* MATA-MATA (BLINDADO CONTRA COLAPSO DE COLUNA) */
         .bracket-container { display: flex; overflow-x: auto; padding: 70px 20px 20px 20px; cursor: grab; min-height: 450px; align-items: stretch; gap: 0; }
         .bracket-container:active { cursor: grabbing; }
-        .bracket-container::-webkit-scrollbar { height: 6px; }
-        .bracket-container::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        .bracket-container::-webkit-scrollbar { height: 8px; }
+        .bracket-container::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        .bracket-container::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
 
-        .bracket-round { display: flex; flex-direction: column; min-width: 320px; padding-right: 60px; position: relative; }
+        /* O flex-shrink: 0 é o segredo matemático para as colunas não sumirem! */
+        .bracket-round { display: flex; flex-direction: column; min-width: 320px; padding-right: 60px; position: relative; flex-shrink: 0; }
         .bracket-round:last-child { padding-right: 0; min-width: 270px; }
         
+        /* TÍTULOS EDITÁVEIS */
         .round-title { position: absolute; top: -50px; left: 0; width: calc(100% - 60px); text-align: center; margin: 0; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; z-index: 10; border-bottom: 1px dashed transparent; outline: none; transition: 0.3s; }
         .round-title:focus { color: var(--accent-color); border-bottom: 1px dashed var(--accent-color); }
         .bracket-round:last-child .round-title { width: 100%; }
 
-        .match-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 10px 0; }
+        .match-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 15px 0; }
         
-        /* RESPONSIVIDADE CHALLONGE: CLASSE BYE-WRAPPER */
-        .bye-wrapper { visibility: hidden; pointer-events: none; }
+        /* RESPONSIVIDADE CHALLONGE: CLASSE BYE-WRAPPER (Invisível) */
+        .bye-wrapper { visibility: hidden; pointer-events: none; opacity: 0; height: 0; padding: 0; margin: 0; border: none; }
         
-        .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.3s ease; width: 100%; margin: 0; padding-top: 15px;}
+        .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.3s ease; width: 100%; margin: 0; padding-top: 15px;}
 
-        .bracket-round:not(:first-child) .match-wrapper::before { content: ''; position: absolute; left: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
-        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(odd):not(:only-of-type)::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 50%; border-top: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 6px 0 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
-        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(even):not(:only-of-type)::after { content: ''; position: absolute; right: -30px; bottom: 50%; width: 30px; height: 50%; border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 0 6px 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
-        .bracket-round:not(:last-child) .match-wrapper:only-of-type::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
+        .bracket-round:not(:first-child) .match-wrapper:not(.bye-wrapper)::before { content: ''; position: absolute; left: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
+        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(odd):not(:only-of-type):not(.bye-wrapper)::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 50%; border-top: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 6px 0 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
+        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(even):not(:only-of-type):not(.bye-wrapper)::after { content: ''; position: absolute; right: -30px; bottom: 50%; width: 30px; height: 50%; border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 0 6px 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
+        .bracket-round:not(:last-child) .match-wrapper:only-of-type:not(.bye-wrapper)::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
 
         .glow-box, .b-match:hover, .champion-box:hover { border-color: var(--accent-color) !important; box-shadow: 0 0 15px var(--accent-glow) !important; transform: scale(1.02); z-index: 10 !important; }
         .glow-incoming::before, .match-wrapper:hover::before { background-color: var(--accent-color) !important; box-shadow: 0 0 8px var(--accent-glow); }
         .glow-outgoing:only-of-type::after, .match-wrapper:only-of-type:hover::after { background-color: var(--accent-color) !important; box-shadow: 0 0 8px var(--accent-glow); }
         .glow-outgoing:nth-of-type(odd):not(:only-of-type)::after, .glow-outgoing:nth-of-type(even):not(:only-of-type)::after, .match-wrapper:nth-of-type(odd):not(:only-of-type):hover::after, .match-wrapper:nth-of-type(even):not(:only-of-type):hover::after { border-color: var(--accent-color) !important; filter: drop-shadow(0 0 4px var(--accent-color)); }
 
-        /* INTELIGÊNCIA VISUAL: DESTINO DO PERDEDOR APRIMORADO */
+        /* INTELIGÊNCIA VISUAL: DESTINO DO PERDEDOR (FUNDO PRETO) */
         .loser-drop-label { 
             font-size: 0.65rem; color: #ff6b6b; text-align: center; padding: 6px; 
-            background: #000 !important; border-top: 2px solid #ff4444; 
+            background: #000000 !important; border-top: 2px solid var(--danger-color); 
             border-radius: 0 0 8px 8px; text-transform: uppercase; letter-spacing: 1px; 
             margin-top: 5px; opacity: 1; transition: 0.3s; pointer-events: none; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.8); font-weight: bold;
+            font-weight: bold; border-left: 1px solid #222; border-right: 1px solid #222; border-bottom: 1px solid #222;
         }
-        .b-match:hover .loser-drop-label { background: #1a0505 !important; color: #fff; border-color: #ff0000; }
+        .b-match:hover .loser-drop-label { background: #1a0505 !important; color: #fff; border-color: #ff0000; box-shadow: inset 0 5px 15px rgba(255,0,0,0.2); }
+        
         .glow-drop { border-color: var(--danger-color) !important; box-shadow: 0 0 20px rgba(255, 68, 68, 0.6) !important; transform: scale(1.02); z-index: 10 !important; }
         .glow-drop::before { content: 'ALVO ⬇'; position: absolute; top: -24px; right: 10px; color: #ff4444; font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; animation: bounceDrop 1s infinite;}
         @keyframes bounceDrop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
@@ -270,6 +285,7 @@
         body.is-viewer input, body.is-viewer [contenteditable="true"], body.is-viewer textarea, body.is-viewer select { pointer-events: none !important; border: none !important; outline: none !important; background: transparent !important; }
         body.is-viewer .god-select-btn { cursor: default !important; border-style: solid !important; }
         body.is-viewer .win-toggle { display: none !important; }
+        body.is-viewer .drag-handle { display: none !important; }
         body.is-viewer .navbar .btn-save, body.is-viewer .navbar .btn-reset, body.is-viewer .navbar .btn-copy { display: none !important; }
 
     </style>
@@ -313,6 +329,7 @@
         <div id="groupsSection" style="display:none; margin-top: 40px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
                 <h2 style="margin:0;">Fase de Grupos (Mortals)</h2>
+                <p class="admin-only" style="font-size:0.7rem; color:var(--text-muted); margin:0; font-style:italic;">Dica: Arraste os jogadores pelo ícone ☰ para trocar de grupo.</p>
             </div>
             <div class="groups-grid" id="groupsDisplay"></div>
         </div>
@@ -501,6 +518,109 @@
         }
 
         // =======================
+        // SISTEMA DE DRAG & DROP DOS GRUPOS
+        // =======================
+        let draggedPlayerRow = null;
+
+        function dragPlayer(e) {
+            if(document.body.classList.contains('is-viewer')) { e.preventDefault(); return; }
+            draggedPlayerRow = e.target;
+            e.dataTransfer.effectAllowed = 'move';
+            setTimeout(() => draggedPlayerRow.classList.add('dragging'), 0);
+        }
+
+        function allowDropPlayer(e) {
+            e.preventDefault();
+            const tr = e.target.closest('tr');
+            if (tr && tr !== draggedPlayerRow && tr.parentNode.id.startsWith('tbody-grupo')) {
+                const bounding = tr.getBoundingClientRect();
+                const offset = bounding.y + (bounding.height / 2);
+                if (e.clientY - offset > 0) tr.style.borderBottom = "2px solid var(--accent-color)";
+                else tr.style.borderTop = "2px solid var(--accent-color)";
+            }
+        }
+
+        function dropPlayer(e) {
+            e.preventDefault();
+            if (!draggedPlayerRow) return;
+            draggedPlayerRow.classList.remove('dragging');
+            document.querySelectorAll('#groupsDisplay tr').forEach(tr => { tr.style.borderTop = ""; tr.style.borderBottom = ""; });
+
+            const targetTbody = e.target.closest('tbody');
+            const targetTr = e.target.closest('tr');
+
+            if (targetTr && targetTr !== draggedPlayerRow) {
+                const bounding = targetTr.getBoundingClientRect();
+                const offset = bounding.y + (bounding.height / 2);
+                if (e.clientY - offset > 0) targetTr.after(draggedPlayerRow);
+                else targetTr.before(draggedPlayerRow);
+            } else if (targetTbody && targetTbody.id.startsWith('tbody-grupo')) {
+                targetTbody.appendChild(draggedPlayerRow);
+            }
+            reprocessarGruposAposDrag();
+        }
+
+        document.addEventListener('dragend', () => {
+            if(draggedPlayerRow) draggedPlayerRow.classList.remove('dragging');
+            document.querySelectorAll('#groupsDisplay tr').forEach(tr => { tr.style.borderTop = ""; tr.style.borderBottom = ""; });
+        });
+
+        // =======================
+        // PRESERVAÇÃO DE DADOS AO REORGANIZAR
+        // =======================
+        function saveCurrentMatchesState() {
+            let matchState = {};
+            document.querySelectorAll('.match-card').forEach(card => {
+                let p1 = card.dataset.p1;
+                let p2 = card.dataset.p2;
+                let streams = card.getAttribute('data-streams') || "[]";
+                
+                let gState = [];
+                const playersDivs = card.querySelectorAll('.match-player');
+                if(playersDivs.length === 2) {
+                    const w1 = playersDivs[0].querySelectorAll('.god-slot-wrapper');
+                    const w2 = playersDivs[1].querySelectorAll('.god-slot-wrapper');
+                    
+                    for(let g=0; g<3; g++) {
+                        let god1 = w1[g]?.querySelector('.god-select-btn')?.getAttribute('data-god') || "";
+                        let win1 = w1[g]?.querySelector('.win-toggle')?.classList.contains('is-winner') || false;
+                        let god2 = w2[g]?.querySelector('.god-select-btn')?.getAttribute('data-god') || "";
+                        let win2 = w2[g]?.querySelector('.win-toggle')?.classList.contains('is-winner') || false;
+                        gState.push({ god1, win1, god2, win2 });
+                    }
+                }
+                matchState[`${p1}|${p2}`] = { streams, gState, reversed: false };
+                matchState[`${p2}|${p1}`] = { streams, gState, reversed: true };
+            });
+            return matchState;
+        }
+
+        function reprocessarGruposAposDrag() {
+            let state = saveCurrentMatchesState();
+            let novosGrupos = [];
+            
+            document.querySelectorAll('[id^="tbody-grupo-"]').forEach(tbody => {
+                let grupo = [];
+                tbody.querySelectorAll('tr').forEach(tr => {
+                    if(tr.dataset.player) {
+                        grupo.push({ nome: tr.dataset.player, seed: tr.classList.contains('seed-row') });
+                    }
+                });
+                novosGrupos.push(grupo);
+            });
+
+            // Re-renderizamos as chaves mas restauramos os placares/deuses já setados
+            gerarConfrontosGrupos(novosGrupos, state);
+            
+            // Força a atualização de tabela geral pra todos os cards recém-criados
+            document.querySelectorAll('.match-card').forEach(card => calcularPlacarGlobal(card, false));
+            
+            calcularEloGeral();
+            saveTournament();
+        }
+
+
+        // =======================
         // SISTEMA AUTOMÁTICO DE VITÓRIAS E DEUSES
         // =======================
         function toggleVitoria(btn) {
@@ -516,10 +636,10 @@
             allTogglesForGame.forEach(t => t.classList.remove('is-winner'));
             if(!wasActive) { btn.classList.add('is-winner'); }
             
-            calcularPlacarGlobal(card);
+            calcularPlacarGlobal(card, true);
         }
 
-        function calcularPlacarGlobal(card) {
+        function calcularPlacarGlobal(card, shouldSave = false) {
             const p1Wins = card.querySelectorAll(`.win-toggle[data-player="1"].is-winner`).length;
             const p2Wins = card.querySelectorAll(`.win-toggle[data-player="2"].is-winner`).length;
             
@@ -537,11 +657,16 @@
             }
             
             atualizarTodosOsGods();
-            calcularEloGeral();
+            if(shouldSave) {
+                calcularEloGeral();
+                saveTournament();
+            }
         }
 
         function verificarBloqueioBoX(card, p1Wins, p2Wins) {
             const totalGames = card.querySelectorAll(`.win-toggle[data-player="1"]`).length;
+            if(totalGames === 0) return;
+
             const majority = Math.ceil(totalGames / 2);
             const isMatchOver = (p1Wins >= majority || p2Wins >= majority);
             
@@ -756,9 +881,16 @@
             document.getElementById('groupsSection').style.display = 'block'; jogadoresPromovidos = [];
 
             grupos.forEach((grupo, idx) => {
-                let html = `<div class="panel" style="padding:25px;"><h3 style="margin-bottom: 20px; font-size:1.2rem;">Grupo ${String.fromCharCode(65 + idx)}</h3><table><thead><tr><th>Status</th><th style="text-align:left">Jogador</th><th>V</th><th>D</th><th>Pts</th></tr></thead><tbody id="tbody-grupo-${idx}">`;
+                let html = `<div class="panel" style="padding:20px;"><h3 style="margin-bottom: 15px; font-size:1.1rem; text-align:center;">Grupo ${String.fromCharCode(65 + idx)}</h3><table style="margin-top:0;"><thead><tr><th style="width:20px;"></th><th>Status</th><th style="text-align:left">Jogador</th><th>V</th><th>D</th><th>Pts</th></tr></thead><tbody id="tbody-grupo-${idx}" ondrop="dropPlayer(event)" ondragover="allowDropPlayer(event)">`;
                 grupo.forEach(p => {
-                    html += `<tr class="${p.seed ? 'seed-row' : ''}" data-player="${p.nome}"><td><button class="btn-promote admin-only" onclick="togglePromote(this, '${p.nome}')">Promover</button></td><td style="text-align:left; font-weight:600;">${p.nome}</td><td class="cell-v" contenteditable="true" oninput="calcPtsManual(this, ${idx})">0</td><td class="cell-d" contenteditable="true">0</td><td class="cell-pts" style="font-weight:bold; color:var(--accent-color)">0</td></tr>`;
+                    html += `<tr class="${p.seed ? 'seed-row' : ''}" data-player="${p.nome}" draggable="true" ondragstart="dragPlayer(event)">
+                        <td class="drag-handle" title="Arraste para mover">☰</td>
+                        <td><button class="btn-promote admin-only" onclick="togglePromote(this, '${p.nome}')">Promover</button></td>
+                        <td style="text-align:left; font-weight:600;">${p.nome}</td>
+                        <td class="cell-v" contenteditable="true" oninput="calcPtsManual(this, ${idx})">0</td>
+                        <td class="cell-d" contenteditable="true">0</td>
+                        <td class="cell-pts" style="font-weight:bold; color:var(--accent-color)">0</td>
+                    </tr>`;
                 });
                 html += `</tbody></table></div>`; container.innerHTML += html;
             });
@@ -796,9 +928,11 @@
 
             rows.forEach(row => {
                 const pName = row.dataset.player;
-                row.querySelector('.cell-v').innerText = tally[pName].v; 
-                row.querySelector('.cell-d').innerText = tally[pName].d;
-                row.querySelector('.cell-pts').innerText = tally[pName].v * 3;
+                if(tally[pName]) {
+                    row.querySelector('.cell-v').innerText = tally[pName].v; 
+                    row.querySelector('.cell-d').innerText = tally[pName].d;
+                    row.querySelector('.cell-pts').innerText = tally[pName].v * 3;
+                }
             });
 
             rows.sort((a, b) => parseInt(b.querySelector('.cell-pts').innerText) - parseInt(a.querySelector('.cell-pts').innerText));
@@ -814,7 +948,7 @@
             rows.forEach(r => tbody.appendChild(r));
         }
 
-        function gerarConfrontosGrupos(grupos) {
+        function gerarConfrontosGrupos(grupos, restoreState = null) {
             const container = document.getElementById('matchesGroupsContainer'); 
             container.innerHTML = '';
 
@@ -823,26 +957,46 @@
                 for(let i = 0; i < grupo.length; i++) {
                     for(let j = i + 1; j < grupo.length; j++) {
                         const matchId = `match_g${idx}_p${i}_p${j}`;
+                        const p1Name = grupo[i].nome;
+                        const p2Name = grupo[j].nome;
+                        
+                        let state = restoreState ? restoreState[`${p1Name}|${p2Name}`] : null;
+                        let streamsStr = state ? state.streams : "[]";
                         
                         let godsHtml1 = '', godsHtml2 = '';
                         for(let g=0; g<3; g++) {
+                            let god1 = "", win1Class = "", god2 = "", win2Class = "";
+                            if(state && state.gState[g]) {
+                                let gData = state.gState[g];
+                                if(state.reversed) {
+                                    god1 = gData.god2; win1Class = gData.win2 ? 'is-winner' : '';
+                                    god2 = gData.god1; win2Class = gData.win1 ? 'is-winner' : '';
+                                } else {
+                                    god1 = gData.god1; win1Class = gData.win1 ? 'is-winner' : '';
+                                    god2 = gData.god2; win2Class = gData.win2 ? 'is-winner' : '';
+                                }
+                            }
+                            
+                            let bg1 = god1 ? `background-image: url('${getGodIconPath(god1)}'); border-style: solid;` : "";
+                            let bg2 = god2 ? `background-image: url('${getGodIconPath(god2)}'); border-style: solid;` : "";
+
                             godsHtml1 += `<div class="god-slot-wrapper">
-                                <div class="god-select-btn game${g}-slot ${matchId}-slot" data-god="" onclick="abrirModalDeuses(this)"></div>
-                                <button class="win-toggle admin-only" data-match="${matchId}" data-game="${g}" data-player="1" onclick="toggleVitoria(this)">V</button>
+                                <div class="god-select-btn game${g}-slot ${matchId}-slot" data-god="${god1}" style="${bg1}" onclick="abrirModalDeuses(this)"></div>
+                                <button class="win-toggle admin-only ${win1Class}" data-match="${matchId}" data-game="${g}" data-player="1" onclick="toggleVitoria(this)">V</button>
                             </div>`;
                             godsHtml2 += `<div class="god-slot-wrapper">
-                                <div class="god-select-btn game${g}-slot ${matchId}-slot" data-god="" onclick="abrirModalDeuses(this)"></div>
-                                <button class="win-toggle admin-only" data-match="${matchId}" data-game="${g}" data-player="2" onclick="toggleVitoria(this)">V</button>
+                                <div class="god-select-btn game${g}-slot ${matchId}-slot" data-god="${god2}" style="${bg2}" onclick="abrirModalDeuses(this)"></div>
+                                <button class="win-toggle admin-only ${win2Class}" data-match="${matchId}" data-game="${g}" data-player="2" onclick="toggleVitoria(this)">V</button>
                             </div>`;
                         }
 
                         matchesHtml += `
-                        <div class="match-card" data-group="${idx}" data-p1="${grupo[i].nome}" data-p2="${grupo[j].nome}">
+                        <div class="match-card" data-group="${idx}" data-p1="${p1Name}" data-p2="${p2Name}" data-streams='${streamsStr}'>
                             <div class="stream-controls">
                                 <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.6rem; border-style:dashed;" onclick="addStreamLink(this)">🎥 +</button>
                             </div>
                             <div class="match-player">
-                                <div style="margin-bottom:5px;">${grupo[i].nome}</div>
+                                <div style="margin-bottom:5px;">${p1Name}</div>
                                 <div class="god-slots-container">${godsHtml1}</div>
                             </div>
                             <div class="match-score">
@@ -851,7 +1005,7 @@
                                 <input type="number" class="score-p2" value="0">
                             </div>
                             <div class="match-player">
-                                <div style="margin-bottom:5px;">${grupo[j].nome}</div>
+                                <div style="margin-bottom:5px;">${p2Name}</div>
                                 <div class="god-slots-container">${godsHtml2}</div>
                             </div>
                         </div>`;
@@ -908,12 +1062,14 @@
             let copia = [...jogadoresPromovidos];
             shuffle(copia); 
 
+            // Lógica Challonge: Encontra a próxima potência de 2
             let neededSize = 2;
             while(neededSize < copia.length) neededSize *= 2;
 
+            // Preenche os espaços vazios com BYE estrategicamente
             let matchPairs = Array.from({length: neededSize/2}, () => ["TBD", "TBD"]);
             let byesToAssign = neededSize - copia.length;
-            let step = Math.floor((neededSize/2) / byesToAssign) || 1;
+            let step = Math.floor((neededSize/2) / (byesToAssign || 1)) || 1;
             
             for(let i=0; i<byesToAssign; i++) {
                 let matchIdx = (i * step) % (neededSize/2);
@@ -932,6 +1088,7 @@
             let finalArray = [];
             matchPairs.forEach(pair => finalArray.push(pair[0], pair[1]));
 
+            // Atualiza o select invisivelmente para manter coerência estrutural
             let select = document.getElementById('bracketSize');
             let optionExists = Array.from(select.options).some(opt => parseInt(opt.value) === neededSize);
             if (!optionExists) {
@@ -1075,7 +1232,6 @@
             
             attachHoverEvents();
             renderStreamLinks();
-            setTimeout(processByes, 100);
         }
 
         // --- SISTEMA INTELIGENTE DE RASTRO ---
@@ -1147,6 +1303,14 @@
                     if(playerSlot) {
                         playerSlot.querySelector('.p-name').innerText = pName;
                         playerSlot.classList.remove('winner-slot', 'loser-slot');
+                        
+                        // Lógica de "Auto-Avanço" caso seja o jogador BYE caindo
+                        if(pName === "BYE" && targetBracket === "W") {
+                             const btnVitoriaOp = targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.btn-advance');
+                             if(btnVitoriaOp && targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.p-name').innerText !== "TBD") {
+                                 setTimeout(() => btnVitoriaOp.click(), 100);
+                             }
+                        }
                     }
                 }
             }
