@@ -78,12 +78,19 @@
         .page.active { display: flex; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .panel { background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 35px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.02); position: relative; overflow: hidden; }
+        .panel {
+            background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 35px; border-radius: 12px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.02); position: relative;
+        }
 
         .setup-grid { display: grid; grid-template-columns: 1fr 1fr 250px; gap: 30px; transition: 0.3s; }
         label { display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
 
-        textarea, select, .setup-grid input { width: 100%; background-color: var(--panel-surface); color: var(--text-main); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; box-sizing: border-box; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; resize: vertical; transition: 0.3s; }
+        textarea, select, .setup-grid input {
+            width: 100%; background-color: var(--panel-surface); color: var(--text-main);
+            border: 1px solid var(--border-color); padding: 15px; border-radius: 8px;
+            box-sizing: border-box; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; resize: vertical; transition: 0.3s;
+        }
         textarea:focus, select:focus, .setup-grid input:focus { outline: none; border-color: var(--accent-color); background-color: #16161a; box-shadow: 0 0 0 3px var(--accent-glow); }
 
         button.action-btn { background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), transparent); color: var(--accent-color); border: 1px solid var(--accent-color); padding: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease; width: 100%; border-radius: 6px; font-weight: 600; font-size: 0.8rem; }
@@ -110,7 +117,7 @@
         .match-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 30px;}
         
         /* MATCH CARD GERAL */
-        .match-card { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 8px; display: flex; flex-direction: column; transition: transform 0.2s; position: relative; padding: 0; overflow: hidden;}
+        .match-card { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 8px; display: flex; flex-direction: column; transition: transform 0.2s; position: relative; padding: 0; }
         .match-card:hover { transform: scale(1.01); border-color: var(--border-highlight); }
         .match-card-body { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 25px 20px 15px 20px; box-sizing: border-box;}
         
@@ -159,34 +166,35 @@
         .viewer-stream-link::before { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--live-color); border-radius: 50%; animation: pulseLive 1.5s infinite; }
         @keyframes pulseLive { 0% { transform: scale(0.8); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.3; } 100% { transform: scale(0.8); opacity: 1; } }
 
-        /* PLACAR BLINDADO CONTRA ESMAGAMENTO */
+        /* PLACAR BLINDADO CONTRA ESMAGAMENTO (Solução do problema visual do placar) */
         .match-score { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: 15px; background: #000; padding: 5px 15px; border-radius: 6px; border: 1px solid var(--border-color); margin: 0 10px; flex-shrink: 0; min-width: 90px; flex-wrap: nowrap !important; }
         .match-score input { width: 30px; background: transparent; border: none; color: var(--accent-color); text-align: center; font-size: 1.5rem; font-weight: 700; padding: 0; font-family: 'Cinzel', serif; pointer-events: none; }
         .match-score span { color: var(--text-muted); font-size: 0.8rem; font-weight: 300; }
 
-        /* MATA-MATA ESTRUTURA COMPACTA */
+        /* MATA-MATA ESTRUTURA BLINDADA */
         .bracket-container { display: flex; overflow-x: auto; padding: 70px 20px 20px 20px; cursor: grab; min-height: 450px; align-items: stretch; gap: 0; }
         .bracket-container:active { cursor: grabbing; }
         .bracket-container::-webkit-scrollbar { height: 8px; }
         .bracket-container::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         .bracket-container::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
 
-        .bracket-round { display: flex; flex-direction: column; min-width: 270px; padding-right: 40px; position: relative; flex-shrink: 0; }
-        .bracket-round:last-child { padding-right: 0; min-width: 250px; }
+        .bracket-round { display: flex; flex-direction: column; min-width: 320px; padding-right: 60px; position: relative; flex-shrink: 0; }
+        .bracket-round:last-child { padding-right: 0; min-width: 270px; }
         
-        .round-title { position: absolute; top: -50px; left: 0; width: calc(100% - 40px); text-align: center; margin: 0; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; z-index: 10; border-bottom: 1px dashed transparent; outline: none; transition: 0.3s; }
+        .round-title { position: absolute; top: -50px; left: 0; width: calc(100% - 60px); text-align: center; margin: 0; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; z-index: 10; border-bottom: 1px dashed transparent; outline: none; transition: 0.3s; }
         .round-title:focus { color: var(--accent-color); border-bottom: 1px dashed var(--accent-color); }
         .bracket-round:last-child .round-title { width: 100%; }
 
-        .match-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 10px 0; }
+        .match-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 15px 0; }
         
-        .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.3s ease; width: 100%; margin: 0; padding-top: 15px; overflow: hidden;}
+        /* Sem overflow:hidden para não cortar as insígnias e o botão de live! */
+        .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.3s ease; width: 100%; margin: 0; padding-top: 15px; }
 
         /* CONEXÕES LÓGICAS */
-        .bracket-round:not(:first-child) .match-wrapper::before { content: ''; position: absolute; left: -20px; top: 50%; width: 20px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
-        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(odd):not(:only-of-type)::after { content: ''; position: absolute; right: -20px; top: 50%; width: 20px; height: 50%; border-top: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 6px 0 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
-        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(even):not(:only-of-type)::after { content: ''; position: absolute; right: -20px; bottom: 50%; width: 20px; height: 50%; border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 0 6px 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
-        .bracket-round:not(:last-child) .match-wrapper:only-of-type::after { content: ''; position: absolute; right: -20px; top: 50%; width: 20px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
+        .bracket-round:not(:first-child) .match-wrapper::before { content: ''; position: absolute; left: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
+        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(odd):not(:only-of-type)::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 50%; border-top: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 6px 0 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
+        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(even):not(:only-of-type)::after { content: ''; position: absolute; right: -30px; bottom: 50%; width: 30px; height: 50%; border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 0 6px 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
+        .bracket-round:not(:last-child) .match-wrapper:only-of-type::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
 
         /* BYE INTELIGENTE */
         .b-match.is-bye { background: transparent !important; border: 1px dashed rgba(255,255,255,0.1) !important; box-shadow: none !important; opacity: 0.5; }
@@ -203,18 +211,18 @@
         .glow-outgoing:nth-of-type(odd):not(:only-of-type)::after, .glow-outgoing:nth-of-type(even):not(:only-of-type)::after, .match-wrapper:nth-of-type(odd):not(:only-of-type):hover::after, .match-wrapper:nth-of-type(even):not(:only-of-type):hover::after { border-color: var(--accent-color) !important; filter: drop-shadow(0 0 4px var(--accent-color)); }
 
         /* AVISO DE QUEDA (FUNDO PRETO) */
-        .loser-drop-label { font-size: 0.55rem; color: #ff6b6b; text-align: center; padding: 4px; background: #000000 !important; border-top: 2px solid var(--danger-color); text-transform: uppercase; letter-spacing: 1px; opacity: 1; transition: 0.3s; pointer-events: none; font-weight: bold; width: 100%; box-sizing: border-box; }
+        .loser-drop-label { font-size: 0.65rem; color: #ff6b6b; text-align: center; padding: 6px; background: #000000 !important; border-top: 2px solid var(--danger-color); border-radius: 0 0 8px 8px; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; opacity: 1; transition: 0.3s; pointer-events: none; font-weight: bold; width: 100%; box-sizing: border-box; }
         .b-match:hover .loser-drop-label { background: #1a0505 !important; color: #fff; border-color: #ff0000; box-shadow: inset 0 5px 15px rgba(255,0,0,0.2); }
         .glow-drop { border-color: var(--danger-color) !important; box-shadow: 0 0 20px rgba(255, 68, 68, 0.6) !important; transform: scale(1.02); z-index: 10 !important; }
         .glow-drop::before { content: 'ALVO ⬇'; position: absolute; top: -20px; right: 10px; color: #ff4444; font-size: 0.65rem; font-weight: bold; letter-spacing: 1px; animation: bounceDrop 1s infinite;}
         @keyframes bounceDrop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
 
-        /* JOGADOR NO MATA-MATA (COMPACTO E ALINHADO) */
-        .b-player { padding: 8px 12px; display: flex; flex-direction: column; align-items: stretch; gap: 4px; transition: all 0.3s; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        /* JOGADOR NO MATA-MATA */
+        .b-player { padding: 12px 15px; display: flex; flex-direction: column; align-items: stretch; gap: 8px; font-size: 0.85rem; transition: all 0.3s; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .b-player:last-child { border-bottom: none; }
         .b-player-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .p-name { font-weight: 600; font-size: 0.8rem; letter-spacing: 0.5px; transition: 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .p-placeholder { color: #888; font-style: italic; font-weight: 400; font-size: 0.65rem; }
+        .p-name { font-weight: 600; letter-spacing: 0.5px; transition: 0.3s; }
+        .p-placeholder { color: #888; font-style: italic; font-weight: 400; font-size: 0.7rem; }
         
         .b-player.winner-slot { background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent); border-left: 3px solid var(--accent-color); }
         .b-player.winner-slot .p-name { color: var(--accent-color); }
@@ -222,11 +230,11 @@
         .b-player.loser-slot .p-name { text-decoration: line-through; color: #666; }
 
         /* PLACAR ELEGANTE & BOTÕES */
-        .placar-mata-wrapper { display:flex; align-items:center; gap:6px; flex-shrink:0; }
-        .score-input { width: 24px !important; height: 24px; padding: 0; background: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; border-radius: 4px; color: var(--text-main) !important; text-align: center !important; font-weight: 700; font-size: 0.95rem; font-family: 'Cinzel', serif; pointer-events: none; box-sizing: border-box; }
+        .placar-mata-wrapper { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+        .score-input { width: 32px !important; height: 32px; padding: 0; background: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; border-radius: 6px; color: var(--text-main) !important; text-align: center !important; font-weight: 700; font-size: 1.1rem; font-family: 'Cinzel', serif; pointer-events: none; box-sizing: border-box; }
         .b-player.winner-slot .score-input { background: rgba(212, 175, 55, 0.2) !important; border-color: var(--accent-color) !important; color: var(--accent-color) !important; text-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
 
-        .btn-advance { background: transparent; border: 1px solid var(--border-highlight); color: var(--text-muted); border-radius: 3px; cursor: pointer; padding: 2px 6px; font-weight: 600; font-size: 0.55rem; transition: all 0.2s; text-transform: uppercase; }
+        .btn-advance { background: transparent; border: 1px solid var(--border-highlight); color: var(--text-muted); border-radius: 4px; cursor: pointer; padding: 4px 10px; font-weight: 600; font-size: 0.65rem; transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px; }
         .btn-advance:hover { border-color: var(--accent-color); color: var(--accent-color); }
         .b-player.winner-slot .btn-advance { display: none; } 
         .btn-loser { border-color: var(--danger-color); color: var(--danger-color); }
@@ -246,28 +254,66 @@
         .god-grid-item { width: 45px; height: 45px; cursor: pointer; border-radius: 6px; border: 2px solid transparent; transition: 0.2s; object-fit: cover; background-color: #000; }
         .god-grid-item:hover { border-color: var(--accent-color); transform: scale(1.1); box-shadow: 0 0 10px var(--accent-glow); }
 
-        /* GALERIA DE MAPAS INTERATIVA */
-        #mapStatsBg { border-radius: 12px; background-size: cover; background-position: center; transition: background-image 0.4s ease-in-out; border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden; min-height: 700px; padding: 40px; }
-        .map-stats-glass { background: rgba(15, 15, 20, 0.75); backdrop-filter: blur(8px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); padding: 30px; max-width: 800px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* GALERIA DE MAPAS INTERATIVA (PÁGINA FULL-BLEED) */
+        #page-maps { padding: 0 !important; max-width: 100% !important; height: calc(100vh - 65px); position: relative; overflow: hidden; }
+        .immersive-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: background-image 0.8s ease-in-out; z-index: 0; }
+        .immersive-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(5,5,8,0.95) 0%, rgba(5,5,8,0.7) 45%, transparent 100%), linear-gradient(0deg, rgba(5,5,8,0.9) 0%, transparent 25%); z-index: 1; }
+        .immersive-content { position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; padding: 40px 60px; box-sizing: border-box; }
         
-        .map-thumb-slider { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px; margin-bottom: 25px; scroll-behavior: smooth; }
-        .map-thumb-slider::-webkit-scrollbar { height: 6px; }
-        .map-thumb-slider::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
-        .map-thumb { min-width: 140px; height: 80px; border-radius: 8px; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: center; cursor: pointer; border: 2px solid transparent; transition: 0.3s; position: relative; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .map-thumb::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); z-index: 1; }
-        .map-thumb span { position: relative; z-index: 2; color: #fff; font-size: 0.7rem; font-weight: bold; margin-bottom: 8px; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
-        .map-thumb:hover { transform: translateY(-3px); border-color: #888; }
-        .map-thumb.active { border-color: var(--accent-color); box-shadow: 0 0 15px var(--accent-glow); transform: scale(1.05); }
+        .map-thumb-slider { display: flex; gap: 15px; overflow-x: auto; padding: 15px 5px; margin-top: auto; scroll-behavior: smooth; }
+        .map-thumb-slider::-webkit-scrollbar { height: 8px; }
+        .map-thumb-slider::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        .map-thumb { min-width: 180px; height: 100px; border-radius: 8px; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: center; cursor: pointer; border: 2px solid transparent; transition: 0.3s; position: relative; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.6); }
+        .map-thumb::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); z-index: 1; transition: 0.3s; }
+        .map-thumb span { position: relative; z-index: 2; color: #fff; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+        .map-thumb:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.5); }
+        .map-thumb:hover::after { background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); }
+        .map-thumb.active { border-color: var(--accent-color); box-shadow: 0 0 20px var(--accent-glow); transform: scale(1.05); }
 
-        /* AJUSTES DO MODO ESPECTADOR (LIBERANDO O FILTRO DE MAPAS GERAL) */
+        /* PODIO DE ESTATISTICAS DE MAPAS */
+        .god-stat-card { display: flex; align-items: center; justify-content: space-between; background: rgba(20,20,25,0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px 20px; transition: 0.3s; position: relative; overflow: hidden; }
+        .god-stat-card:hover { background: rgba(30,30,40,0.8); transform: translateX(10px); }
+        .god-stat-card::before { content: ''; position: absolute; top:0; left:0; height:100%; width:4px; }
+        
+        .god-stat-card.gold { border-color: rgba(255, 215, 0, 0.4); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.1); }
+        .god-stat-card.gold::before { background: #FFD700; box-shadow: 0 0 10px #FFD700; }
+        .god-stat-card.gold .pos-number { color: #FFD700; font-size: 1.5rem; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        .god-stat-card.gold .god-avatar { width: 44px; height: 44px; border-color: #FFD700; }
+        
+        .god-stat-card.silver { border-color: rgba(192, 192, 192, 0.4); }
+        .god-stat-card.silver::before { background: #C0C0C0; box-shadow: 0 0 10px #C0C0C0; }
+        .god-stat-card.silver .pos-number { color: #C0C0C0; font-size: 1.3rem; }
+        .god-stat-card.silver .god-avatar { width: 40px; height: 40px; border-color: #C0C0C0; }
+
+        .god-stat-card.bronze { border-color: rgba(205, 127, 50, 0.4); }
+        .god-stat-card.bronze::before { background: #CD7F32; box-shadow: 0 0 10px #CD7F32; }
+        .god-stat-card.bronze .pos-number { color: #CD7F32; font-size: 1.2rem; }
+        .god-stat-card.bronze .god-avatar { width: 38px; height: 38px; border-color: #CD7F32; }
+
+        .god-stat-card.standard::before { background: #444; }
+        .god-stat-card.standard .pos-number { color: #888; font-size: 1rem; }
+        .god-stat-card.standard .god-avatar { width: 32px; height: 32px; border-color: #444; }
+
+        .stat-metric { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .stat-metric .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-metric .value { font-size: 1.1rem; font-weight: bold; color: #fff; }
+        
+        .win-bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 4px; overflow: hidden; display: flex; }
+        .win-bar-fill { height: 100%; background: #4ade80; }
+        .loss-bar-fill { height: 100%; background: var(--danger-color); }
+
+        /* AJUSTES DO MODO ESPECTADOR (LIBERANDO O FILTRO DE MAPAS GERAL E O CARROSSEL) */
         body.is-viewer .admin-only, body.is-viewer .btn-advance, body.is-viewer .btn-promote { display: none !important; }
         body.is-viewer input, body.is-viewer [contenteditable="true"], body.is-viewer textarea { pointer-events: none !important; border: none !important; outline: none !important; background: transparent !important; }
         body.is-viewer .god-select-btn { pointer-events: none !important; border-style: solid !important; }
         body.is-viewer .win-toggle { display: none !important; }
         body.is-viewer .drag-handle { display: none !important; }
         body.is-viewer .navbar .btn-save, body.is-viewer .navbar .btn-reset, body.is-viewer .navbar .btn-copy { display: none !important; }
+        
+        /* Libera os dropdowns de mapa apenas na visualização (os dos jogos ficam travados visualmente) */
         body.is-viewer select.map-select:not(#mapFilter) { pointer-events: none !important; appearance: none; -webkit-appearance: none; border: none; background: transparent; color: var(--accent-color); font-weight: bold; text-align: center; padding:0;}
         body.is-viewer #mapFilter { pointer-events: auto !important; appearance: auto !important; -webkit-appearance: auto !important; border: 1px solid #333 !important; background: #0a0a0d !important; padding: 4px 8px !important;}
+        body.is-viewer .map-thumb { pointer-events: auto !important; cursor: pointer !important; }
 
     </style>
 </head>
@@ -344,7 +390,6 @@
                     <table>
                         <thead><tr><th style="text-align:left;">God</th><th title="Jogos Jogados">J</th><th title="Vitórias">V</th><th title="Derrotas">D</th><th title="Bans Globais" style="color:var(--danger-color);">B</th><th title="Winrate">WR</th></tr></thead>
                         <tbody id="godsTable">
-                            <!-- Populated statically initially, dynamic later -->
                             <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="zeus_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Zeus</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
                             <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="hades_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Hades</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
                             <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="poseidon_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Poseidon</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
@@ -376,30 +421,31 @@
         <div class="footer">DESENVOLVIDO POR [CAOK] PAIN</div>
     </div>
 
-    <!-- PÁGINA DE MAPAS: ESTATÍSTICAS AVANÇADAS -->
-    <div id="page-maps" class="container page" style="max-width:1200px;">
-        <div id="mapStatsBg">
-            <div class="map-stats-glass">
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; margin-bottom:15px;">
-                    <h2 style="margin:0; font-size:1.8rem; text-shadow:0 2px 5px rgba(0,0,0,0.8);">Análise de Terreno: <span id="mapaDestaqueTitulo" style="color:#fff;"></span></h2>
-                </div>
-                
-                <!-- CARROSSEL DE MAPAS INTERATIVO -->
-                <div id="mapThumbSelector" class="map-thumb-slider">
-                    <!-- Thumbnails Injetados via JS -->
-                </div>
-                
-                <div style="text-align:center; margin-bottom:20px;">
-                    <div style="font-size:0.8rem; color:var(--accent-color); text-transform:uppercase; letter-spacing:2px; font-weight:bold;">Total de Partidas no Mapa</div>
-                    <div id="mapTotalJogos" style="font-size:3.5rem; font-family:'Cinzel', serif; font-weight:bold; line-height:1; text-shadow:0 2px 10px rgba(0,0,0,0.5);">0</div>
-                </div>
-
-                <div id="mapStatsList" style="display:flex; flex-direction:column; gap:10px; max-height:400px; overflow-y:auto; padding-right:10px;">
-                    <!-- Lista de Estatísticas Injetada via JS -->
+    <!-- PÁGINA DE MAPAS: ESTATÍSTICAS AVANÇADAS IMERSIVAS -->
+    <div id="page-maps" class="page">
+        <div id="immersiveMapBg" class="immersive-bg">
+            <div class="immersive-overlay"></div>
+        </div>
+        
+        <div class="immersive-content">
+            <!-- Coluna de Estatísticas (Esquerda) -->
+            <div style="flex: 1; display: flex; flex-direction: row; gap: 40px;">
+                <div style="width: 450px; display: flex; flex-direction: column; gap: 20px;">
+                    <h1 id="mapaDestaqueTitulo" style="font-size: 3rem; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); font-family: 'Cinzel', serif; color: var(--accent-color); letter-spacing: 2px;">Anatólia</h1>
+                    <div style="font-size: 1rem; color: #fff; text-transform: uppercase; font-weight: bold; letter-spacing: 2px; text-shadow: 1px 1px 4px #000;">Total de Partidas no Mapa: <span id="mapTotalJogos" style="color: var(--accent-color); font-size: 1.5rem; margin-left: 10px;">0</span></div>
+                    
+                    <div id="mapStatsList" style="flex: 1; overflow-y: auto; padding-right: 10px; display:flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+                        <!-- Pódio e Lista Injetados via JS -->
+                    </div>
                 </div>
             </div>
+
+            <!-- Carrossel de Mapas (Rodapé) -->
+            <div id="mapThumbSelector" class="map-thumb-slider">
+                <!-- Thumbnails Injetados via JS -->
+            </div>
+            <div class="footer" style="margin-top: 10px; padding-bottom: 0;">DESENVOLVIDO POR [CAOK] PAIN</div>
         </div>
-        <div class="footer">DESENVOLVIDO POR [CAOK] PAIN</div>
     </div>
 
     <!-- TAVERNAS OF MORTALS (GRUPOS) -->
@@ -554,8 +600,8 @@
             if(activeThumb) activeThumb.classList.add('active');
 
             let bgImg = mapaImagens[mapaEscolhido] || 'header.png';
-            let container = document.getElementById('mapStatsBg');
-            if(container) container.style.backgroundImage = `linear-gradient(to bottom, rgba(15,15,20,0.85), rgba(15,15,20,0.98)), url('${bgImg}')`;
+            let container = document.getElementById('immersiveMapBg');
+            if(container) container.style.backgroundImage = `url('${bgImg}')`;
             
             let titulo = document.getElementById('mapaDestaqueTitulo');
             if(titulo) titulo.innerText = mapaEscolhido;
@@ -609,26 +655,37 @@
                 godsPlayed.forEach((g, index) => {
                     let s = godStats[g];
                     let wr = ((s.v / s.j) * 100).toFixed(1);
-                    let posColor = index === 0 ? '#FFD700' : (index === 1 ? '#C0C0C0' : (index === 2 ? '#CD7F32' : '#fff'));
                     
+                    let posText = index === 0 ? '1º' : (index === 1 ? '2º' : (index === 2 ? '3º' : `${index+1}º`));
+                    let cardClass = index === 0 ? 'gold' : (index === 1 ? 'silver' : (index === 2 ? 'bronze' : 'standard'));
+                    
+                    let winPct = (s.v / s.j) * 100;
+                    let lossPct = (s.d / s.j) * 100;
+
                     html += `
-                    <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(0,0,0,0.5); padding:10px 20px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
-                        <div style="display:flex; align-items:center; gap:15px; width:40%;">
-                            <span style="font-weight:bold; color:${posColor}; width:20px; font-size:1.2rem;">${index+1}º</span>
-                            <img src="${getGodIconPath(g)}" style="width:36px; height:36px; border-radius:4px; border:1px solid #555; box-shadow:0 2px 5px rgba(0,0,0,0.5);">
+                    <div class="god-stat-card ${cardClass}">
+                        <div style="display:flex; align-items:center; gap:15px; width:45%;">
+                            <span class="pos-number" style="font-weight:bold; width:25px; text-align:center;">${posText}</span>
+                            <img src="${getGodIconPath(g)}" class="god-avatar" style="border-radius:4px; border-width:2px; border-style:solid; box-shadow:0 2px 5px rgba(0,0,0,0.5);">
                             <span style="font-weight:bold; font-size:1.1rem; letter-spacing:1px; color:#fff;">${g}</span>
                         </div>
-                        <div style="width:20%; text-align:center;">
-                            <div style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Jogos</div>
-                            <div style="font-size:1.1rem; font-weight:bold; color:#fff;">${s.j}</div>
+                        <div class="stat-metric" style="width:15%;">
+                            <div class="label">Jogos</div>
+                            <div class="value">${s.j}</div>
                         </div>
-                        <div style="width:20%; text-align:center;">
-                            <div style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">V - D</div>
-                            <div style="font-size:1.1rem; color:#aaa; font-weight:bold;"><span style="color:#4ade80;">${s.v}</span> - <span style="color:var(--danger-color);">${s.d}</span></div>
+                        <div style="width:25%; text-align:center;">
+                            <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:bold; padding: 0 2px;">
+                                <span style="color:#4ade80;">${s.v}V</span>
+                                <span style="color:var(--danger-color);">${s.d}D</span>
+                            </div>
+                            <div class="win-bar-container">
+                                <div class="win-bar-fill" style="width: ${winPct}%;"></div>
+                                <div class="loss-bar-fill" style="width: ${lossPct}%;"></div>
+                            </div>
                         </div>
-                        <div style="width:20%; text-align:right;">
-                            <div style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Winrate</div>
-                            <div style="font-size:1.3rem; font-weight:bold; color:var(--accent-color);">${wr}%</div>
+                        <div class="stat-metric" style="width:15%;">
+                            <div class="label" style="color:var(--accent-color);">Winrate</div>
+                            <div class="value" style="color:var(--accent-color); font-size:1.3rem;">${wr}%</div>
                         </div>
                     </div>`;
                 });
@@ -702,7 +759,6 @@
                     for(let g=0; g<3; g++) {
                         let god1 = w1[g]?.querySelector('.god-select-btn')?.getAttribute('data-god') || "";
                         let win1 = w1[g]?.querySelector('.win-toggle')?.classList.contains('is-winner') || false;
-                        
                         let god2 = w2[g]?.querySelector('.god-select-btn')?.getAttribute('data-god') || "";
                         let win2 = w2[g]?.querySelector('.win-toggle')?.classList.contains('is-winner') || false;
                         gState.push({ god1, win1, god2, win2 });
@@ -1064,6 +1120,9 @@
             renderStreamLinks();
         }
 
+        // =======================
+        // LÓGICA DE DESTINO DO PERDEDOR E CHAVE DINÂMICA
+        // =======================
         function getLoserDestinationText(r, m, size) {
             if (r === 0) return `L1-M${Math.floor(m/2) + 1}`;
             const lRound = r * 2 - 1;
@@ -1081,10 +1140,7 @@
                 
                 let p1 = players[0].innerText.trim(), p2 = players[1].innerText.trim();
 
-                if ((p1 === "BYE" && p2 !== "BYE" && p2 !== "TBD" && !p2.startsWith("Perd.") && !p2.startsWith("Venc.")) || 
-                    (p2 === "BYE" && p1 !== "BYE" && p1 !== "TBD" && !p1.startsWith("Perd.") && !p1.startsWith("Venc.")) || 
-                    (p1 === "BYE" && p2 === "BYE")) {
-                    
+                if (p1 === "BYE" || p2 === "BYE") {
                     match.classList.add('bye-processed');
                     match.classList.add('is-bye');
                     
@@ -1185,6 +1241,7 @@
             
             let roundsW = Math.log2(size);
             
+            // --- WINNERS BRACKET ---
             for(let i=0; i < roundsW; i++) {
                 let matchesNum = size / Math.pow(2, i+1);
                 let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
@@ -1217,7 +1274,7 @@
                                 <span class="id-badge">${matchDisplayId}</span>
                             </div>
                             <div class="b-match" data-bracket="W" data-round="${i}" data-match="${j}" data-drop-r="${dropR}" data-drop-m="${crossM}">
-                                <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
+                                <div class="stream-controls" style="top: 8px; right: 8px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                     <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                                 </div>
                                 ${gerarSlotHtml(p1, 0, slots, mId)}
@@ -1230,6 +1287,7 @@
                 wContainer.appendChild(roundDiv);
             }
 
+            // --- LOSERS BRACKET ---
             let roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1; 
             for(let i=0; i < roundsL; i++) {
                 let matchesNum = size / Math.pow(2, Math.floor(i/2) + 2);
@@ -1255,7 +1313,7 @@
                                 <span class="id-badge">${matchDisplayId}</span>
                             </div>
                             <div class="b-match" data-bracket="L" data-round="${i}" data-match="${j}">
-                                <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
+                                <div class="stream-controls" style="top: 8px; right: 8px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                     <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                                 </div>
                                 ${gerarSlotHtml("TBD", 0, slots, mId)}
@@ -1267,6 +1325,7 @@
                 lContainer.appendChild(roundDiv);
             }
 
+            // --- GRAND FINALS ---
             fContainer.innerHTML = `
                 <div class="bracket-round round-champion" style="min-width: 400px;">
                     <h4 class="round-title" style="color:#FFD700;" contenteditable="true" onblur="saveTournament()">GRAND FINALS (TITANS)</h4>
@@ -1276,7 +1335,7 @@
                             <span class="id-badge">GF</span>
                         </div>
                         <div class="b-match glow-box" style="border-color:#FFD700;" data-bracket="F" data-round="0" data-match="0">
-                            <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
+                            <div class="stream-controls" style="top: 8px; right: 8px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                 <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                             </div>
                             ${gerarSlotHtml("Venc. Chave Superior", 0, 7, "f_0_0")}
@@ -1362,7 +1421,7 @@
                         playerSlot.classList.remove('is-empty');
                         
                         if(pName === "BYE" && targetBracket === "W") {
-                             const btnVitoriaOp = targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.btn-advance');
+                             const btnVitoriaOp = targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.btn-advance.w') || targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('button[title="Avançar Vencedor"]');
                              if(btnVitoriaOp && targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.p-name').innerText !== "TBD") {
                                  setTimeout(() => btnVitoriaOp.click(), 100);
                              }
