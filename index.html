@@ -160,7 +160,6 @@
         .viewer-stream-link::before { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--live-color); border-radius: 50%; animation: pulseLive 1.5s infinite; }
         @keyframes pulseLive { 0% { transform: scale(0.8); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.3; } 100% { transform: scale(0.8); opacity: 1; } }
 
-        /* PLACAR BLINDADO CONTRA ESMAGAMENTO */
         .match-score { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: 15px; background: #000; padding: 5px 15px; border-radius: 6px; border: 1px solid var(--border-color); margin: 0 10px; flex-shrink: 0; min-width: 90px; flex-wrap: nowrap !important; }
         .match-score input { width: 30px; background: transparent; border: none; color: var(--accent-color); text-align: center; font-size: 1.5rem; font-weight: 700; padding: 0; font-family: 'Cinzel', serif; pointer-events: none; }
         .match-score span { color: var(--text-muted); font-size: 0.8rem; font-weight: 300; }
@@ -168,26 +167,26 @@
         /* =========================================
            MATA-MATA ESTRUTURA MINIATURIZADA (PRO)
            ========================================= */
-        .bracket-container { display: flex; overflow-x: auto; padding: 50px 10px 20px 10px; cursor: grab; min-height: 400px; align-items: stretch; gap: 0; }
+        .bracket-container { display: flex; overflow-x: auto; padding: 40px 10px 20px 10px; cursor: grab; min-height: 400px; align-items: stretch; gap: 0; }
         .bracket-container:active { cursor: grabbing; }
 
-        .bracket-round { display: flex; flex-direction: column; min-width: 240px; padding-right: 40px; position: relative; flex-shrink: 0; }
-        .bracket-round:last-child { padding-right: 0; min-width: 220px; }
+        .bracket-round { display: flex; flex-direction: column; min-width: 220px; padding-right: 35px; position: relative; flex-shrink: 0; }
+        .bracket-round:last-child { padding-right: 0; min-width: 200px; }
         
-        .round-title { position: absolute; top: -35px; left: 0; width: calc(100% - 40px); text-align: center; margin: 0; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; z-index: 10; border-bottom: 1px dashed transparent; outline: none; transition: 0.3s; }
+        .round-title { position: absolute; top: -30px; left: 0; width: calc(100% - 35px); text-align: center; margin: 0; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; z-index: 10; border-bottom: 1px dashed transparent; outline: none; transition: 0.3s; }
         .round-title:focus { color: var(--accent-color); border-bottom: 1px dashed var(--accent-color); }
         .bracket-round:last-child .round-title { width: 100%; }
 
-        .match-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 8px 0; }
+        .match-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 6px 0; }
         
-        /* Sem overflow:hidden para os emblemas vazarem corretamente */
-        .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.2s ease; width: 100%; margin: 0; padding-top: 10px;}
+        /* OVERFLOW VISIBLE para as badges e botão de stream não sumirem! */
+        .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.2s ease; width: 100%; margin: 0; padding-top: 10px; overflow: visible;}
 
         /* CONEXÕES LÓGICAS */
-        .bracket-round:not(:first-child) .match-wrapper::before { content: ''; position: absolute; left: -20px; top: 50%; width: 20px; height: 2px; background-color: #444; z-index: 1; transform: translateY(-50%); }
-        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(odd):not(:only-of-type)::after { content: ''; position: absolute; right: -20px; top: 50%; width: 20px; height: 50%; border-top: 2px solid #444; border-right: 2px solid #444; border-radius: 0 4px 0 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
-        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(even):not(:only-of-type)::after { content: ''; position: absolute; right: -20px; bottom: 50%; width: 20px; height: 50%; border-bottom: 2px solid #444; border-right: 2px solid #444; border-radius: 0 0 4px 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
-        .bracket-round:not(:last-child) .match-wrapper:only-of-type::after { content: ''; position: absolute; right: -20px; top: 50%; width: 20px; height: 2px; background-color: #444; z-index: 1; transform: translateY(-50%); }
+        .bracket-round:not(:first-child) .match-wrapper::before { content: ''; position: absolute; left: -17px; top: 50%; width: 17px; height: 2px; background-color: #444; z-index: 1; transform: translateY(-50%); }
+        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(odd):not(:only-of-type)::after { content: ''; position: absolute; right: -17px; top: 50%; width: 17px; height: 50%; border-top: 2px solid #444; border-right: 2px solid #444; border-radius: 0 4px 0 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
+        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(even):not(:only-of-type)::after { content: ''; position: absolute; right: -17px; bottom: 50%; width: 17px; height: 50%; border-bottom: 2px solid #444; border-right: 2px solid #444; border-radius: 0 0 4px 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
+        .bracket-round:not(:last-child) .match-wrapper:only-of-type::after { content: ''; position: absolute; right: -17px; top: 50%; width: 17px; height: 2px; background-color: #444; z-index: 1; transform: translateY(-50%); }
 
         /* BYE INTELIGENTE */
         .b-match.is-bye { background: transparent !important; border: 1px dashed rgba(255,255,255,0.1) !important; box-shadow: none !important; opacity: 0.4; }
@@ -207,10 +206,9 @@
         .b-match:hover .loser-drop-label { background: #1a0505 !important; color: #fff; border-color: #ff0000; box-shadow: inset 0 3px 10px rgba(255,0,0,0.2); }
         .glow-drop { border-color: var(--danger-color) !important; box-shadow: 0 0 15px rgba(255, 68, 68, 0.5) !important; transform: scale(1.02); z-index: 10 !important; }
         .glow-drop::before { content: 'ALVO ⬇'; position: absolute; top: -18px; right: 8px; color: #ff4444; font-size: 0.6rem; font-weight: bold; letter-spacing: 1px; animation: bounceDrop 1s infinite;}
-        @keyframes bounceDrop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
 
         /* JOGADOR NO MATA-MATA (REDUZIDO E ALINHADO) */
-        .b-player { padding: 6px 10px; display: flex; flex-direction: column; align-items: stretch; gap: 4px; transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .b-player { padding: 4px 8px; display: flex; flex-direction: column; align-items: stretch; gap: 3px; transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .b-player:last-child { border-bottom: none; }
         .b-player-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .p-name { font-weight: 600; font-size: 0.75rem; letter-spacing: 0.5px; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
@@ -223,25 +221,25 @@
 
         /* PLACAR BLINDADO E REDUZIDO NO MATA MATA */
         .placar-mata-wrapper { display:flex !important; flex-direction: row !important; align-items:center !important; justify-content: flex-end; gap:4px; flex-shrink:0; flex-wrap: nowrap !important; }
-        .score-input { width: 18px !important; height: 18px; padding: 0; background: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; border-radius: 4px; color: var(--text-main) !important; text-align: center !important; font-weight: 700; font-size: 0.8rem; font-family: 'Cinzel', serif; pointer-events: none; box-sizing: border-box; margin-left: 5px;}
+        .score-input { width: 18px !important; height: 18px; padding: 0; background: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; border-radius: 3px; color: var(--text-main) !important; text-align: center !important; font-weight: 700; font-size: 0.75rem; font-family: 'Cinzel', serif; pointer-events: none; box-sizing: border-box; margin-left: 3px;}
         .b-player.winner-slot .score-input { background: rgba(212, 175, 55, 0.2) !important; border-color: var(--accent-color) !important; color: var(--accent-color) !important; text-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
 
-        .btn-advance { background: transparent; border: 1px solid var(--border-highlight); color: var(--text-muted); border-radius: 3px; cursor: pointer; padding: 1px 4px; font-weight: 600; font-size: 0.5rem; transition: all 0.2s; text-transform: uppercase; }
+        .btn-advance { background: transparent; border: 1px solid var(--border-highlight); color: var(--text-muted); border-radius: 2px; cursor: pointer; padding: 1px 3px; font-weight: 600; font-size: 0.45rem; transition: all 0.2s; text-transform: uppercase; }
         .btn-advance:hover { border-color: var(--accent-color); color: var(--accent-color); }
         .b-player.winner-slot .btn-advance { display: none; } 
         .btn-loser { border-color: var(--danger-color); color: var(--danger-color); }
         .btn-loser:hover { background-color: var(--danger-color); color: #fff; }
 
         /* DEUSES NO MATA-MATA MENORES */
-        .draft-section.mata-draft { margin-top: 2px; }
+        .draft-section.mata-draft { margin-top: 1px; gap: 4px;}
         .mata-draft .god-select-btn { width: 16px; height: 16px; border-radius: 2px; }
-        .mata-draft .ban-slot { width: 14px; height: 14px; }
+        .mata-draft .ban-slot { width: 12px; height: 12px; }
         .mata-draft .ban-label { font-size: 0.35rem; }
-        .mata-draft .win-toggle { font-size: 0.4rem; padding: 0; border-radius: 2px; }
+        .mata-draft .win-toggle { font-size: 0.35rem; padding: 0; border-radius: 2px; border-width: 0.5px;}
 
         /* MATA-MATA MAP ROW */
         .match-card .map-row { padding: 4px; background: rgba(0,0,0,0.2); }
-        .match-card .map-select { font-size: 0.55rem; padding: 1px 2px; max-width: 70px; border-radius: 3px; }
+        .match-card .map-select { font-size: 0.5rem; padding: 1px 2px; max-width: 65px; border-radius: 3px; }
 
         /* MODAIS E GERAIS */
         [contenteditable="true"] { outline: none; border-bottom: 1px dashed transparent; transition: 0.3s; cursor: text; }
@@ -272,18 +270,18 @@
         
         .map-info-left { flex: 1; max-width: 400px; display: flex; flex-direction: column; gap: 15px;}
         
-        /* O Pódio agora foi movido para a direita, empurrado um pouco para a esquerda (sobre o mapa) */
+        /* Pódio movido para a direita, empurrado um pouco para a esquerda (sobre o mapa) */
         .map-podium-right { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 550px; margin-right: 12%; margin-top: 5%;}
 
         /* BOTAO DE DICAS E TRANSIÇÃO */
         .btn-hint { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 20px; font-family: 'Cinzel', serif; text-transform: uppercase; cursor: pointer; border-radius: 30px; transition: 0.3s; font-weight: bold; letter-spacing: 2px; display: inline-flex; align-items: center; gap: 10px; align-self: flex-start;}
         .btn-hint:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 20px var(--accent-glow); }
         
-        /* Overlay da Dica Fullscreen */
+        /* Overlay da Dica Fullscreen (SEM INTERFACE) */
         #hintContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 50; opacity: 0; transition: opacity 0.5s ease; background: transparent; }
         #hintContainer.active { opacity: 1; pointer-events: auto; }
-        #hintImageElement { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: -1;}
-        .btn-fechar-dica { margin-top: auto; margin-bottom: 40px; background: rgba(0,0,0,0.8); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 12px 40px; font-family: 'Cinzel', serif; text-transform: uppercase; cursor: pointer; border-radius: 30px; font-weight: bold; letter-spacing: 2px; transition: 0.3s; z-index: 10; backdrop-filter: blur(5px);}
+        /* A imagem de fundo fará o papel de dica, o container tem só o botão */
+        .btn-fechar-dica { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 12px 40px; font-family: 'Cinzel', serif; text-transform: uppercase; cursor: pointer; border-radius: 30px; font-weight: bold; letter-spacing: 2px; transition: 0.3s; z-index: 10; backdrop-filter: blur(5px);}
         .btn-fechar-dica:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 20px var(--accent-glow); }
 
         /* PÓDIO 3D E FLIP CARD MINIMALISTA */
@@ -359,7 +357,7 @@
         body.is-viewer .map-thumb { pointer-events: auto !important; cursor: pointer !important; }
         body.is-viewer .btn-hint { pointer-events: auto !important; }
         body.is-viewer .btn-fechar-dica { pointer-events: auto !important; }
-        body.is-viewer .flip-card { pointer-events: auto !important; }
+        body.is-viewer .flip-card { pointer-events: auto !important; cursor: pointer !important; }
     </style>
 </head>
 <body>
@@ -368,7 +366,7 @@
         <button class="nav-btn active" onclick="switchTab('page-main', this)">Painel Principal</button>
         <button class="nav-btn" onclick="switchTab('page-matches', this)">Tavernas of Mortals</button>
         <button class="nav-btn" onclick="switchTab('page-bracket', this)">Demigods & Titans</button>
-        <button class="nav-btn" onclick="switchTab('page-maps', this); atualizarPainelMapas('Anatólia');">Estatísticas de Mapas</button>
+        <button class="nav-btn" onclick="switchTab('page-maps', this); atualizarPainelMapas('Anatólia'); initHorizontalDrag();">Estatísticas de Mapas</button>
         <div style="width: 1px; height: 30px; background: var(--border-color); margin: 0 10px;"></div>
         <button class="nav-btn btn-save admin-only" onclick="saveTournament()">Salvar na Nuvem <span class="loader" id="saveLoader"></span></button>
         <button class="nav-btn btn-reset admin-only" onclick="resetTournament()">Resetar</button>
@@ -469,13 +467,15 @@
     <!-- PÁGINA DE MAPAS: ESTATÍSTICAS AVANÇADAS IMERSIVAS -->
     <div id="page-maps" class="page">
         <!-- Mapa de Fundo -->
-        <div id="immersiveMapBg" class="immersive-bg"></div>
+        <div id="immersiveMapBg" class="immersive-bg">
+            <div class="immersive-overlay"></div>
+        </div>
         
         <div id="mainMapUI" class="immersive-content">
             <!-- Lado Superior (Esquerda e Direita) -->
             <div class="map-stats-top">
                 <div class="map-info-left">
-                    <h1 id="mapaDestaqueTitulo" style="font-size: 3rem; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); font-family: 'Cinzel', serif; color: var(--accent-color); letter-spacing: 2px; line-height:1.1;">Anatólia</h1>
+                    <h1 id="mapaDestaqueTitulo" style="font-size: 3.5rem; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); font-family: 'Cinzel', serif; color: var(--accent-color); letter-spacing: 2px; line-height:1.1;">Anatólia</h1>
                     <div style="font-size: 0.9rem; color: #fff; text-transform: uppercase; font-weight: bold; letter-spacing: 2px; text-shadow: 1px 1px 4px #000; margin-top: 10px;">Total de Partidas no Mapa: <span id="mapTotalJogos" style="color: var(--accent-color); font-size: 1.4rem; margin-left: 5px;">0</span></div>
                     <button class="btn-hint" onclick="toggleDicas()">💡 Ver Dicas do Mapa</button>
                 </div>
@@ -504,7 +504,6 @@
 
         <!-- OVERLAY DE DICAS (Sem interface, tela cheia) -->
         <div id="hintContainer">
-            <img id="hintImageElement" src="" alt="Dica do Mapa">
             <button class="btn-fechar-dica" onclick="toggleDicas()">Voltar às Estatísticas</button>
         </div>
     </div>
@@ -583,11 +582,11 @@
 
         const listaDeuses = ["Zeus", "Hades", "Poseidon", "Deméter", "Tsukuyomi", "Amaterasu", "Susanoo", "Fuxi", "Nuwa", "Shennong", "Thor", "Odin", "Loki", "Freyr", "Ísis", "Rá", "Set", "Cronos", "Gaia", "Urano", "Quetzalcoatl", "Tezcatlipoca", "Huitzilopochtli"];
         
-        // Mapeamento Inteligente de Imagens Oficiais
+        // Mapeamento Exato de Imagens Oficiais
         const mapaImagens = {
-            "Anatólia": "anatolia.png",
-            "Elísio": "elisio.png",
-            "Floresta das Trevas": "floresta das trevas.png",
+            "Anatólia": "anatolia.jpg",
+            "Elísio": "elisio.jpg",
+            "Floresta das Trevas": "floresta das trevas.jpg",
             "Lago Fantasma": "lago fantasma.png",
             "Mediterrâneo": "bmediterraneo.png",
             "Muspelheim": "muspelheim.png",
@@ -600,14 +599,13 @@
 
         function getGodIconPath(nome) { if(!nome) return ''; let safeName = nome.toLowerCase().replace('é', 'e').replace('í', 'i').replace('á', 'a'); return safeName + '_icon.png'; }
 
-        // Lógica Inteligente para Imagens de Dicas (Hints)
+        // Lógica Inteligente para Imagens de Dicas em PNG (Conforme Solicitado)
         function getMapHintPath(nomeDoMapa) {
             if(nomeDoMapa === "O Coração de Tenochtitlán") return "hint_coracao.png";
             if(nomeDoMapa === "Lago Fantasma") return "hint_fantasma.png";
-            if(nomeDoMapa === "Floresta das Trevas") return "hint_trevas.png";
             let safeName = nomeDoMapa.toLowerCase()
                 .replace('é', 'e').replace('í', 'i')
-                .replace('á', 'a').replace('â', 'a').replace('ó', 'o');
+                .replace('á', 'a').replace('â', 'a').replace('ó', 'o').trim();
             return "hint_" + safeName + ".png";
         }
 
@@ -659,7 +657,7 @@
         }
 
         // =======================
-        // ESTATÍSTICAS ESPECÍFICAS DE MAPAS INTERATIVO E PÓDIO
+        // ESTATÍSTICAS DE MAPAS INTERATIVO (NOVA ABA - PÓDIO À DIREITA E DICAS FULLSCREEN)
         // =======================
         let mapaAtivoGlobal = "Anatólia";
         let mostrandoDicas = false;
@@ -675,12 +673,18 @@
                 uiContent.style.opacity = '0';
                 uiContent.style.pointerEvents = 'none';
                 hintContainer.classList.add('active');
-                mapBg.style.filter = "blur(15px) brightness(0.6)";
+                
+                // O fundo vira a imagem da dica sem blur
+                mapBg.style.backgroundImage = `url('${getMapHintPath(mapaAtivoGlobal)}')`;
+                document.querySelector('.immersive-overlay').style.opacity = '0';
             } else {
                 uiContent.style.opacity = '1';
                 uiContent.style.pointerEvents = 'auto';
                 hintContainer.classList.remove('active');
-                mapBg.style.filter = "blur(0px) brightness(1)";
+                
+                // Retorna a imagem do mapa original com a máscara
+                mapBg.style.backgroundImage = `url('${mapaImagens[mapaAtivoGlobal]}')`;
+                document.querySelector('.immersive-overlay').style.opacity = '1';
             }
         }
 
@@ -688,8 +692,6 @@
             mapaAtivoGlobal = mapaEscolhido;
             
             if(mostrandoDicas) toggleDicas(); // Força fechar dica ao mudar de mapa
-            
-            document.getElementById('hintImageElement').src = getMapHintPath(mapaEscolhido);
 
             document.querySelectorAll('.map-thumb').forEach(t => t.classList.remove('active'));
             let activeThumb = document.getElementById('thumb-' + mapaEscolhido.replace(/\s+/g, '-'));
@@ -705,7 +707,7 @@
             let titulo = document.getElementById('mapaDestaqueTitulo');
             if(titulo) titulo.innerText = mapaEscolhido;
 
-            // Coleta de dados com inteligência de jogadores
+            // Coleta de dados blindada contra crash no DOM
             let godStats = {};
             listaDeuses.forEach(g => godStats[g] = {j: 0, v: 0, d: 0, topPlayers: {}});
 
@@ -733,7 +735,20 @@
                     godStats[g].j++;
                     if(thisWon) {
                         godStats[g].v++;
-                        let playerName = toggle.closest('.b-player').querySelector('.p-name').innerText.trim();
+                        // Busca de nome segura para grupos e mata-mata
+                        let playerName = "TBD";
+                        let bPlayer = toggle.closest('.b-player');
+                        if (bPlayer) {
+                            let pNameEl = bPlayer.querySelector('.p-name');
+                            if(pNameEl) playerName = pNameEl.innerText.trim();
+                        } else {
+                            let mPlayer = toggle.closest('.match-player');
+                            if (mPlayer) {
+                                let firstDiv = mPlayer.querySelector('div');
+                                if(firstDiv) playerName = firstDiv.innerText.trim();
+                            }
+                        }
+
                         if(playerName !== "TBD" && playerName !== "BYE" && !playerName.startsWith("Perd.") && !playerName.startsWith("Venc.")) {
                             godStats[g].topPlayers[playerName] = (godStats[g].topPlayers[playerName] || 0) + 1;
                         }
@@ -758,7 +773,7 @@
             let othersHtml = '';
 
             if(godsPlayed.length === 0) {
-                podiumHtml = `<div style="text-align:center; width:100%; padding: 40px; color:#aaa; font-size:1.2rem; font-style:italic;">Aguardando partidas...</div>`;
+                podiumHtml = `<div style="text-align:right; width:100%; padding: 40px; color:#aaa; font-size:1.2rem; font-style:italic;">Aguardando partidas...</div>`;
             } else {
                 function gerarCardPodio(godName, pos, tierClass) {
                     let s = godStats[godName];
@@ -767,15 +782,15 @@
                     let lossPct = (s.d / s.j) * 100;
                     let titlePos = pos === 1 ? '1º' : (pos === 2 ? '2º' : '3º');
 
-                    // Lógica dos Top Jogadores para o Flip Card
+                    // Lógica dos Top Jogadores para a face de trás do Flip Card
                     let playersArr = Object.keys(s.topPlayers).map(p => ({name: p, wins: s.topPlayers[p]}));
                     playersArr.sort((a,b) => b.wins - a.wins);
                     let topPlayerHtml = playersArr.length > 0 
                         ? playersArr.slice(0,2).map(p => `<div class="podium-back-player">${p.name} <span>(${p.wins}V)</span></div>`).join('') 
-                        : `<div class="podium-back-player" style="color:#888;">Ninguém</div>`;
+                        : `<div class="podium-back-player" style="color:#888;">Nenhum</div>`;
 
                     return `
-                    <div class="flip-card ${tierClass}" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card ${tierClass}" onclick="this.classList.toggle('flipped')" title="Clique para ver os Especialistas">
                         <div class="podium-item">
                             <div class="podium-front">
                                 <div class="avatar-wrapper">
@@ -810,6 +825,7 @@
                 let p2 = godsPlayed[1] ? gerarCardPodio(godsPlayed[1], 2, 'silver') : '';
                 let p3 = godsPlayed[2] ? gerarCardPodio(godsPlayed[2], 3, 'bronze') : '';
 
+                // Ouro é o primeiro da DOM para ficar sempre por cima na animação
                 podiumHtml = `<div class="podium-wrapper">${p2}${p1}${p3}</div>`;
 
                 for(let i = 3; i < godsPlayed.length; i++) {
@@ -1345,7 +1361,7 @@
             let banBtns = '';
             for(let i=0; i<2; i++) {
                 banBtns += `<div class="god-slot-wrapper">
-                    <div class="god-select-btn ban-slot ${matchId}-ban${i}-p${idx+1}" style="width:14px; height:14px;" data-god="" onclick="abrirModalDeuses(this)" title="Banir Deus"></div>
+                    <div class="god-select-btn ban-slot ${matchId}-ban${i}-p${idx+1}" style="width:12px; height:12px;" data-god="" onclick="abrirModalDeuses(this)" title="Banir Deus"></div>
                 </div>`;
             }
             
