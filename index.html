@@ -78,19 +78,12 @@
         .page.active { display: flex; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .panel {
-            background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 35px; border-radius: 12px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.02); position: relative; overflow: hidden;
-        }
+        .panel { background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 35px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.02); position: relative; overflow: hidden; }
 
         .setup-grid { display: grid; grid-template-columns: 1fr 1fr 250px; gap: 30px; transition: 0.3s; }
         label { display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
 
-        textarea, select, .setup-grid input {
-            width: 100%; background-color: var(--panel-surface); color: var(--text-main);
-            border: 1px solid var(--border-color); padding: 15px; border-radius: 8px;
-            box-sizing: border-box; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; resize: vertical; transition: 0.3s;
-        }
+        textarea, select, .setup-grid input { width: 100%; background-color: var(--panel-surface); color: var(--text-main); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; box-sizing: border-box; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; resize: vertical; transition: 0.3s; }
         textarea:focus, select:focus, .setup-grid input:focus { outline: none; border-color: var(--accent-color); background-color: #16161a; box-shadow: 0 0 0 3px var(--accent-glow); }
 
         button.action-btn { background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), transparent); color: var(--accent-color); border: 1px solid var(--accent-color); padding: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease; width: 100%; border-radius: 6px; font-weight: 600; font-size: 0.8rem; }
@@ -100,8 +93,6 @@
         table { width: 100%; border-collapse: separate; border-spacing: 0 6px; margin-top: 10px; }
         th { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; padding: 10px 15px; border-bottom: 1px solid var(--border-color); }
         td { padding: 12px 15px; background-color: var(--panel-surface); text-align: center; font-size: 0.9rem; transition: background-color 0.3s; border-top: 1px solid transparent; border-bottom: 1px solid transparent; }
-        tbody tr td:first-child { border-radius: 6px 0 0 6px; border-left: 1px solid transparent; }
-        tbody tr td:last-child { border-radius: 0 6px 6px 0; border-right: 1px solid transparent; }
         tbody tr:hover td { background-color: #1a1a20; }
         .seed-row td:first-child { box-shadow: inset 3px 0 0 var(--accent-color); }
         .promoted td { background-color: rgba(212, 175, 55, 0.08); border-top: 1px solid rgba(212, 175, 55, 0.15); border-bottom: 1px solid rgba(212, 175, 55, 0.15); }
@@ -122,24 +113,21 @@
         .match-card { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 8px; display: flex; flex-direction: column; transition: transform 0.2s; position: relative; padding: 0; overflow: hidden;}
         .match-card:hover { transform: scale(1.01); border-color: var(--border-highlight); }
         .match-card-body { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 25px 20px 15px 20px; box-sizing: border-box;}
-        .match-player { flex: 1; text-align: center; font-weight: 600; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center;}
+        
+        .match-player { flex: 1; min-width: 0; text-align: center; font-weight: 600; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center;}
         
         .map-row { display: flex; justify-content: center; gap: 5px; width: 100%; padding: 8px; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.03); box-sizing: border-box;}
         .map-select { background: #0a0a0d; border: 1px solid #333; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 0.65rem; border-radius: 4px; padding: 2px 4px; transition: 0.2s; max-width: 90px;}
         .map-select:focus { border-color: var(--accent-color); outline: none; color: var(--text-main); }
         
-        /* DRAFT E BANS */
+        /* SISTEMA INTELIGENTE DE DRAFT (BANS E PICKS) */
         .draft-section { display: flex; align-items: flex-start; justify-content: center; margin-top: 6px; gap: 8px; }
         .ban-group { display: flex; align-items: center; gap: 4px; padding-right: 8px; border-right: 1px solid #333; }
         .ban-label { font-size: 0.45rem; color: var(--danger-color); font-weight: 800; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 1px; opacity: 0.8; }
         .picks-group { display: flex; align-items: flex-start; gap: 4px; }
         .god-slot-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; }
         
-        .god-select-btn {
-            width: 26px; height: 26px; border-radius: 4px; border: 1px dashed var(--text-muted);
-            background-color: #050505; cursor: pointer; display: inline-block;
-            background-size: cover; background-position: center; transition: 0.2s; position: relative;
-        }
+        .god-select-btn { width: 26px; height: 26px; border-radius: 4px; border: 1px dashed var(--text-muted); background-color: #050505; cursor: pointer; display: inline-block; background-size: cover; background-position: center; transition: 0.2s; position: relative; }
         .god-select-btn:hover { border-color: var(--accent-color); box-shadow: 0 0 8px var(--accent-glow); }
         .god-select-btn::after { content: '+'; color: var(--text-muted); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 14px; font-weight: bold; }
         .god-select-btn[data-god]:not([data-god=""])::after { display: none; }
@@ -171,7 +159,12 @@
         .viewer-stream-link::before { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--live-color); border-radius: 50%; animation: pulseLive 1.5s infinite; }
         @keyframes pulseLive { 0% { transform: scale(0.8); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.3; } 100% { transform: scale(0.8); opacity: 1; } }
 
-        /* MATA-MATA ESTRUTURA BLINDADA COMPACTA */
+        /* PLACAR BLINDADO CONTRA ESMAGAMENTO */
+        .match-score { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: 15px; background: #000; padding: 5px 15px; border-radius: 6px; border: 1px solid var(--border-color); margin: 0 10px; flex-shrink: 0; min-width: 90px; flex-wrap: nowrap !important; }
+        .match-score input { width: 30px; background: transparent; border: none; color: var(--accent-color); text-align: center; font-size: 1.5rem; font-weight: 700; padding: 0; font-family: 'Cinzel', serif; pointer-events: none; }
+        .match-score span { color: var(--text-muted); font-size: 0.8rem; font-weight: 300; }
+
+        /* MATA-MATA ESTRUTURA COMPACTA */
         .bracket-container { display: flex; overflow-x: auto; padding: 70px 20px 20px 20px; cursor: grab; min-height: 450px; align-items: stretch; gap: 0; }
         .bracket-container:active { cursor: grabbing; }
         .bracket-container::-webkit-scrollbar { height: 8px; }
@@ -210,24 +203,17 @@
         .glow-outgoing:nth-of-type(odd):not(:only-of-type)::after, .glow-outgoing:nth-of-type(even):not(:only-of-type)::after, .match-wrapper:nth-of-type(odd):not(:only-of-type):hover::after, .match-wrapper:nth-of-type(even):not(:only-of-type):hover::after { border-color: var(--accent-color) !important; filter: drop-shadow(0 0 4px var(--accent-color)); }
 
         /* AVISO DE QUEDA (FUNDO PRETO) */
-        .loser-drop-label { 
-            font-size: 0.55rem; color: #ff6b6b; text-align: center; padding: 4px; 
-            background: #000000 !important; border-top: 2px solid var(--danger-color); 
-            text-transform: uppercase; letter-spacing: 1px; 
-            opacity: 1; transition: 0.3s; pointer-events: none; 
-            font-weight: bold; width: 100%; box-sizing: border-box;
-        }
+        .loser-drop-label { font-size: 0.55rem; color: #ff6b6b; text-align: center; padding: 4px; background: #000000 !important; border-top: 2px solid var(--danger-color); text-transform: uppercase; letter-spacing: 1px; opacity: 1; transition: 0.3s; pointer-events: none; font-weight: bold; width: 100%; box-sizing: border-box; }
         .b-match:hover .loser-drop-label { background: #1a0505 !important; color: #fff; border-color: #ff0000; box-shadow: inset 0 5px 15px rgba(255,0,0,0.2); }
-        
         .glow-drop { border-color: var(--danger-color) !important; box-shadow: 0 0 20px rgba(255, 68, 68, 0.6) !important; transform: scale(1.02); z-index: 10 !important; }
         .glow-drop::before { content: 'ALVO ⬇'; position: absolute; top: -20px; right: 10px; color: #ff4444; font-size: 0.65rem; font-weight: bold; letter-spacing: 1px; animation: bounceDrop 1s infinite;}
         @keyframes bounceDrop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
 
-        /* JOGADOR NO MATA-MATA (COMPACTO) */
+        /* JOGADOR NO MATA-MATA (COMPACTO E ALINHADO) */
         .b-player { padding: 8px 12px; display: flex; flex-direction: column; align-items: stretch; gap: 4px; transition: all 0.3s; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .b-player:last-child { border-bottom: none; }
         .b-player-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .p-name { font-weight: 600; font-size: 0.8rem; letter-spacing: 0.5px; transition: 0.3s; }
+        .p-name { font-weight: 600; font-size: 0.8rem; letter-spacing: 0.5px; transition: 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .p-placeholder { color: #888; font-style: italic; font-weight: 400; font-size: 0.65rem; }
         
         .b-player.winner-slot { background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent); border-left: 3px solid var(--accent-color); }
@@ -236,15 +222,11 @@
         .b-player.loser-slot .p-name { text-decoration: line-through; color: #666; }
 
         /* PLACAR ELEGANTE & BOTÕES */
-        .score-input { 
-            width: 24px !important; height: 24px; padding: 0; background: rgba(255, 255, 255, 0.1) !important; 
-            border: 1px solid rgba(255, 255, 255, 0.2) !important; border-radius: 4px;
-            color: var(--text-main) !important; text-align: center !important; font-weight: 700; 
-            font-size: 0.95rem; font-family: 'Cinzel', serif; pointer-events: none; box-sizing: border-box;
-        }
+        .placar-mata-wrapper { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+        .score-input { width: 24px !important; height: 24px; padding: 0; background: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; border-radius: 4px; color: var(--text-main) !important; text-align: center !important; font-weight: 700; font-size: 0.95rem; font-family: 'Cinzel', serif; pointer-events: none; box-sizing: border-box; }
         .b-player.winner-slot .score-input { background: rgba(212, 175, 55, 0.2) !important; border-color: var(--accent-color) !important; color: var(--accent-color) !important; text-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
 
-        .btn-advance { background: transparent; border: 1px solid var(--border-highlight); color: var(--text-muted); border-radius: 3px; cursor: pointer; padding: 2px 6px; font-weight: 600; font-size: 0.55rem; transition: all 0.2s; margin-left: 6px; text-transform: uppercase; }
+        .btn-advance { background: transparent; border: 1px solid var(--border-highlight); color: var(--text-muted); border-radius: 3px; cursor: pointer; padding: 2px 6px; font-weight: 600; font-size: 0.55rem; transition: all 0.2s; text-transform: uppercase; }
         .btn-advance:hover { border-color: var(--accent-color); color: var(--accent-color); }
         .b-player.winner-slot .btn-advance { display: none; } 
         .btn-loser { border-color: var(--danger-color); color: var(--danger-color); }
@@ -264,18 +246,29 @@
         .god-grid-item { width: 45px; height: 45px; cursor: pointer; border-radius: 6px; border: 2px solid transparent; transition: 0.2s; object-fit: cover; background-color: #000; }
         .god-grid-item:hover { border-color: var(--accent-color); transform: scale(1.1); box-shadow: 0 0 10px var(--accent-glow); }
 
-        /* AJUSTES DO MODO ESPECTADOR */
+        /* GALERIA DE MAPAS INTERATIVA */
+        #mapStatsBg { border-radius: 12px; background-size: cover; background-position: center; transition: background-image 0.4s ease-in-out; border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden; min-height: 700px; padding: 40px; }
+        .map-stats-glass { background: rgba(15, 15, 20, 0.75); backdrop-filter: blur(8px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); padding: 30px; max-width: 800px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .map-thumb-slider { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px; margin-bottom: 25px; scroll-behavior: smooth; }
+        .map-thumb-slider::-webkit-scrollbar { height: 6px; }
+        .map-thumb-slider::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+        .map-thumb { min-width: 140px; height: 80px; border-radius: 8px; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: center; cursor: pointer; border: 2px solid transparent; transition: 0.3s; position: relative; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .map-thumb::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); z-index: 1; }
+        .map-thumb span { position: relative; z-index: 2; color: #fff; font-size: 0.7rem; font-weight: bold; margin-bottom: 8px; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+        .map-thumb:hover { transform: translateY(-3px); border-color: #888; }
+        .map-thumb.active { border-color: var(--accent-color); box-shadow: 0 0 15px var(--accent-glow); transform: scale(1.05); }
+
+        /* AJUSTES DO MODO ESPECTADOR (LIBERANDO O FILTRO DE MAPAS GERAL) */
         body.is-viewer .admin-only, body.is-viewer .btn-advance, body.is-viewer .btn-promote { display: none !important; }
         body.is-viewer input, body.is-viewer [contenteditable="true"], body.is-viewer textarea { pointer-events: none !important; border: none !important; outline: none !important; background: transparent !important; }
         body.is-viewer .god-select-btn { pointer-events: none !important; border-style: solid !important; }
         body.is-viewer .win-toggle { display: none !important; }
         body.is-viewer .drag-handle { display: none !important; }
         body.is-viewer .navbar .btn-save, body.is-viewer .navbar .btn-reset, body.is-viewer .navbar .btn-copy { display: none !important; }
-        body.is-viewer select.map-select { pointer-events: none !important; appearance: none; -webkit-appearance: none; border: none; background: transparent; color: var(--accent-color); font-weight: bold; text-align: center; padding:0;}
+        body.is-viewer select.map-select:not(#mapFilter) { pointer-events: none !important; appearance: none; -webkit-appearance: none; border: none; background: transparent; color: var(--accent-color); font-weight: bold; text-align: center; padding:0;}
+        body.is-viewer #mapFilter { pointer-events: auto !important; appearance: auto !important; -webkit-appearance: auto !important; border: 1px solid #333 !important; background: #0a0a0d !important; padding: 4px 8px !important;}
 
-        /* ESTILOS DA NOVA PÁGINA DE MAPAS */
-        #mapStatsBg { border-radius: 12px; background-size: cover; background-position: center; transition: background-image 0.4s ease-in-out; border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden; min-height: 700px; padding: 40px; }
-        .map-stats-glass { background: rgba(15, 15, 20, 0.75); backdrop-filter: blur(8px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); padding: 30px; max-width: 800px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
@@ -284,7 +277,7 @@
         <button class="nav-btn active" onclick="switchTab('page-main', this)">Painel Principal</button>
         <button class="nav-btn" onclick="switchTab('page-matches', this)">Tavernas of Mortals</button>
         <button class="nav-btn" onclick="switchTab('page-bracket', this)">Demigods & Titans</button>
-        <button class="nav-btn" onclick="switchTab('page-maps', this); atualizarPainelMapas();">Estatísticas de Mapas</button>
+        <button class="nav-btn" onclick="switchTab('page-maps', this); atualizarPainelMapas('Anatólia');">Estatísticas de Mapas</button>
         <div style="width: 1px; height: 30px; background: var(--border-color); margin: 0 10px;"></div>
         <button class="nav-btn btn-save admin-only" onclick="saveTournament()">Salvar na Nuvem <span class="loader" id="saveLoader"></span></button>
         <button class="nav-btn btn-reset admin-only" onclick="resetTournament()">Resetar</button>
@@ -323,7 +316,7 @@
             <div class="groups-grid" id="groupsDisplay"></div>
         </div>
 
-        <!-- ELO E GODS COM FILTRO DE MAPA -->
+        <!-- ELO E GODS COM FILTRO DE MAPA GLOBAL -->
         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-top: 40px;">
             <div class="panel">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
@@ -341,6 +334,9 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; flex-wrap:wrap; gap:10px;">
                     <h3 style="margin:0; font-size: 1.2rem; color: var(--accent-color); font-family: 'Cinzel', serif; letter-spacing: 2px; font-weight: 600; display:flex; align-items:center; gap:15px;">
                         Estatísticas GERAIS
+                        <select id="mapFilter" class="map-select" style="font-size:0.75rem; padding:4px 8px; border-radius:4px; max-width:150px; font-family:'Montserrat', sans-serif;" onchange="atualizarTodosOsGods()">
+                            <option value="ALL">Todos os Mapas</option>
+                        </select>
                     </h3>
                     <button class="nav-btn active" style="padding: 4px 12px; font-size: 0.65rem;" onclick="toggleStats()" id="btnToggleStats">Recolher</button>
                 </div>
@@ -348,6 +344,7 @@
                     <table>
                         <thead><tr><th style="text-align:left;">God</th><th title="Jogos Jogados">J</th><th title="Vitórias">V</th><th title="Derrotas">D</th><th title="Bans Globais" style="color:var(--danger-color);">B</th><th title="Winrate">WR</th></tr></thead>
                         <tbody id="godsTable">
+                            <!-- Populated statically initially, dynamic later -->
                             <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="zeus_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Zeus</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
                             <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="hades_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Hades</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
                             <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="poseidon_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Poseidon</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
@@ -383,20 +380,22 @@
     <div id="page-maps" class="container page" style="max-width:1200px;">
         <div id="mapStatsBg">
             <div class="map-stats-glass">
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:20px; margin-bottom:25px;">
-                    <h2 style="margin:0; font-size:1.8rem; text-shadow:0 2px 5px rgba(0,0,0,0.8);">Análise de Terreno</h2>
-                    <select id="mapaDestaqueSelect" class="map-select" style="font-size:1rem; padding:8px 15px; border-radius:6px; max-width:250px;" onchange="atualizarPainelMapas()">
-                        <!-- Options carregadas via JS -->
-                    </select>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; margin-bottom:15px;">
+                    <h2 style="margin:0; font-size:1.8rem; text-shadow:0 2px 5px rgba(0,0,0,0.8);">Análise de Terreno: <span id="mapaDestaqueTitulo" style="color:#fff;"></span></h2>
                 </div>
                 
-                <div style="text-align:center; margin-bottom:30px;">
+                <!-- CARROSSEL DE MAPAS INTERATIVO -->
+                <div id="mapThumbSelector" class="map-thumb-slider">
+                    <!-- Thumbnails Injetados via JS -->
+                </div>
+                
+                <div style="text-align:center; margin-bottom:20px;">
                     <div style="font-size:0.8rem; color:var(--accent-color); text-transform:uppercase; letter-spacing:2px; font-weight:bold;">Total de Partidas no Mapa</div>
                     <div id="mapTotalJogos" style="font-size:3.5rem; font-family:'Cinzel', serif; font-weight:bold; line-height:1; text-shadow:0 2px 10px rgba(0,0,0,0.5);">0</div>
                 </div>
 
-                <div id="mapStatsList" style="display:flex; flex-direction:column; gap:10px;">
-                    <!-- Injetado via JS -->
+                <div id="mapStatsList" style="display:flex; flex-direction:column; gap:10px; max-height:400px; overflow-y:auto; padding-right:10px;">
+                    <!-- Lista de Estatísticas Injetada via JS -->
                 </div>
             </div>
         </div>
@@ -482,13 +481,13 @@
             "Anatólia": "anatolia.jpg",
             "Elísio": "elisio.jpg",
             "Floresta das Trevas": "floresta das trevas.jpg",
-            "Lago Fantasma": "lago fantasma.jpg",
-            "Mediterrâneo": "bmediterraneo.jpg",
-            "Muspelheim": "muspelheim.jpg",
-            "O Coração de Tenochtitlán": "coracao.jpg",
-            "Oásis": "oasis.jpg",
-            "Tundra": "tundra.jpg",
-            "Vaus do Nilo": "vaus do nilo.jpg"
+            "Lago Fantasma": "lago fantasma.png",
+            "Mediterrâneo": "bmediterraneo.png",
+            "Muspelheim": "muspelheim.png",
+            "O Coração de Tenochtitlán": "coracao.png",
+            "Oásis": "oasis.png",
+            "Tundra": "tundra.png",
+            "Vaus do Nilo": "vaus do nilo.png"
         };
         const listaMapas = Object.keys(mapaImagens).sort();
 
@@ -500,11 +499,22 @@
         }
         
         function renderizarFiltrosDeMapas() {
-            let selectPageMain = document.getElementById('mapaDestaqueSelect');
+            let selectPageMain = document.getElementById('mapFilter');
             if(selectPageMain) {
                 listaMapas.forEach(m => { selectPageMain.innerHTML += `<option value="${m}">${m}</option>`; });
-                atualizarPainelMapas(); // Set initial BG
             }
+
+            const selector = document.getElementById('mapThumbSelector');
+            if(!selector) return;
+            selector.innerHTML = '';
+            listaMapas.forEach(m => {
+                const img = mapaImagens[m] || 'header.png';
+                selector.innerHTML += `
+                    <div class="map-thumb" onclick="atualizarPainelMapas('${m}')" id="thumb-${m.replace(/\s+/g, '-')}" style="background-image: url('${img}')">
+                        <span>${m}</span>
+                    </div>
+                `;
+            });
         }
 
         let godTargetElement = null;
@@ -531,16 +541,24 @@
         }
 
         // =======================
-        // ESTATÍSTICAS ESPECÍFICAS DE MAPAS (NOVA ABA)
+        // ESTATÍSTICAS ESPECÍFICAS DE MAPAS INTERATIVO (NOVA ABA)
         // =======================
-        function atualizarPainelMapas() {
-            let select = document.getElementById('mapaDestaqueSelect');
-            if(!select) return;
-            let mapaEscolhido = select.value;
-            let bgImg = mapaImagens[mapaEscolhido] || 'header.png';
+        let mapaAtivoGlobal = "Anatólia";
+
+        function atualizarPainelMapas(mapaEscolhido = mapaAtivoGlobal) {
+            mapaAtivoGlobal = mapaEscolhido;
             
+            // Atualiza UI dos Thumbs
+            document.querySelectorAll('.map-thumb').forEach(t => t.classList.remove('active'));
+            let activeThumb = document.getElementById('thumb-' + mapaEscolhido.replace(/\s+/g, '-'));
+            if(activeThumb) activeThumb.classList.add('active');
+
+            let bgImg = mapaImagens[mapaEscolhido] || 'header.png';
             let container = document.getElementById('mapStatsBg');
-            container.style.backgroundImage = `linear-gradient(to bottom, rgba(15,15,20,0.8), rgba(15,15,20,0.95)), url('${bgImg}')`;
+            if(container) container.style.backgroundImage = `linear-gradient(to bottom, rgba(15,15,20,0.85), rgba(15,15,20,0.98)), url('${bgImg}')`;
+            
+            let titulo = document.getElementById('mapaDestaqueTitulo');
+            if(titulo) titulo.innerText = mapaEscolhido;
 
             let godStats = {};
             listaDeuses.forEach(g => godStats[g] = {j: 0, v: 0, d: 0});
@@ -581,7 +599,8 @@
             });
 
             let totalJogos = godsPlayed.reduce((acc, g) => acc + godStats[g].j, 0) / 2;
-            document.getElementById('mapTotalJogos').innerText = Math.floor(totalJogos);
+            let elTotal = document.getElementById('mapTotalJogos');
+            if(elTotal) elTotal.innerText = Math.floor(totalJogos);
 
             let html = '';
             if(godsPlayed.length === 0) {
@@ -597,24 +616,25 @@
                         <div style="display:flex; align-items:center; gap:15px; width:40%;">
                             <span style="font-weight:bold; color:${posColor}; width:20px; font-size:1.2rem;">${index+1}º</span>
                             <img src="${getGodIconPath(g)}" style="width:36px; height:36px; border-radius:4px; border:1px solid #555; box-shadow:0 2px 5px rgba(0,0,0,0.5);">
-                            <span style="font-weight:bold; font-size:1.1rem; letter-spacing:1px;">${g}</span>
+                            <span style="font-weight:bold; font-size:1.1rem; letter-spacing:1px; color:#fff;">${g}</span>
                         </div>
                         <div style="width:20%; text-align:center;">
-                            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Jogos</div>
-                            <div style="font-size:1.2rem; font-weight:bold;">${s.j}</div>
+                            <div style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Jogos</div>
+                            <div style="font-size:1.1rem; font-weight:bold; color:#fff;">${s.j}</div>
                         </div>
                         <div style="width:20%; text-align:center;">
-                            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">V - D</div>
+                            <div style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">V - D</div>
                             <div style="font-size:1.1rem; color:#aaa; font-weight:bold;"><span style="color:#4ade80;">${s.v}</span> - <span style="color:var(--danger-color);">${s.d}</span></div>
                         </div>
                         <div style="width:20%; text-align:right;">
-                            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Winrate</div>
-                            <div style="font-size:1.4rem; font-weight:bold; color:var(--accent-color);">${wr}%</div>
+                            <div style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Winrate</div>
+                            <div style="font-size:1.3rem; font-weight:bold; color:var(--accent-color);">${wr}%</div>
                         </div>
                     </div>`;
                 });
             }
-            document.getElementById('mapStatsList').innerHTML = html;
+            let listEl = document.getElementById('mapStatsList');
+            if(listEl) listEl.innerHTML = html;
         }
 
         // =======================
@@ -682,6 +702,7 @@
                     for(let g=0; g<3; g++) {
                         let god1 = w1[g]?.querySelector('.god-select-btn')?.getAttribute('data-god') || "";
                         let win1 = w1[g]?.querySelector('.win-toggle')?.classList.contains('is-winner') || false;
+                        
                         let god2 = w2[g]?.querySelector('.god-select-btn')?.getAttribute('data-god') || "";
                         let win2 = w2[g]?.querySelector('.win-toggle')?.classList.contains('is-winner') || false;
                         gState.push({ god1, win1, god2, win2 });
@@ -760,10 +781,14 @@
 
         function atualizarTodosOsGods() {
             let godStats = {}; listaDeuses.forEach(g => godStats[g] = {j: 0, v: 0, d: 0, b: 0});
-            
+            let mapFilterElement = document.getElementById('mapFilter');
+            let mapFilter = mapFilterElement ? mapFilterElement.value : 'ALL';
+
             document.querySelectorAll('.ban-slot').forEach(banSlot => {
                 let g = banSlot.dataset.god;
-                if(g && godStats[g]) { godStats[g].b++; }
+                if(g && godStats[g]) {
+                    if(mapFilter === 'ALL') { godStats[g].b++; }
+                }
             });
 
             document.querySelectorAll('.win-toggle').forEach(toggle => {
@@ -775,6 +800,10 @@
 
                 let matchCard = toggle.closest('.match-card') || toggle.closest('.b-match');
                 let gameIdx = toggle.dataset.game;
+                let mapSelect = matchCard.querySelector(`.map-select[data-game="${gameIdx}"]`);
+                let gameMap = mapSelect ? mapSelect.value : "";
+
+                if(mapFilter !== 'ALL' && gameMap !== mapFilter) return; 
 
                 const allTogglesThisGame = matchCard.querySelectorAll(`.win-toggle[data-game="${gameIdx}"]`);
                 let gameResolved = false; let thisWon = toggle.classList.contains('is-winner'); let oppWon = false;
@@ -1035,9 +1064,6 @@
             renderStreamLinks();
         }
 
-        // =======================
-        // LÓGICA DE DESTINO DO PERDEDOR E CHAVE DINÂMICA
-        // =======================
         function getLoserDestinationText(r, m, size) {
             if (r === 0) return `L1-M${Math.floor(m/2) + 1}`;
             const lRound = r * 2 - 1;
@@ -1123,7 +1149,6 @@
             }
             
             let banBtns = '';
-            // No mata-mata aplicaremos 2 Bans por jogador
             for(let i=0; i<2; i++) {
                 banBtns += `<div class="god-slot-wrapper">
                     <div class="god-select-btn ban-slot ${matchId}-ban${i}-p${idx+1}" style="width:14px; height:14px;" data-god="" onclick="abrirModalDeuses(this)" title="Banir Deus"></div>
@@ -1141,7 +1166,7 @@
             <div class="b-player ${pName === 'BYE' ? 'is-empty' : ''}" data-slot="${idx}">
                 <div class="b-player-info">
                     <span class="p-name ${isPlaceholder ? 'p-placeholder' : ''}" contenteditable="true" oninput="calcularEloGeral()">${pName}</span>
-                    <div style="display:flex; align-items:center; gap:6px;">
+                    <div class="placar-mata-wrapper">
                         <button class="btn-advance admin-only" title="Avançar Vencedor" onclick="avancarWinner(this, ${idx})">W</button>
                         <button class="btn-advance btn-loser admin-only" title="Enviar p/ Repescagem" onclick="avancarLoser(this, ${idx})">L</button>
                         <input type="number" class="score-input score-p${idx+1}" value="0">
@@ -1160,7 +1185,6 @@
             
             let roundsW = Math.log2(size);
             
-            // --- WINNERS BRACKET ---
             for(let i=0; i < roundsW; i++) {
                 let matchesNum = size / Math.pow(2, i+1);
                 let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
@@ -1182,7 +1206,7 @@
                     let crossM = j;
                     if(i > 0) { let mInR = size / Math.pow(2, i+1); crossM = (mInR - 1) - j; if (crossM < 0 || isNaN(crossM)) crossM = j; }
                     
-                    let mapsHtml = `<div class="map-row">`;
+                    let mapsHtml = `<div class="map-row" style="background:transparent; border-top:1px solid rgba(255,255,255,0.03);">`;
                     for(let g=0; g<slots; g++) mapsHtml += `<select class="map-select" data-match="${mId}" data-game="${g}" onchange="atualizarMapas(this)"><option value="">Mapa ${g+1}</option>${listaMapas.map(m => `<option value="${m}">${m}</option>`).join('')}</select>`;
                     mapsHtml += `</div>`;
 
@@ -1206,7 +1230,6 @@
                 wContainer.appendChild(roundDiv);
             }
 
-            // --- LOSERS BRACKET ---
             let roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1; 
             for(let i=0; i < roundsL; i++) {
                 let matchesNum = size / Math.pow(2, Math.floor(i/2) + 2);
@@ -1221,7 +1244,7 @@
                     const mId = `l_${i}_${j}`;
                     const matchDisplayId = `L${i+1}-M${j+1}`;
                     
-                    let mapsHtml = `<div class="map-row">`;
+                    let mapsHtml = `<div class="map-row" style="background:transparent; border-top:1px solid rgba(255,255,255,0.03);">`;
                     for(let g=0; g<slots; g++) mapsHtml += `<select class="map-select" data-match="${mId}" data-game="${g}" onchange="atualizarMapas(this)"><option value="">Mapa ${g+1}</option>${listaMapas.map(m => `<option value="${m}">${m}</option>`).join('')}</select>`;
                     mapsHtml += `</div>`;
 
@@ -1244,9 +1267,8 @@
                 lContainer.appendChild(roundDiv);
             }
 
-            // --- GRAND FINALS ---
             fContainer.innerHTML = `
-                <div class="bracket-round round-champion" style="min-width: 350px;">
+                <div class="bracket-round round-champion" style="min-width: 400px;">
                     <h4 class="round-title" style="color:#FFD700;" contenteditable="true" onblur="saveTournament()">GRAND FINALS (TITANS)</h4>
                     <div class="match-wrapper" style="justify-content: center; padding-top: 30px;">
                         <div class="match-badges" style="left: 50%; transform: translateX(-50%);">
@@ -1257,12 +1279,10 @@
                             <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                 <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                             </div>
-                            <div class="map-row" style="position:absolute; bottom:0; width:100%; border-top:1px solid rgba(255,255,255,0.03);">
+                            ${gerarSlotHtml("Venc. Chave Superior", 0, 7, "f_0_0")}
+                            ${gerarSlotHtml("Venc. Repescagem", 1, 7, "f_0_0")}
+                            <div class="map-row" style="background:transparent; border-top:1px solid rgba(255,255,255,0.03); flex-wrap:wrap; padding:15px 5px;">
                                 ${[...Array(7)].map((_,g) => `<select class="map-select" data-match="f_0_0" data-game="${g}" onchange="atualizarMapas(this)"><option value="">Map ${g+1}</option>${listaMapas.map(m => `<option value="${m}">${m}</option>`).join('')}</select>`).join('')}
-                            </div>
-                            <div style="padding-bottom:30px;">
-                                ${gerarSlotHtml("Venc. Chave Superior", 0, 7, "f_0_0")}
-                                ${gerarSlotHtml("Venc. Repescagem", 1, 7, "f_0_0")}
                             </div>
                         </div>
                     </div>
@@ -1342,7 +1362,7 @@
                         playerSlot.classList.remove('is-empty');
                         
                         if(pName === "BYE" && targetBracket === "W") {
-                             const btnVitoriaOp = targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.btn-advance.w') || targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('button[title="Avançar Vencedor"]');
+                             const btnVitoriaOp = targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.btn-advance');
                              if(btnVitoriaOp && targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.p-name').innerText !== "TBD") {
                                  setTimeout(() => btnVitoriaOp.click(), 100);
                              }
