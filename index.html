@@ -105,7 +105,6 @@
         }
         button.action-btn:hover { background: var(--accent-color); color: #000; transform: translateY(-2px); box-shadow: 0 5px 15px var(--accent-glow); }
 
-        /* GRUPOS */
         table { width: 100%; border-collapse: separate; border-spacing: 0 6px; margin-top: 10px; }
         th { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; padding: 10px 15px; border-bottom: 1px solid var(--border-color); }
         td { padding: 12px 15px; background-color: var(--panel-surface); text-align: center; font-size: 0.9rem; transition: background-color 0.3s; border-top: 1px solid transparent; border-bottom: 1px solid transparent; }
@@ -125,9 +124,9 @@
         .promoted .btn-promote { background: var(--accent-color); color: #000; border-color: var(--accent-color); font-weight: 600; }
 
         .groups-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; }
+        @media (max-width: 900px) { .groups-grid { grid-template-columns: 1fr; } }
+
         .match-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 30px;}
-        
-        /* MATCH CARD FASE DE GRUPOS E MATA MATA */
         .match-card { background: var(--panel-surface); border: 1px solid var(--border-color); padding: 25px 20px 20px 20px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s; position: relative; }
         .match-card:hover { transform: scale(1.01); border-color: var(--border-highlight); }
         .match-player { flex: 1; text-align: center; font-weight: 600; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center;}
@@ -146,38 +145,55 @@
         .god-select-btn[data-god]:not([data-god=""])::after { display: none; }
         .god-select-btn[data-god]:not([data-god=""]) { border-style: solid; border-color: var(--border-color); }
         
-        .god-select-btn.locked { border: 1px solid rgba(255, 255, 255, 0.2) !important; background-color: #000 !important; background-image: none !important; cursor: not-allowed; pointer-events: none; }
+        .god-select-btn.locked {
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            background-color: #000 !important;
+            background-image: none !important;
+            cursor: not-allowed; pointer-events: none;
+        }
         .god-select-btn.locked::after { content: '🔒'; color: #888; font-size: 12px; display: block !important; }
 
         .win-toggle {
             width: 100%; font-size: 0.6rem; cursor: pointer; border: 1px solid var(--border-color);
             background: transparent; color: var(--text-muted); border-radius: 3px; padding: 2px 0;
-            transition: all 0.2s; text-transform: uppercase; font-family: 'Montserrat', sans-serif; font-weight: bold;
+            transition: all 0.2s; text-transform: uppercase; font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
         }
         .win-toggle:hover { border-color: var(--accent-color); color: var(--text-main); }
         .win-toggle.is-winner { background: #4ade80; color: #000; border-color: #4ade80; box-shadow: 0 0 8px rgba(74, 222, 128, 0.4); }
 
         .stage-title { color: var(--accent-color); font-family: 'Cinzel', serif; text-align: center; letter-spacing: 3px; text-shadow: 0 0 10px var(--accent-glow); margin-bottom: 25px; }
         
-        /* SISTEMA DE IDENTIFICAÇÃO DE PARTIDAS E FORMATOS */
-        .match-badges { position: absolute; top: -12px; left: 10px; display: flex; gap: 5px; z-index: 10; }
-        .format-badge, .id-badge { background: #111; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.55rem; padding: 2px 6px; border-radius: 6px; letter-spacing: 1px; font-weight: bold; }
-        .format-badge { border-color: var(--accent-color); color: var(--accent-color); background: rgba(212, 175, 55, 0.1); }
-        .id-badge { border-color: #555; color: #bbb; background: #050505; font-family: monospace; }
+        /* SOLUÇÃO INTELIGENTE DO MD3/MD5: Posicionado à esquerda para não conflitar com a live */
+        .format-badge { background: rgba(212, 175, 55, 0.15); border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; position: absolute; top: -12px; left: 15px; z-index: 10; letter-spacing: 1px; font-weight: bold; }
 
         /* MÚLTIPLOS LINKS DE STREAM COM CORES DINÂMICAS */
         .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: center; width: 80%; }
         
         .viewer-stream-link { 
-            --live-color: #ff4d4d; display: flex; align-items: center; justify-content: center; gap: 5px; 
-            color: var(--live-color); font-size: 0.65rem; text-decoration: none; font-weight: bold; letter-spacing: 1px; 
-            background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--border-color); transition: 0.3s; text-transform: uppercase; 
+            --live-color: #ff4d4d; 
+            display: flex; align-items: center; justify-content: center; gap: 5px; 
+            color: var(--live-color); font-size: 0.65rem; text-decoration: none; 
+            font-weight: bold; letter-spacing: 1px; 
+            background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 12px; 
+            border: 1px solid var(--border-color); transition: 0.3s; text-transform: uppercase; 
         }
-        .viewer-stream-link:hover { border-color: var(--live-color); transform: scale(1.05); box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); }
-        .viewer-stream-link::before { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--live-color); border-radius: 50%; animation: pulseLive 1.5s infinite; }
-        @keyframes pulseLive { 0% { transform: scale(0.8); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.3; } 100% { transform: scale(0.8); opacity: 1; } }
+        .viewer-stream-link:hover { 
+            border-color: var(--live-color); transform: scale(1.05); 
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+        .viewer-stream-link::before { 
+            content: ''; display: inline-block; width: 6px; height: 6px; 
+            background: var(--live-color); border-radius: 50%; 
+            animation: pulseLive 1.5s infinite; 
+        }
+        @keyframes pulseLive { 
+            0% { transform: scale(0.8); opacity: 1; } 
+            50% { transform: scale(1.5); opacity: 0.3; } 
+            100% { transform: scale(0.8); opacity: 1; } 
+        }
 
-        /* PLACAR GLOBAL (READ-ONLY) */
+        /* PLACAR GLOBAL E CAIXA FANTASMA (READ-ONLY) */
         .match-score { display: flex; align-items: center; gap: 15px; background: #000; padding: 5px 15px; border-radius: 6px; border: 1px solid var(--border-color); margin: 0 10px; }
         .match-score input { width: 30px; background: transparent; border: none; color: var(--accent-color); text-align: center; font-size: 1.5rem; font-weight: 700; padding: 0; font-family: 'Cinzel', serif; pointer-events: none; }
         .match-score span { color: var(--text-muted); font-size: 0.8rem; font-weight: 300; }
@@ -185,73 +201,67 @@
         /* MATA-MATA ESTRUTURA BLINDADA */
         .bracket-container { display: flex; overflow-x: auto; padding: 70px 20px 20px 20px; cursor: grab; min-height: 450px; align-items: stretch; gap: 0; }
         .bracket-container:active { cursor: grabbing; }
-        .bracket-container::-webkit-scrollbar { height: 8px; }
-        .bracket-container::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        .bracket-container::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+        .bracket-container::-webkit-scrollbar { height: 6px; }
+        .bracket-container::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-        /* O flex-shrink: 0 é o segredo matemático para as colunas não sumirem! */
-        .bracket-round { display: flex; flex-direction: column; min-width: 350px; padding-right: 60px; position: relative; flex-shrink: 0; }
-        .bracket-round:last-child { padding-right: 0; min-width: 290px; }
+        .bracket-round { display: flex; flex-direction: column; min-width: 320px; padding-right: 60px; position: relative; }
+        .bracket-round:last-child { padding-right: 0; min-width: 270px; }
         
+        /* TÍTULOS EDITÁVEIS */
         .round-title { position: absolute; top: -50px; left: 0; width: calc(100% - 60px); text-align: center; margin: 0; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; z-index: 10; border-bottom: 1px dashed transparent; outline: none; transition: 0.3s; }
         .round-title:focus { color: var(--accent-color); border-bottom: 1px dashed var(--accent-color); }
         .bracket-round:last-child .round-title { width: 100%; }
 
-        .match-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 15px 0; }
-        
-        .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.3s ease; width: 100%; margin: 0; padding-top: 20px;}
+        .match-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 10px 0; }
+        .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.3s ease; width: 100%; margin: 0; padding-top: 15px;}
 
-        /* CONEXÕES DE LINHAS ESTRUTURAIS */
         .bracket-round:not(:first-child) .match-wrapper::before { content: ''; position: absolute; left: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
         .bracket-round:not(:last-child) .match-wrapper:nth-of-type(odd):not(:only-of-type)::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 50%; border-top: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 6px 0 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
         .bracket-round:not(:last-child) .match-wrapper:nth-of-type(even):not(:only-of-type)::after { content: ''; position: absolute; right: -30px; bottom: 50%; width: 30px; height: 50%; border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 0 6px 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
         .bracket-round:not(:last-child) .match-wrapper:only-of-type::after { content: ''; position: absolute; right: -30px; top: 50%; width: 30px; height: 2px; background-color: var(--border-color); transition: 0.3s; z-index: 1; transform: translateY(-50%); }
 
-        /* BYE INTELIGENTE (CAIXA FANTASMA MAS PRESENTE NA GEOMETRIA PARA MANTER AS LINHAS) */
-        .b-match.is-bye {
-            background: transparent !important; border: 1px dashed rgba(255,255,255,0.1) !important; box-shadow: none !important; opacity: 0.5;
-        }
-        .b-match.is-bye:hover { transform: none; box-shadow: none; border-color: rgba(255,255,255,0.2) !important; }
-        .b-match.is-bye .stream-controls, .b-match.is-bye .mata-gods, .b-match.is-bye .loser-drop-label, .b-match.is-bye .match-score, .b-match.is-bye .btn-advance, .b-match.is-bye .match-badges { display: none !important; }
-        .b-match.is-bye .b-player { border-bottom: none; }
-        .b-player.is-empty .p-name { color: #555; text-decoration: line-through; }
-        .b-match.is-bye .winner-slot { background: transparent; border-left-color: #555; }
-        .b-match.is-bye .winner-slot .p-name { color: #888; font-weight: normal; }
-
         .glow-box, .b-match:hover, .champion-box:hover { border-color: var(--accent-color) !important; box-shadow: 0 0 15px var(--accent-glow) !important; transform: scale(1.02); z-index: 10 !important; }
         .glow-incoming::before, .match-wrapper:hover::before { background-color: var(--accent-color) !important; box-shadow: 0 0 8px var(--accent-glow); }
-        .glow-outgoing:after, .match-wrapper:only-of-type:hover::after { background-color: var(--accent-color) !important; box-shadow: 0 0 8px var(--accent-glow); border-color: var(--accent-color) !important; }
+        .glow-outgoing:only-of-type::after, .match-wrapper:only-of-type:hover::after { background-color: var(--accent-color) !important; box-shadow: 0 0 8px var(--accent-glow); }
         .glow-outgoing:nth-of-type(odd):not(:only-of-type)::after, .glow-outgoing:nth-of-type(even):not(:only-of-type)::after, .match-wrapper:nth-of-type(odd):not(:only-of-type):hover::after, .match-wrapper:nth-of-type(even):not(:only-of-type):hover::after { border-color: var(--accent-color) !important; filter: drop-shadow(0 0 4px var(--accent-color)); }
 
-        /* INTELIGÊNCIA VISUAL: DESTINO DO PERDEDOR (FUNDO PRETO) */
-        .loser-drop-label { 
-            font-size: 0.65rem; color: #ff6b6b; text-align: center; padding: 6px; 
-            background: #000000 !important; border-top: 2px solid var(--danger-color); 
-            border-radius: 0 0 8px 8px; text-transform: uppercase; letter-spacing: 1px; 
-            margin-top: 5px; opacity: 1; transition: 0.3s; pointer-events: none; 
-            font-weight: bold; border-left: 1px solid #222; border-right: 1px solid #222; border-bottom: 1px solid #222;
-        }
-        .b-match:hover .loser-drop-label { background: #1a0505 !important; color: #fff; border-color: #ff0000; box-shadow: inset 0 5px 15px rgba(255,0,0,0.2); }
-        
-        .glow-drop { border-color: var(--danger-color) !important; box-shadow: 0 0 20px rgba(255, 68, 68, 0.6) !important; transform: scale(1.02); z-index: 10 !important; }
-        .glow-drop::before { content: 'ALVO ⬇'; position: absolute; top: -24px; right: 10px; color: #ff4444; font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; animation: bounceDrop 1s infinite;}
-        @keyframes bounceDrop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
-
-        /* JOGADOR NO MATA-MATA CLÁSSICO */
-        .b-player { padding: 12px 15px; display: flex; flex-direction: column; align-items: stretch; gap: 8px; font-size: 0.85rem; transition: all 0.3s; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .b-player { padding: 12px 15px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; transition: all 0.3s; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .b-player:last-child { border-bottom: none; }
         .b-player-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .p-name { font-weight: 600; letter-spacing: 0.5px; transition: 0.3s; }
-        .p-placeholder { color: #888; font-style: italic; font-weight: 400; font-size: 0.7rem; }
         
         .b-player.winner-slot { background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent); border-left: 3px solid var(--accent-color); }
         .b-player.winner-slot .p-name { color: var(--accent-color); }
         .b-player.loser-slot { opacity: 0.4; background-color: rgba(0,0,0,0.6); }
         .b-player.loser-slot .p-name { text-decoration: line-through; color: #666; }
 
+        /* NOVA CAIXA DE PLACAR MAIS ELEGANTE E COMPACTA */
+        .score-input { 
+            width: 32px !important; 
+            height: 32px;
+            padding: 0; 
+            background: rgba(255, 255, 255, 0.08) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.15) !important; 
+            border-radius: 6px;
+            color: var(--text-main) !important; 
+            text-align: center !important; 
+            font-weight: 700; 
+            font-size: 1.1rem;
+            font-family: 'Cinzel', serif; 
+            pointer-events: none; 
+            box-sizing: border-box;
+        }
+        .b-player.winner-slot .score-input { 
+            background: rgba(212, 175, 55, 0.15) !important; 
+            border-color: var(--accent-color) !important; 
+            color: var(--accent-color) !important; 
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.4); 
+        }
+
         .btn-advance { background: transparent; border: 1px solid var(--border-highlight); color: var(--text-muted); border-radius: 4px; cursor: pointer; padding: 4px 10px; font-weight: 600; font-size: 0.65rem; transition: all 0.2s; margin-left: 10px; text-transform: uppercase; letter-spacing: 1px; }
         .btn-advance:hover { border-color: var(--accent-color); color: var(--accent-color); }
         .b-player.winner-slot .btn-advance { display: none; } 
+        
         .btn-loser { border-color: var(--danger-color); color: var(--danger-color); }
         .btn-loser:hover { background-color: var(--danger-color); color: #fff; }
 
@@ -259,6 +269,7 @@
         [contenteditable="true"]:focus { border-bottom: 1px dashed var(--accent-color); color: var(--accent-color); }
 
         .footer { text-align: center; margin-top: 30px; font-size: 0.7rem; color: var(--text-muted); letter-spacing: 4px; font-weight: 300; }
+        
         #godsTable td, #statsContent th { padding: 10px 5px; font-size: 0.8rem; }
         .stat-input { width: 45px; padding: 4px; text-align: center; background: transparent; border: 1px solid var(--border-color); color: var(--text-main); border-radius: 4px; pointer-events:none;}
         .god-icon { width: 24px; height: 24px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
@@ -708,9 +719,6 @@
             });
         }
 
-        // =======================
-        // NAVEGAÇÃO E SETUP
-        // =======================
         function toggleSetup() {
             const content = document.getElementById('setupContent'), btn = document.getElementById('btnToggleSetup');
             if (content.style.display === 'none') { content.style.display = 'grid'; btn.innerText = 'Recolher'; btn.classList.remove('active'); }
@@ -863,9 +871,6 @@
             renderStreamLinks();
         }
 
-        // =======================
-        // LÓGICA DE DESTINO DO PERDEDOR E CHAVE DINÂMICA
-        // =======================
         function getLoserDestinationText(r, m, size) {
             if (r === 0) return `L1-M${Math.floor(m/2) + 1}`;
             const lRound = r * 2 - 1;
@@ -883,7 +888,10 @@
                 
                 let p1 = players[0].innerText.trim(), p2 = players[1].innerText.trim();
 
-                if (p1 === "BYE" || p2 === "BYE") {
+                if ((p1 === "BYE" && p2 !== "BYE" && p2 !== "TBD" && !p2.startsWith("Perd.") && !p2.startsWith("Venc.")) || 
+                    (p2 === "BYE" && p1 !== "BYE" && p1 !== "TBD" && !p1.startsWith("Perd.") && !p1.startsWith("Venc.")) || 
+                    (p1 === "BYE" && p2 === "BYE")) {
+                    
                     match.classList.add('bye-processed');
                     match.classList.add('is-bye');
                     
@@ -1058,8 +1066,8 @@
                             <div class="stream-controls" style="top: -14px; right: 10px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                 <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.5rem; background:var(--panel-surface);" onclick="addStreamLink(this)">🎥 +</button>
                             </div>
-                            ${gerarSlotHtml("Venc. Chave Superior", 0, 7, "f_0_0")}
-                            ${gerarSlotHtml("Venc. Repescagem", 1, 7, "f_0_0")}
+                            ${gerarSlotHtml("Winner Finalist", 0, 7, "f_0_0")}
+                            ${gerarSlotHtml("Loser Finalist", 1, 7, "f_0_0")}
                         </div>
                     </div>
                 </div>
