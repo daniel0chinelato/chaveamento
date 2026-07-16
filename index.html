@@ -180,7 +180,7 @@
         .match-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 8px 0; }
         
         /* Sem overflow:hidden para os emblemas vazarem corretamente */
-        .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.2s ease; width: 100%; margin: 0; padding-top: 10px;}
+        .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.2s ease; width: 100%; margin: 0; padding-top: 10px; overflow: visible;}
 
         /* CONEXÕES LÓGICAS */
         .bracket-round:not(:first-child) .match-wrapper::before { content: ''; position: absolute; left: -20px; top: 50%; width: 20px; height: 2px; background-color: #444; z-index: 1; transform: translateY(-50%); }
@@ -270,14 +270,14 @@
         
         .map-info-left { flex: 1; max-width: 400px; display: flex; flex-direction: column; gap: 15px;}
         
-        /* O Pódio agora foi movido para a direita, empurrado um pouco para a esquerda (sobre o mapa) */
-        .map-podium-right { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 550px; margin-right: 25%; margin-top: 2%;}
+        /* Pódio movido para a direita, empurrado um pouco para a esquerda (sobre o mapa) */
+        .map-podium-right { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 550px; margin-right: 22%; margin-top: 2%;}
 
         /* BOTAO DE DICAS E TRANSIÇÃO */
         .btn-hint { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 20px; font-family: 'Cinzel', serif; text-transform: uppercase; cursor: pointer; border-radius: 30px; transition: 0.3s; font-weight: bold; letter-spacing: 2px; display: inline-flex; align-items: center; gap: 10px; align-self: flex-start;}
         .btn-hint:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 20px var(--accent-glow); }
         
-        /* Overlay da Dica Fullscreen */
+        /* Overlay da Dica Fullscreen (SEM INTERFACE) */
         #hintContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 50; opacity: 0; transition: opacity 0.5s ease; background: transparent; }
         #hintContainer.active { opacity: 1; pointer-events: auto; }
         /* A imagem de fundo fará o papel de dica, o container tem só o botão */
@@ -480,7 +480,7 @@
             <!-- Lado Superior (Esquerda e Direita) -->
             <div class="map-stats-top">
                 <div class="map-info-left">
-                    <h1 id="mapaDestaqueTitulo" style="font-size: 3rem; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); font-family: 'Cinzel', serif; color: var(--accent-color); letter-spacing: 2px; line-height:1.1;">Anatólia</h1>
+                    <h1 id="mapaDestaqueTitulo" style="font-size: 3.5rem; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); font-family: 'Cinzel', serif; color: var(--accent-color); letter-spacing: 2px; line-height:1.1;">Anatólia</h1>
                     <div style="font-size: 0.9rem; color: #fff; text-transform: uppercase; font-weight: bold; letter-spacing: 2px; text-shadow: 1px 1px 4px #000; margin-top: 10px;">Total de Partidas no Mapa: <span id="mapTotalJogos" style="color: var(--accent-color); font-size: 1.4rem; margin-left: 5px;">0</span></div>
                     <button class="btn-hint" onclick="toggleDicas()">💡 Ver Dicas do Mapa</button>
                 </div>
@@ -587,7 +587,7 @@
 
         const listaDeuses = ["Zeus", "Hades", "Poseidon", "Deméter", "Tsukuyomi", "Amaterasu", "Susanoo", "Fuxi", "Nuwa", "Shennong", "Thor", "Odin", "Loki", "Freyr", "Ísis", "Rá", "Set", "Cronos", "Gaia", "Urano", "Quetzalcoatl", "Tezcatlipoca", "Huitzilopochtli"];
         
-        // Mapeamento Exato de Imagens Oficiais
+        // Mapeamento Exato de Imagens Oficiais (Todos JPG)
         const mapaImagens = {
             "Acrópole": "acropole.jpg",
             "Anatólia": "anatolia.jpg",
@@ -612,15 +612,15 @@
         // Lógica Inteligente para Imagens de Dicas PNG
         function getMapHintPath(nomeDoMapa) {
             const hintsEspeciais = {
-                "Coração de Tenochtitlán": "hint_coracao.png",
-                "Lago Fantasma": "hint_fantasma.png"
+                "Coração de Tenochtitlán": "hint_coracao.jpg",
+                "Lago Fantasma": "hint_fantasma.jpg"
             };
             if(hintsEspeciais[nomeDoMapa]) return hintsEspeciais[nomeDoMapa];
             
             let safeName = nomeDoMapa.toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove acentos
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
                 .trim();
-            return "hint_" + safeName + ".png";
+            return "hint_" + safeName + ".jpg";
         }
 
         function renderizarGodGrid() {
@@ -796,7 +796,6 @@
                     let lossPct = (s.d / s.j) * 100;
                     let titlePos = pos === 1 ? '1º' : (pos === 2 ? '2º' : '3º');
 
-                    // Lógica dos Top Jogadores para o Hover
                     let playersArr = Object.keys(s.topPlayers).map(p => ({name: p, wins: s.topPlayers[p]}));
                     playersArr.sort((a,b) => b.wins - a.wins);
                     let topPlayerHtml = playersArr.length > 0 
@@ -1623,220 +1622,4 @@
                 });
                 slider.addEventListener('mouseleave', () => { isDown = false; slider.style.cursor = 'grab'; });
                 slider.addEventListener('mouseup', () => { isDown = false; slider.style.cursor = 'grab'; });
-                slider.addEventListener('mousemove', (e) => {
-                    if (!isDown) return; e.preventDefault();
-                    const x = e.pageX - slider.offsetLeft;
-                    slider.scrollLeft = scrollLeft - (x - startX) * 1.5;
-                });
-            });
-        }
-
-        function calcularEloGeral() {
-            try {
-                let eloData = {};
-
-                document.querySelectorAll('#groupsDisplay tbody tr').forEach(row => {
-                    let pName = row.dataset.player;
-                    if (pName && pName !== "BYE") {
-                        pName = pName.trim();
-                        let isSeed = row.classList.contains('seed-row');
-                        eloData[pName] = { nome: pName, isSeed: isSeed, elo: 1000 };
-                    }
-                });
-
-                if (Object.keys(eloData).length === 0) {
-                    let sInput = document.getElementById('seedsInput');
-                    let rInput = document.getElementById('regularsInput');
-                    if(sInput && rInput) {
-                        let s = sInput.value.split('\n').filter(x => x.trim() !== '');
-                        let r = rInput.value.split('\n').filter(x => x.trim() !== '');
-                        s.forEach(n => eloData[n.trim()] = { nome: n.trim(), isSeed: true, elo: 1000 });
-                        r.forEach(n => eloData[n.trim()] = { nome: n.trim(), isSeed: false, elo: 1000 });
-                    }
-                }
-
-                document.querySelectorAll('.match-card').forEach(card => {
-                    let p1 = card.dataset.p1 ? card.dataset.p1.trim() : null;
-                    let p2 = card.dataset.p2 ? card.dataset.p2.trim() : null;
-                    if (!p1 || !p2 || p1 === "BYE" || p2 === "BYE") return;
-
-                    let inputs = card.querySelectorAll('input.score-input');
-                    if (inputs.length < 2) return;
-
-                    let val1 = inputs[0].value || inputs[0].getAttribute('value');
-                    let val2 = inputs[1].value || inputs[1].getAttribute('value');
-
-                    if (val1 !== "" && val2 !== "" && val1 !== null && val2 !== null) {
-                        let s1 = parseInt(val1);
-                        let s2 = parseInt(val2);
-
-                        if (!isNaN(s1) && !isNaN(s2) && s1 !== s2) {
-                            let winner = s1 > s2 ? p1 : p2;
-                            let loser = s1 > s2 ? p2 : p1;
-
-                            if (eloData[winner] && eloData[loser]) {
-                                let wSeed = eloData[winner].isSeed === true;
-                                let lSeed = eloData[loser].isSeed === true;
-
-                                if (!wSeed && !lSeed) { eloData[winner].elo += 10; eloData[loser].elo -= 10; }
-                                else if (!wSeed && lSeed) { eloData[winner].elo += 15; eloData[loser].elo -= 15; }
-                                else if (wSeed && !lSeed) { eloData[winner].elo += 5; eloData[loser].elo -= 5; }
-                                else if (wSeed && lSeed) { eloData[winner].elo += 10; eloData[loser].elo -= 10; }
-                            }
-                        }
-                    }
-                });
-
-                if (typeof jogadoresPromovidos !== 'undefined') {
-                    jogadoresPromovidos.forEach(p => {
-                        let pName = p.trim();
-                        if (eloData[pName]) eloData[pName].elo += 25;
-                    });
-                }
-
-                document.querySelectorAll('.b-match:not(.is-bye)').forEach(match => {
-                    let players = match.querySelectorAll('.b-player');
-                    if (players.length === 2) {
-                        let p1Div = players[0];
-                        let p2Div = players[1];
-                        
-                        let p1Span = p1Div.querySelector('.p-name');
-                        let p2Span = p2Div.querySelector('.p-name');
-                        if (!p1Span || !p2Span) return;
-
-                        let p1Name = p1Span.innerText.trim();
-                        let p2Name = p2Span.innerText.trim();
-
-                        if(p1Name === "BYE" || p2Name === "BYE") return;
-
-                        if (p1Name && p1Name !== "TBD" && !p1Name.startsWith("Perd.") && !p1Name.startsWith("Venc.") && !eloData[p1Name]) eloData[p1Name] = { nome: p1Name, isSeed: false, elo: 1000 };
-                        if (p2Name && p2Name !== "TBD" && !p2Name.startsWith("Perd.") && !p2Name.startsWith("Venc.") && !eloData[p2Name]) eloData[p2Name] = { nome: p2Name, isSeed: false, elo: 1000 };
-
-                        let p1Win = p1Div.classList.contains('winner-slot');
-                        let p2Win = p2Div.classList.contains('winner-slot');
-
-                        if (p1Win && !p2Win) {
-                            if (eloData[p1Name]) eloData[p1Name].elo += 30;
-                            if (eloData[p2Name]) eloData[p2Name].elo -= 15;
-                        } else if (p2Win && !p1Win) {
-                            if (eloData[p2Name]) eloData[p2Name].elo += 30;
-                            if (eloData[p1Name]) eloData[p1Name].elo -= 15;
-                        }
-                    }
-                });
-
-                let eloArray = Object.values(eloData);
-                eloArray.sort((a, b) => b.elo - a.elo);
-
-                let tbody = document.getElementById('eloTableBody');
-                if (tbody) {
-                    tbody.innerHTML = '';
-                    if (eloArray.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted); font-style: italic; font-size: 0.8rem; padding: 15px;">Aguardando geração dos grupos...</td></tr>`;
-                    } else {
-                        eloArray.forEach((p, index) => {
-                            let statusBadge = p.isSeed 
-                                ? '<span style="color:var(--accent-color); font-size:0.55rem; letter-spacing: 0.5px; text-transform: uppercase;">Cabeça de Chave</span>' 
-                                : '<span style="color:var(--text-muted); font-size:0.55rem; letter-spacing: 0.5px; text-transform: uppercase;">Regular</span>';
-                            
-                            let posColor = "var(--text-main)";
-                            if(index === 0) posColor = "#FFD700"; 
-                            else if (index === 1) posColor = "#C0C0C0"; 
-                            else if (index === 2) posColor = "#CD7F32"; 
-
-                            tbody.innerHTML += `
-                            <tr style="transition: 0.3s; background-color: var(--panel-surface);">
-                                <td style="font-weight:bold; font-size:1.1rem; color:${posColor}; text-align: center; border-radius: 6px 0 0 6px; padding: 8px 5px;">${index + 1}º</td>
-                                <td style="text-align:left; font-weight:700; font-size:0.9rem; line-height: 1.2; padding: 8px 5px;">
-                                    ${p.nome}<br>${statusBadge}
-                                </td>
-                                <td style="font-weight:bold; font-family:'Cinzel', serif; color:var(--accent-color); font-size:1.2rem; text-align: center; border-radius: 0 6px 6px 0; padding: 8px 5px;">${p.elo}</td>
-                            </tr>`;
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error("Erro no ELO:", error);
-            }
-        }
-
-        function saveTournament() {
-            if(document.body.classList.contains('is-viewer')) return; 
-            const btnSave = document.getElementById('saveLoader');
-            if(btnSave) btnSave.style.display = 'inline-block';
-
-            try {
-                document.querySelectorAll('input:not(.score-input)').forEach(input => input.setAttribute('value', input.value));
-                document.querySelectorAll('.score-input').forEach(input => input.setAttribute('value', input.value));
-                
-                const data = {
-                    seeds: document.getElementById('seedsInput')?.value || '',
-                    regulars: document.getElementById('regularsInput')?.value || '',
-                    playersPerGroup: document.getElementById('playersPerGroup')?.value || '3',
-                    groupsDisplay: document.getElementById('groupsDisplay')?.innerHTML || '',
-                    groupsSectionVisible: document.getElementById('groupsSection')?.style.display || 'none',
-                    godsTable: document.getElementById('godsTable')?.innerHTML || '',
-                    matchesGroupsContainer: document.getElementById('matchesGroupsContainer')?.innerHTML || '',
-                    promotedList: jogadoresPromovidos || [],
-                    bracketSize: document.getElementById('bracketSize')?.value || '8',
-                    winnersDisplay: document.getElementById('winnersBracketDisplay')?.innerHTML || '',
-                    losersDisplay: document.getElementById('losersBracketDisplay')?.innerHTML || '',
-                    finalsDisplay: document.getElementById('grandFinalsDisplay')?.innerHTML || '',
-                };
-
-                db.ref('tavernas_data').set(data)
-                  .then(() => { if(btnSave) btnSave.style.display = 'none'; })
-                  .catch((e) => { if(btnSave) btnSave.style.display = 'none'; alert("Erro Firebase: " + e.message); });
-
-            } catch(e) { if(btnSave) btnSave.style.display = 'none'; alert("Erro interno: " + e.message); }
-        }
-
-        function loadTournament() {
-            db.ref('tavernas_data').once('value').then((snapshot) => {
-                const data = snapshot.val();
-                if (!data) { if(!document.body.classList.contains('is-viewer')) gerarChave(); initDragToScroll(); return; }
-                
-                if(data.seeds) document.getElementById('seedsInput').value = data.seeds; 
-                if(data.regulars) document.getElementById('regularsInput').value = data.regulars;
-                if(data.playersPerGroup) document.getElementById('playersPerGroup').value = data.playersPerGroup;
-                
-                if(data.groupsDisplay) document.getElementById('groupsDisplay').innerHTML = data.groupsDisplay;
-                if(data.groupsSectionVisible) document.getElementById('groupsSection').style.display = data.groupsSectionVisible; 
-                if(data.godsTable) document.getElementById('godsTable').innerHTML = data.godsTable;
-                if(data.matchesGroupsContainer) document.getElementById('matchesGroupsContainer').innerHTML = data.matchesGroupsContainer;
-                
-                if(data.winnersDisplay) document.getElementById('winnersBracketDisplay').innerHTML = data.winnersDisplay;
-                if(data.losersDisplay) document.getElementById('losersBracketDisplay').innerHTML = data.losersDisplay;
-                if(data.finalsDisplay) document.getElementById('grandFinalsDisplay').innerHTML = data.finalsDisplay;
-                
-                jogadoresPromovidos = data.promotedList || [];
-                if(data.bracketSize) {
-                    let select = document.getElementById('bracketSize');
-                    let optionExists = Array.from(select.options).some(opt => parseInt(opt.value) === parseInt(data.bracketSize));
-                    if (!optionExists) {
-                        let newOpt = document.createElement('option');
-                        newOpt.value = data.bracketSize;
-                        newOpt.innerText = `Top ${data.bracketSize}`;
-                        select.appendChild(newOpt);
-                    }
-                    select.value = data.bracketSize;
-                    select.style.display = 'inline-block';
-                }
-                
-                attachHoverEvents(); calcularEloGeral(); renderFiltrosDeMapas(); initDragToScroll(); renderStreamLinks();
-            }).catch(e => {
-                if(!document.body.classList.contains('is-viewer')) gerarChave();
-                initDragToScroll();
-            });
-        }
-
-        function resetTournament() {
-            if(confirm("Tem certeza que deseja apagar TODOS os dados da Nuvem? Isso não pode ser desfeito.")) {
-                db.ref('tavernas_data').remove().then(() => { location.reload(); });
-            }
-        }
-
-        window.onload = () => { renderizarGodGrid(); renderizarFiltrosDeMapas(); loadTournament(); };
-    </script>
-</body>
-</html>
+                slider.addEventListener('mousemoveNormally I can help with things like this, but I don't seem to have access to that content. You can try again or ask me for something else.
