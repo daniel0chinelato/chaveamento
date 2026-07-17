@@ -484,17 +484,17 @@
         };
         const listaMapas = Object.keys(mapaImagens).sort();
         function getGodIconPath(nome) { if(!nome) return ''; let safeName = nome.toLowerCase().replace('é', 'e').replace('í', 'i').replace('á', 'a'); return safeName + '_icon.png'; }
-        // Lógica Inteligente para Imagens de Dicas PNG
+        // Lógica Inteligente para Imagens de Dicas JPG
         function getMapHintPath(nomeDoMapa) {
             const hintsEspeciais = {
-                "Coração de Tenochtitlán": "hint_coracao.png",
-                "Lago Fantasma": "hint_fantasma.png"
+                "Coração de Tenochtitlán": "hint_coracao.jpg",
+                "Lago Fantasma": "hint_fantasma.jpg"
             };
             if(hintsEspeciais[nomeDoMapa]) return hintsEspeciais[nomeDoMapa];
             let safeName = nomeDoMapa.toLowerCase()
                 .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove acentos
                 .trim();
-            return "hint_" + safeName + ".png";
+            return "hint_" + safeName + ".jpg";
         }
         function renderizarGodGrid() {
             const grid = document.getElementById('godGrid'); grid.innerHTML = '';
