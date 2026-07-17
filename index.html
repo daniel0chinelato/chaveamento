@@ -8,9 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
 
     <style>
         :root {
@@ -235,7 +232,7 @@
         .mata-draft .god-select-btn { width: 18px; height: 18px; border-radius: 2px; }
         .mata-draft .ban-slot { width: 14px; height: 14px; }
         .mata-draft .ban-label { font-size: 0.35rem; }
-        .mata-draft .win-toggle { font-size: 0.4rem; padding: 0; border-radius: 2px; }
+        .mata-draft .win-toggle { font-size: 0.4rem; padding: 0; border-radius: 2px; border-width: 0.5px;}
 
         /* MATA-MATA MAP ROW */
         .match-card .map-row { padding: 4px; background: rgba(0,0,0,0.2); }
@@ -270,21 +267,20 @@
         
         .map-info-left { flex: 1; max-width: 400px; display: flex; flex-direction: column; gap: 15px;}
         
-        /* Pódio movido para a direita, empurrado um pouco para a esquerda (sobre o mapa) */
+        /* O Pódio agora foi movido para a direita, empurrado um pouco para a esquerda (sobre o mapa) */
         .map-podium-right { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 550px; margin-right: 22%; margin-top: 2%;}
 
         /* BOTAO DE DICAS E TRANSIÇÃO */
         .btn-hint { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 20px; font-family: 'Cinzel', serif; text-transform: uppercase; cursor: pointer; border-radius: 30px; transition: 0.3s; font-weight: bold; letter-spacing: 2px; display: inline-flex; align-items: center; gap: 10px; align-self: flex-start;}
         .btn-hint:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 20px var(--accent-glow); }
         
-        /* Overlay da Dica Fullscreen (SEM INTERFACE) */
+        /* Overlay da Dica Fullscreen */
         #hintContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 50; opacity: 0; transition: opacity 0.5s ease; background: transparent; }
         #hintContainer.active { opacity: 1; pointer-events: auto; }
-        /* A imagem de fundo fará o papel de dica, o container tem só o botão */
         .btn-fechar-dica { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 12px 40px; font-family: 'Cinzel', serif; text-transform: uppercase; cursor: pointer; border-radius: 30px; font-weight: bold; letter-spacing: 2px; transition: 0.3s; z-index: 10; backdrop-filter: blur(5px);}
         .btn-fechar-dica:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 20px var(--accent-glow); }
 
-        /* PÓDIO 3D COM EFEITO DARK (SEM FLIP) */
+        /* PÓDIO 3D COM EFEITO DARK E FLIP ELIMINADO PARA MVP */
         .podium-wrapper { display: flex; align-items: flex-end; justify-content: center; gap: 20px; height: 260px; padding-bottom: 20px; width: 100%;}
         
         .podium-item { position: relative; width: 140px; display: flex; flex-direction: column; align-items: center; transition: 0.3s; cursor: pointer; }
@@ -366,200 +362,6 @@
     </style>
 </head>
 <body>
-
-    <div class="navbar">
-        <button class="nav-btn active" onclick="switchTab('page-main', this)">Painel Principal</button>
-        <button class="nav-btn" onclick="switchTab('page-matches', this)">Tavernas of Mortals</button>
-        <button class="nav-btn" onclick="switchTab('page-bracket', this)">Demigods & Titans</button>
-        <button class="nav-btn" onclick="switchTab('page-maps', this); atualizarPainelMapas('Anatólia'); initHorizontalDrag();">Estatísticas de Mapas</button>
-        <div style="width: 1px; height: 30px; background: var(--border-color); margin: 0 10px;"></div>
-        <button class="nav-btn btn-save admin-only" onclick="saveTournament()">Salvar na Nuvem <span class="loader" id="saveLoader"></span></button>
-        <button class="nav-btn btn-reset admin-only" onclick="resetTournament()">Resetar</button>
-        <button class="btn-copy admin-only" onclick="copiarLinkPublico(this)" title="Copiar link para os espectadores">Link Público</button>
-    </div>
-
-    <!-- PAINEL PRINCIPAL -->
-    <div id="page-main" class="container page active">
-        <div class="header-container"><img src="header.png" alt="Era das Tavernas" class="header-image" onerror="this.style.display='none'"></div>
-
-        <div class="panel admin-only">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
-                <h2 style="margin:0;">Configuração de Sorteio</h2>
-                <button class="nav-btn" style="padding: 6px 16px; font-size: 0.7rem;" onclick="toggleSetup()" id="btnToggleSetup">Recolher</button>
-            </div>
-            
-            <div class="setup-grid" id="setupContent">
-                <div><label>Cabeças de Chave (Linha por Linha)</label><textarea id="seedsInput" rows="5" placeholder="Jogador A&#10;Jogador B"></textarea></div>
-                <div><label>Jogadores Regulares (Linha por Linha)</label><textarea id="regularsInput" rows="5" placeholder="Jogador C&#10;Jogador D..."></textarea></div>
-                <div>
-                    <label>Estrutura do Torneio</label>
-                    <div style="display: flex; gap: 10px; align-items: center; background-color: var(--panel-surface); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color);">
-                        <label style="margin:0; text-transform:none; letter-spacing:0; flex: 2; font-size: 0.85rem;">Jogadores por Grupo:</label>
-                        <input type="number" id="playersPerGroup" value="3" min="2" style="flex: 1; padding: 8px; margin: 0; text-align: center;">
-                    </div>
-                    <button class="action-btn" style="margin-top:25px;" onclick="gerarTorneio()">Sortear Chaves</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="groupsSection" style="display:none; margin-top: 40px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                <h2 style="margin:0;">Fase de Grupos (Mortals)</h2>
-                <p class="admin-only" style="font-size:0.7rem; color:var(--text-muted); margin:0; font-style:italic;">Dica: Arraste os jogadores pelo ícone ☰ para trocar de grupo.</p>
-            </div>
-            <div class="groups-grid" id="groupsDisplay"></div>
-        </div>
-
-        <!-- ELO E GODS COM FILTRO DE MAPA GLOBAL -->
-        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-top: 40px;">
-            <div class="panel">
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
-                    <h3 style="margin:0; font-size: 1.2rem; color: var(--accent-color); font-family: 'Cinzel', serif; letter-spacing: 2px; font-weight: 600;">Ranking ELO</h3>
-                </div>
-                <div id="eloContent" style="margin-top: 15px; height: 700px; overflow-y: auto; padding-right: 5px;">
-                    <table style="width: 100%; border-spacing: 0 4px;">
-                        <thead><tr><th style="width: 30px; text-align: center; padding: 8px 5px;">#</th><th style="text-align: left; padding: 8px 5px;">Jogador</th><th style="text-align: center; padding: 8px 5px;">Pts</th></tr></thead>
-                        <tbody id="eloTableBody"><tr><td colspan="3" style="text-align:center; color:var(--text-muted); font-style: italic; font-size: 0.8rem; padding: 15px;">Aguardando o início do torneio...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; flex-wrap:wrap; gap:10px;">
-                    <h3 style="margin:0; font-size: 1.2rem; color: var(--accent-color); font-family: 'Cinzel', serif; letter-spacing: 2px; font-weight: 600; display:flex; align-items:center; gap:15px;">
-                        Estatísticas GERAIS
-                        <select id="mapFilter" class="map-select" style="font-size:0.75rem; padding:4px 8px; border-radius:4px; max-width:150px; font-family:'Montserrat', sans-serif;" onchange="atualizarTodosOsGods()">
-                            <option value="ALL">Todos os Mapas</option>
-                        </select>
-                    </h3>
-                    <button class="nav-btn active" style="padding: 4px 12px; font-size: 0.65rem;" onclick="toggleStats()" id="btnToggleStats">Recolher</button>
-                </div>
-                <div id="statsContent" style="display: block; margin-top: 15px; height: 700px; overflow-y: auto; padding-right: 5px;">
-                    <table>
-                        <thead><tr><th style="text-align:left;">God</th><th title="Jogos Jogados">J</th><th title="Vitórias">V</th><th title="Derrotas">D</th><th title="Bans Globais" style="color:var(--danger-color);">B</th><th title="Winrate">WR</th></tr></thead>
-                        <tbody id="godsTable">
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="zeus_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Zeus</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="hades_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Hades</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="poseidon_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Poseidon</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="demeter_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Deméter</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="tsukuyomi_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Tsukuyomi</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="amaterasu_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Amaterasu</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="susanoo_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Susanoo</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="fuxi_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Fuxi</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="nuwa_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Nuwa</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="shennong_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Shennong</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="thor_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Thor</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="odin_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Odin</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="loki_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Loki</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="freyr_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Freyr</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="isis_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Ísis</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="ra_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Rá</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="set_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Set</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="cronos_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Cronos</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="gaia_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Gaia</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="urano_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Urano</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="quetzalcoatl_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Quetzalcoatl</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="tezcatlipoca_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Tezcatlipoca</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                            <tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="huitzilopochtli_icon.png" class="god-icon" onerror="this.style.display='none'"><span>Huitzilopochtli</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="footer">DESENVOLVIDO POR [CAOK] PAIN</div>
-    </div>
-
-    <!-- PÁGINA DE MAPAS: ESTATÍSTICAS AVANÇADAS IMERSIVAS -->
-    <div id="page-maps" class="page">
-        <!-- Mapa de Fundo -->
-        <div id="immersiveMapBg" class="immersive-bg">
-            <div class="immersive-overlay"></div>
-        </div>
-        
-        <div id="mainMapUI" class="immersive-content">
-            <!-- Lado Superior (Esquerda e Direita) -->
-            <div class="map-stats-top">
-                <div class="map-info-left">
-                    <h1 id="mapaDestaqueTitulo" style="font-size: 3.5rem; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); font-family: 'Cinzel', serif; color: var(--accent-color); letter-spacing: 2px; line-height:1.1;">Anatólia</h1>
-                    <div style="font-size: 0.9rem; color: #fff; text-transform: uppercase; font-weight: bold; letter-spacing: 2px; text-shadow: 1px 1px 4px #000; margin-top: 10px;">Total de Partidas no Mapa: <span id="mapTotalJogos" style="color: var(--accent-color); font-size: 1.4rem; margin-left: 5px;">0</span></div>
-                    <button class="btn-hint" onclick="toggleDicas()">💡 Ver Dicas do Mapa</button>
-                </div>
-                
-                <div id="fadeStatsContainer" class="fade-container map-podium-right">
-                    <!-- PÓDIO TOP 3 INTERATIVO -->
-                    <div id="podiumArea">
-                        <!-- Injetado via JS -->
-                    </div>
-                    
-                    <!-- RESTANTE (4º em diante) -->
-                    <div id="otherGodsArea" class="other-gods-list">
-                        <!-- Injetado via JS -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Carrossel de Mapas (Rodapé/Dock) -->
-            <div class="map-dock-wrapper">
-                <div class="map-dock-title">Selecione o Terreno</div>
-                <div id="mapThumbSelector" class="map-thumb-slider">
-                    <!-- Thumbnails Injetados via JS -->
-                </div>
-            </div>
-        </div>
-
-        <!-- OVERLAY DE DICAS (Sem interface, tela cheia) -->
-        <div id="hintContainer">
-            <button class="btn-fechar-dica" onclick="toggleDicas()">Voltar às Estatísticas</button>
-        </div>
-    </div>
-
-    <!-- TAVERNAS OF MORTALS (GRUPOS) -->
-    <div id="page-matches" class="container page">
-        <h2 class="stage-title">TAVERNAS OF MORTALS</h2>
-        <div id="matchesGroupsContainer" style="margin-top: 20px;"><p style="text-align:center; color:var(--text-muted); font-style: italic;">Aguardando geração dos grupos no painel principal.</p></div>
-        <div class="footer">DESENVOLVIDO POR [CAOK] PAIN</div>
-    </div>
-
-    <!-- MATA-MATA: DEMIGODS & TITANS -->
-    <div id="page-bracket" class="container page" style="max-width: 1800px;">
-        <div class="header-container"><img src="header.png" alt="Era das Tavernas" class="header-image" onerror="this.style.display='none'"></div>
-        
-        <div class="panel" style="padding: 25px; background: #0c0c0f; border-color: #222;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap:15px; border-bottom: 1px solid #222; padding-bottom: 15px; margin-bottom: 10px;">
-                <h2 style="margin:0;">Mata-Mata Final</h2>
-                <div class="admin-only" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                    <select id="bracketSize" style="width:110px; margin:0; display:inline-block;">
-                        <!-- Options injetadas dinamicamente -->
-                    </select>
-                    <button class="nav-btn" style="margin:0; padding:8px 12px; background:var(--accent-color); color:#000; border-color:var(--accent-color);" onclick="puxarPromovidos()">Importar Top (Automático)</button>
-                </div>
-            </div>
-            
-            <p class="admin-only" style="font-size:0.7rem; color:var(--text-muted); margin-bottom: 0; text-align: right; font-style: italic;">Dica: Arraste a tela para os lados. Clique nos títulos das rodadas para editar seus nomes.</p>
-            
-            <h2 class="stage-title" style="margin-top: 30px; font-size: 1.5rem;">TAVERNAS OF DEMIGODS & TITANS</h2>
-            
-            <h3 style="color: #4ade80; margin-top: 20px;">WINNERS BRACKET</h3>
-            <div class="bracket-container" id="winnersBracketDisplay"></div>
-
-            <h3 style="color: var(--danger-color); margin-top: 40px;">LOSERS BRACKET</h3>
-            <div class="bracket-container" id="losersBracketDisplay"></div>
-            
-            <h3 style="color: #FFD700; margin-top: 40px; text-align: center;">GRAND FINALS</h3>
-            <div class="bracket-container" id="grandFinalsDisplay" style="justify-content: center; min-height: 200px;"></div>
-        </div>
-        <div class="footer">DESENVOLVIDO POR [CAOK] PAIN</div>
-    </div>
-
-    <!-- MODAL DE DEUSES -->
-    <div id="godModal" class="modal-overlay" onclick="fecharModalDeuses(event)">
-        <div class="modal-box" onclick="event.stopPropagation()">
-            <h3 style="margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Selecione o Deus</h3>
-            <div id="godGrid" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;"></div>
-            <button class="action-btn admin-only" style="margin-top: 25px; border-color: var(--danger-color); color: var(--danger-color); background: transparent;" onclick="removerDeusSelecionado()">Remover Deus</button>
-        </div>
-    </div>
-
     <script>
         // ======= FIREBASE E INICIALIZAÇÃO =======
         const firebaseConfig = {
@@ -587,40 +389,22 @@
 
         const listaDeuses = ["Zeus", "Hades", "Poseidon", "Deméter", "Tsukuyomi", "Amaterasu", "Susanoo", "Fuxi", "Nuwa", "Shennong", "Thor", "Odin", "Loki", "Freyr", "Ísis", "Rá", "Set", "Cronos", "Gaia", "Urano", "Quetzalcoatl", "Tezcatlipoca", "Huitzilopochtli"];
         
-        // Mapeamento Exato de Imagens Oficiais (Todos JPG)
         const mapaImagens = {
-            "Acrópole": "acropole.jpg",
-            "Anatólia": "anatolia.jpg",
-            "Coração de Tenochtitlán": "coracao.jpg",
-            "Elísio": "elisio.jpg",
-            "Estepe": "estepe.jpg",
-            "Floresta das Trevas": "floresta das trevas.jpg",
-            "Lago Fantasma": "lago fantasma.jpg",
-            "Mediterrâneo": "mediterraneo.jpg",
-            "Muspelheim": "muspelheim.jpg",
-            "Oásis": "oasis.jpg",
-            "Pântano": "pantano.jpg",
-            "Savana": "savana.jpg",
-            "Senjogahara": "senjogahara.jpg",
-            "Tundra": "tundra.jpg",
-            "Vaus do Nilo": "vaus do nilo.jpg"
+            "Acrópole": "acropole.jpg", "Anatólia": "anatolia.jpg", "Coração de Tenochtitlán": "coracao.jpg",
+            "Elísio": "elisio.jpg", "Estepe": "estepe.jpg", "Floresta das Trevas": "floresta das trevas.jpg",
+            "Lago Fantasma": "lago fantasma.jpg", "Mediterrâneo": "mediterraneo.jpg", "Muspelheim": "muspelheim.jpg",
+            "Oásis": "oasis.jpg", "Pântano": "pantano.jpg", "Savana": "savana.jpg", "Senjogahara": "senjogahara.jpg",
+            "Tundra": "tundra.jpg", "Vaus do Nilo": "vaus do nilo.jpg"
         };
         const listaMapas = Object.keys(mapaImagens).sort();
 
         function getGodIconPath(nome) { if(!nome) return ''; let safeName = nome.toLowerCase().replace('é', 'e').replace('í', 'i').replace('á', 'a'); return safeName + '_icon.png'; }
 
-        // Lógica Inteligente para Imagens de Dicas PNG
         function getMapHintPath(nomeDoMapa) {
-            const hintsEspeciais = {
-                "Coração de Tenochtitlán": "hint_coracao.jpg",
-                "Lago Fantasma": "hint_fantasma.jpg"
-            };
-            if(hintsEspeciais[nomeDoMapa]) return hintsEspeciais[nomeDoMapa];
-            
-            let safeName = nomeDoMapa.toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
-                .trim();
-            return "hint_" + safeName + ".jpg";
+            if(nomeDoMapa === "Coração de Tenochtitlán" || nomeDoMapa === "O Coração de Tenochtitlán") return "hint_coracao.png";
+            if(nomeDoMapa === "Lago Fantasma") return "hint_fantasma.png";
+            let safeName = nomeDoMapa.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            return "hint_" + safeName + ".png";
         }
 
         function renderizarGodGrid() {
@@ -630,20 +414,14 @@
         
         function renderizarFiltrosDeMapas() {
             let selectPageMain = document.getElementById('mapFilter');
-            if(selectPageMain) {
-                listaMapas.forEach(m => { selectPageMain.innerHTML += `<option value="${m}">${m}</option>`; });
-            }
+            if(selectPageMain) listaMapas.forEach(m => { selectPageMain.innerHTML += `<option value="${m}">${m}</option>`; });
 
             const selector = document.getElementById('mapThumbSelector');
             if(!selector) return;
             selector.innerHTML = '';
             listaMapas.forEach(m => {
                 const img = mapaImagens[m] || 'header.png';
-                selector.innerHTML += `
-                    <div class="map-thumb" onclick="atualizarPainelMapas('${m}')" id="thumb-${m.replace(/\s+/g, '-')}" style="background-image: url('${img}')">
-                        <span>${m}</span>
-                    </div>
-                `;
+                selector.innerHTML += `<div class="map-thumb" onclick="atualizarPainelMapas('${m}')" id="thumb-${m.replace(/\s+/g, '-')}" style="background-image: url('${img}')"><span>${m}</span></div>`;
             });
         }
 
@@ -665,14 +443,9 @@
                 if(opt.value === sel.value) opt.setAttribute('selected', 'selected');
                 else opt.removeAttribute('selected');
             });
-            atualizarTodosOsGods();
-            atualizarPainelMapas();
-            saveTournament();
+            atualizarTodosOsGods(); atualizarPainelMapas(); saveTournament();
         }
 
-        // =======================
-        // ESTATÍSTICAS DE MAPAS INTERATIVO (NOVA ABA - PÓDIO À DIREITA E DICAS FULLSCREEN)
-        // =======================
         let mapaAtivoGlobal = "Anatólia";
         let mostrandoDicas = false;
 
@@ -687,16 +460,12 @@
                 uiContent.style.opacity = '0';
                 uiContent.style.pointerEvents = 'none';
                 hintContainer.classList.add('active');
-                
-                // O fundo vira a imagem da dica sem blur
                 mapBg.style.backgroundImage = `url('${getMapHintPath(mapaAtivoGlobal)}')`;
                 document.querySelector('.immersive-overlay').style.opacity = '0';
             } else {
                 uiContent.style.opacity = '1';
                 uiContent.style.pointerEvents = 'auto';
                 hintContainer.classList.remove('active');
-                
-                // Retorna a imagem do mapa original com a máscara
                 mapBg.style.backgroundImage = `url('${mapaImagens[mapaAtivoGlobal]}')`;
                 document.querySelector('.immersive-overlay').style.opacity = '1';
             }
@@ -705,7 +474,7 @@
         function atualizarPainelMapas(mapaEscolhido = mapaAtivoGlobal) {
             mapaAtivoGlobal = mapaEscolhido;
             
-            if(mostrandoDicas) toggleDicas(); // Força fechar dica ao mudar de mapa
+            if(mostrandoDicas) toggleDicas(); 
 
             document.querySelectorAll('.map-thumb').forEach(t => t.classList.remove('active'));
             let activeThumb = document.getElementById('thumb-' + mapaEscolhido.replace(/\s+/g, '-'));
@@ -721,7 +490,6 @@
             let titulo = document.getElementById('mapaDestaqueTitulo');
             if(titulo) titulo.innerText = mapaEscolhido;
 
-            // Coleta de dados blindada contra crash no DOM
             let godStats = {};
             listaDeuses.forEach(g => godStats[g] = {j: 0, v: 0, d: 0, topPlayers: {}});
 
@@ -740,8 +508,7 @@
                 if (gameMap !== mapaEscolhido) return;
 
                 const allTogglesThisGame = matchCard.querySelectorAll(`.win-toggle[data-game="${gameIdx}"]`);
-                let gameResolved = false;
-                let thisWon = toggle.classList.contains('is-winner');
+                let gameResolved = false; let thisWon = toggle.classList.contains('is-winner');
                 
                 allTogglesThisGame.forEach(t => { if(t.classList.contains('is-winner')) gameResolved = true; });
 
@@ -749,7 +516,6 @@
                     godStats[g].j++;
                     if(thisWon) {
                         godStats[g].v++;
-                        // Busca de nome segura para grupos e mata-mata
                         let playerName = "TBD";
                         let bPlayer = toggle.closest('.b-player');
                         if (bPlayer) {
@@ -832,7 +598,6 @@
                 let p2 = godsPlayed[1] ? gerarCardPodio(godsPlayed[1], 2, 'silver') : '';
                 let p3 = godsPlayed[2] ? gerarCardPodio(godsPlayed[2], 3, 'bronze') : '';
 
-                // Ouro é o primeiro da DOM para ficar sempre por cima na animação
                 podiumHtml = `<div class="podium-wrapper">${p2}${p1}${p3}</div>`;
 
                 for(let i = 3; i < godsPlayed.length; i++) {
@@ -852,68 +617,32 @@
             document.getElementById('otherGodsArea').innerHTML = othersHtml;
         }
 
-        // =======================
-        // SISTEMA DE DRAG & DROP DOS GRUPOS
-        // =======================
         let draggedPlayerRow = null;
-
-        function dragPlayer(e) {
-            if(document.body.classList.contains('is-viewer')) { e.preventDefault(); return; }
-            draggedPlayerRow = e.target; e.dataTransfer.effectAllowed = 'move';
-            setTimeout(() => draggedPlayerRow.classList.add('dragging'), 0);
-        }
-
-        function allowDropPlayer(e) {
-            e.preventDefault(); const tr = e.target.closest('tr');
-            if (tr && tr !== draggedPlayerRow && tr.parentNode.id.startsWith('tbody-grupo')) {
-                const bounding = tr.getBoundingClientRect(); const offset = bounding.y + (bounding.height / 2);
-                if (e.clientY - offset > 0) tr.style.borderBottom = "2px solid var(--accent-color)";
-                else tr.style.borderTop = "2px solid var(--accent-color)";
-            }
-        }
-
+        function dragPlayer(e) { if(document.body.classList.contains('is-viewer')) return; draggedPlayerRow = e.target; e.dataTransfer.effectAllowed = 'move'; setTimeout(() => draggedPlayerRow.classList.add('dragging'), 0); }
+        function allowDropPlayer(e) { e.preventDefault(); const tr = e.target.closest('tr'); if (tr && tr !== draggedPlayerRow && tr.parentNode.id.startsWith('tbody-grupo')) { const bounding = tr.getBoundingClientRect(); const offset = bounding.y + (bounding.height / 2); if (e.clientY - offset > 0) tr.style.borderBottom = "2px solid var(--accent-color)"; else tr.style.borderTop = "2px solid var(--accent-color)"; } }
         function dropPlayer(e) {
-            e.preventDefault(); if (!draggedPlayerRow) return;
-            draggedPlayerRow.classList.remove('dragging');
+            e.preventDefault(); if (!draggedPlayerRow) return; draggedPlayerRow.classList.remove('dragging');
             document.querySelectorAll('#groupsDisplay tr').forEach(tr => { tr.style.borderTop = ""; tr.style.borderBottom = ""; });
-
             const targetTbody = e.target.closest('tbody'); const targetTr = e.target.closest('tr');
-
             if (targetTr && targetTr !== draggedPlayerRow) {
                 const bounding = targetTr.getBoundingClientRect(); const offset = bounding.y + (bounding.height / 2);
-                if (e.clientY - offset > 0) targetTr.after(draggedPlayerRow);
-                else targetTr.before(draggedPlayerRow);
-            } else if (targetTbody && targetTbody.id.startsWith('tbody-grupo')) {
-                targetTbody.appendChild(draggedPlayerRow);
-            }
+                if (e.clientY - offset > 0) targetTr.after(draggedPlayerRow); else targetTr.before(draggedPlayerRow);
+            } else if (targetTbody && targetTbody.id.startsWith('tbody-grupo')) { targetTbody.appendChild(draggedPlayerRow); }
             reprocessarGruposAposDrag();
         }
-
-        document.addEventListener('dragend', () => {
-            if(draggedPlayerRow) draggedPlayerRow.classList.remove('dragging');
-            document.querySelectorAll('#groupsDisplay tr').forEach(tr => { tr.style.borderTop = ""; tr.style.borderBottom = ""; });
-        });
+        document.addEventListener('dragend', () => { if(draggedPlayerRow) draggedPlayerRow.classList.remove('dragging'); document.querySelectorAll('#groupsDisplay tr').forEach(tr => { tr.style.borderTop = ""; tr.style.borderBottom = ""; }); });
 
         function saveCurrentMatchesState() {
             let matchState = {};
             document.querySelectorAll('.match-card').forEach(card => {
                 let p1 = card.dataset.p1, p2 = card.dataset.p2, streams = card.getAttribute('data-streams') || "[]";
-                
-                let maps = [];
-                card.querySelectorAll('.map-select').forEach(sel => maps.push(sel.value));
-
-                let bansP1 = [];
-                card.querySelectorAll(`.match-card .ban-slot[class*="-p1"], .b-match .ban-slot[class*="-p1"]`).forEach(b => bansP1.push(b.getAttribute('data-god') || ""));
-                
-                let bansP2 = [];
-                card.querySelectorAll(`.match-card .ban-slot[class*="-p2"], .b-match .ban-slot[class*="-p2"]`).forEach(b => bansP2.push(b.getAttribute('data-god') || ""));
-
-                let gState = [];
-                const playersDivs = card.querySelectorAll('.match-player');
+                let maps = []; card.querySelectorAll('.map-select').forEach(sel => maps.push(sel.value));
+                let bansP1 = []; card.querySelectorAll(`.match-card .ban-slot[class*="-p1"], .b-match .ban-slot[class*="-p1"]`).forEach(b => bansP1.push(b.getAttribute('data-god') || ""));
+                let bansP2 = []; card.querySelectorAll(`.match-card .ban-slot[class*="-p2"], .b-match .ban-slot[class*="-p2"]`).forEach(b => bansP2.push(b.getAttribute('data-god') || ""));
+                let gState = []; const playersDivs = card.querySelectorAll('.match-player');
                 if(playersDivs.length === 2) {
                     const w1 = playersDivs[0].querySelectorAll('.pick-slot-wrapper, .god-slot-wrapper:not(.ban-group .god-slot-wrapper)');
                     const w2 = playersDivs[1].querySelectorAll('.pick-slot-wrapper, .god-slot-wrapper:not(.ban-group .god-slot-wrapper)');
-                    
                     for(let g=0; g<3; g++) {
                         let god1 = w1[g]?.querySelector('.god-select-btn')?.getAttribute('data-god') || "";
                         let win1 = w1[g]?.querySelector('.win-toggle')?.classList.contains('is-winner') || false;
@@ -931,27 +660,19 @@
         function reprocessarGruposAposDrag() {
             let state = saveCurrentMatchesState(); let novosGrupos = [];
             document.querySelectorAll('[id^="tbody-grupo-"]').forEach(tbody => {
-                let grupo = [];
-                tbody.querySelectorAll('tr').forEach(tr => { if(tr.dataset.player) grupo.push({ nome: tr.dataset.player, seed: tr.classList.contains('seed-row') }); });
+                let grupo = []; tbody.querySelectorAll('tr').forEach(tr => { if(tr.dataset.player) grupo.push({ nome: tr.dataset.player, seed: tr.classList.contains('seed-row') }); });
                 novosGrupos.push(grupo);
             });
-            gerarConfrontosGrupos(novosGrupos, state);
-            document.querySelectorAll('.match-card').forEach(card => calcularPlacarGlobal(card, false));
-            calcularEloGeral(); saveTournament();
+            gerarConfrontosGrupos(novosGrupos, state); document.querySelectorAll('.match-card').forEach(card => calcularPlacarGlobal(card, false)); calcularEloGeral(); saveTournament();
         }
 
-        // =======================
-        // SISTEMA AUTOMÁTICO DE VITÓRIAS E DEUSES
-        // =======================
         function toggleVitoria(btn) {
             if(document.body.classList.contains('is-viewer')) return;
             const gameIdx = btn.dataset.game, card = btn.closest('.match-card') || btn.closest('.b-match');
             const allTogglesForGame = card.querySelectorAll(`.win-toggle[data-game="${gameIdx}"]`);
             const wasActive = btn.classList.contains('is-winner');
-            
             allTogglesForGame.forEach(t => t.classList.remove('is-winner'));
             if(!wasActive) { btn.classList.add('is-winner'); }
-            
             calcularPlacarGlobal(card, true);
         }
 
@@ -959,14 +680,11 @@
             const p1Wins = card.querySelectorAll(`.win-toggle[data-player="1"].is-winner`).length;
             const p2Wins = card.querySelectorAll(`.win-toggle[data-player="2"].is-winner`).length;
             const score1 = card.querySelector('.score-p1'), score2 = card.querySelector('.score-p2');
-            
             if(score1) { score1.value = p1Wins; score1.setAttribute('value', p1Wins); }
             if(score2) { score2.value = p2Wins; score2.setAttribute('value', p2Wins); }
-            
             verificarBloqueioBoX(card, p1Wins, p2Wins);
             const groupIdx = card.dataset.group;
             if(groupIdx !== undefined) atualizarEstatisticasDoGrupo(groupIdx);
-            
             atualizarTodosOsGods(); atualizarPainelMapas();
             if(shouldSave) { calcularEloGeral(); saveTournament(); }
         }
@@ -974,15 +692,12 @@
         function verificarBloqueioBoX(card, p1Wins, p2Wins) {
             const totalGames = card.querySelectorAll(`.win-toggle[data-player="1"]`).length;
             if(totalGames === 0) return;
-            const majority = Math.ceil(totalGames / 2);
-            const isMatchOver = (p1Wins >= majority || p2Wins >= majority);
-            
+            const majority = Math.ceil(totalGames / 2); const isMatchOver = (p1Wins >= majority || p2Wins >= majority);
             for(let i=0; i < totalGames; i++) {
                 const toggles = card.querySelectorAll(`.win-toggle[data-game="${i}"]`);
                 const isGameResolved = (toggles[0]?.classList.contains('is-winner') || toggles[1]?.classList.contains('is-winner'));
                 const matchIdBase = card.querySelector('.win-toggle').dataset.match;
                 const godSlots = card.querySelectorAll(`.game${i}-slot.${matchIdBase}-slot`);
-                
                 if(isMatchOver && !isGameResolved) {
                     godSlots.forEach(slot => { slot.classList.add('locked'); slot.dataset.god = ""; slot.setAttribute('data-god', ""); slot.style.backgroundImage = "none"; });
                     toggles.forEach(t => t.style.display = 'none');
@@ -1000,17 +715,13 @@
 
             document.querySelectorAll('.ban-slot').forEach(banSlot => {
                 let g = banSlot.dataset.god;
-                if(g && godStats[g]) {
-                    if(mapFilter === 'ALL') { godStats[g].b++; }
-                }
+                if(g && godStats[g]) { if(mapFilter === 'ALL') { godStats[g].b++; } }
             });
 
             document.querySelectorAll('.win-toggle').forEach(toggle => {
                 let wrapper = toggle.closest('.god-slot-wrapper');
                 let btn = wrapper.querySelector('.god-select-btn:not(.ban-slot)');
-                if(!btn) return;
-                let g = btn.dataset.god;
-                if(!g) return;
+                if(!btn) return; let g = btn.dataset.god; if(!g) return;
 
                 let matchCard = toggle.closest('.match-card') || toggle.closest('.b-match');
                 let gameIdx = toggle.dataset.game;
@@ -1022,11 +733,7 @@
                 const allTogglesThisGame = matchCard.querySelectorAll(`.win-toggle[data-game="${gameIdx}"]`);
                 let gameResolved = false; let thisWon = toggle.classList.contains('is-winner'); let oppWon = false;
                 
-                allTogglesThisGame.forEach(t => {
-                    if(t.classList.contains('is-winner')) gameResolved = true;
-                    if(t !== toggle && t.classList.contains('is-winner')) oppWon = true;
-                });
-
+                allTogglesThisGame.forEach(t => { if(t.classList.contains('is-winner')) gameResolved = true; if(t !== toggle && t.classList.contains('is-winner')) oppWon = true; });
                 if(gameResolved) { godStats[g].j++; if(thisWon) godStats[g].v++; if(oppWon) godStats[g].d++; }
             });
 
@@ -1039,24 +746,15 @@
                 const statInputs = row.querySelectorAll('.stat-input');
                 statInputs[0].value = stats.j; statInputs[0].setAttribute('value', stats.j);
                 statInputs[1].value = stats.v; statInputs[1].setAttribute('value', stats.v);
-                
                 row.querySelector('.g-d').innerText = stats.d; row.querySelector('.g-b').innerText = stats.b;
-                
                 const wr = stats.j > 0 ? (stats.v / stats.j) * 100 : 0;
                 row.querySelector('.g-w').innerText = wr.toFixed(1) + '%';
                 row.dataset.j = stats.j; row.dataset.v = stats.v; row.dataset.wr = wr;
             });
-
-            rows.sort((a, b) => {
-                const vA = parseInt(a.dataset.v), vB = parseInt(b.dataset.v), wrA = parseFloat(a.dataset.wr), wrB = parseFloat(b.dataset.wr), jA = parseInt(a.dataset.j), jB = parseInt(b.dataset.j);
-                if (vB !== vA) return vB - vA; if (wrB !== wrA) return wrB - wrA; return jB - jA;
-            });
+            rows.sort((a, b) => { const vA = parseInt(a.dataset.v), vB = parseInt(b.dataset.v), wrA = parseFloat(a.dataset.wr), wrB = parseFloat(b.dataset.wr), jA = parseInt(a.dataset.j), jB = parseInt(b.dataset.j); if (vB !== vA) return vB - vA; if (wrB !== wrA) return wrB - wrA; return jB - jA; });
             rows.forEach(r => tbody.appendChild(r));
         }
 
-        // =======================
-        // FUNÇÕES DE MULTIPLOS LINKS (LIVE) E SVG
-        // =======================
         function addStreamLink(btn) {
             const card = btn.closest('.match-card') || btn.closest('.b-match');
             let streams = []; try { streams = JSON.parse(card.getAttribute('data-streams') || "[]"); } catch(e) {}
@@ -1072,25 +770,16 @@
             document.querySelectorAll('.match-card, .b-match').forEach(card => {
                 const streamData = card.getAttribute('data-streams'), controls = card.querySelector('.stream-controls');
                 if(!controls) return;
-                const addBtn = controls.querySelector('.add-stream-btn');
-                controls.innerHTML = ''; if(addBtn) controls.appendChild(addBtn);
-
+                const addBtn = controls.querySelector('.add-stream-btn'); controls.innerHTML = ''; if(addBtn) controls.appendChild(addBtn);
                 if(streamData) {
                     try {
                         const links = JSON.parse(streamData);
                         links.forEach((streamUrl, idx) => {
                             if(streamUrl && streamUrl.trim() !== "") {
                                 let iconHtml = 'LIVE ' + (idx + 1), color = '#ff4d4d'; 
-                                if(streamUrl.toLowerCase().includes('twitch.tv')) {
-                                    iconHtml = `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg> TWITCH`;
-                                    color = '#b9a3e3'; 
-                                } else if (streamUrl.toLowerCase().includes('youtu')) {
-                                    iconHtml = `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> YT`;
-                                    color = '#ff4d4d'; 
-                                }
-                                const a = document.createElement('a'); a.href = streamUrl; a.target = '_blank';
-                                a.className = 'viewer-stream-link'; a.innerHTML = iconHtml; a.style.setProperty('--live-color', color);
-                                controls.insertBefore(a, addBtn);
+                                if(streamUrl.toLowerCase().includes('twitch.tv')) { iconHtml = `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg> TWITCH`; color = '#b9a3e3'; } 
+                                else if (streamUrl.toLowerCase().includes('youtu')) { iconHtml = `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> YT`; color = '#ff4d4d'; }
+                                const a = document.createElement('a'); a.href = streamUrl; a.target = '_blank'; a.className = 'viewer-stream-link'; a.innerHTML = iconHtml; a.style.setProperty('--live-color', color); controls.insertBefore(a, addBtn);
                             }
                         });
                     } catch(e) {}
@@ -1098,179 +787,67 @@
             });
         }
 
-        // =======================
-        // NAVEGAÇÃO E SETUP
-        // =======================
-        function toggleSetup() {
-            const content = document.getElementById('setupContent'), btn = document.getElementById('btnToggleSetup');
-            if (content.style.display === 'none') { content.style.display = 'grid'; btn.innerText = 'Recolher'; btn.classList.remove('active'); }
-            else { content.style.display = 'none'; btn.innerText = 'Expandir'; btn.classList.add('active'); }
-        }
-        function toggleStats() {
-            const content = document.getElementById('statsContent'), btn = document.getElementById('btnToggleStats');
-            if (content.style.display === 'none') { content.style.display = 'block'; btn.innerText = 'Recolher'; btn.classList.add('active'); } 
-            else { content.style.display = 'none'; btn.innerText = 'Mostrar'; btn.classList.remove('active'); }
-        }
-        function switchTab(pageId, btn) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.navbar .nav-btn:not(.btn-save):not(.btn-reset):not(.btn-copy)').forEach(b => b.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active'); btn.classList.add('active');
-        }
-
+        function toggleSetup() { const content = document.getElementById('setupContent'), btn = document.getElementById('btnToggleSetup'); if (content.style.display === 'none') { content.style.display = 'grid'; btn.innerText = 'Recolher'; btn.classList.remove('active'); } else { content.style.display = 'none'; btn.innerText = 'Expandir'; btn.classList.add('active'); } }
+        function toggleStats() { const content = document.getElementById('statsContent'), btn = document.getElementById('btnToggleStats'); if (content.style.display === 'none') { content.style.display = 'block'; btn.innerText = 'Recolher'; btn.classList.add('active'); } else { content.style.display = 'none'; btn.innerText = 'Mostrar'; btn.classList.remove('active'); } }
+        function switchTab(pageId, btn) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.querySelectorAll('.navbar .nav-btn:not(.btn-save):not(.btn-reset):not(.btn-copy)').forEach(b => b.classList.remove('active')); document.getElementById(pageId).classList.add('active'); btn.classList.add('active'); }
         function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
 
         function gerarTorneio() {
-            const seeds = document.getElementById('seedsInput').value.split('\n').filter(n => n.trim() !== '');
-            const regulars = document.getElementById('regularsInput').value.split('\n').filter(n => n.trim() !== '');
-            const pPerGroup = parseInt(document.getElementById('playersPerGroup').value);
-            
-            const totalJogadores = seeds.length + regulars.length;
-            if (totalJogadores < 2) return alert("Insira os jogadores!");
-            const numG = Math.ceil(totalJogadores / pPerGroup);
-
-            shuffle(seeds); shuffle(regulars);
-            const grupos = Array.from({ length: numG }, () => []);
-            let todosJogadores = [...seeds.map(n => ({nome: n, seed: true})), ...regulars.map(n => ({nome: n, seed: false}))];
-            let currentGroup = 0;
+            const seeds = document.getElementById('seedsInput').value.split('\n').filter(n => n.trim() !== ''); const regulars = document.getElementById('regularsInput').value.split('\n').filter(n => n.trim() !== '');
+            const pPerGroup = parseInt(document.getElementById('playersPerGroup').value); const totalJogadores = seeds.length + regulars.length;
+            if (totalJogadores < 2) return alert("Insira os jogadores!"); const numG = Math.ceil(totalJogadores / pPerGroup);
+            shuffle(seeds); shuffle(regulars); const grupos = Array.from({ length: numG }, () => []);
+            let todosJogadores = [...seeds.map(n => ({nome: n, seed: true})), ...regulars.map(n => ({nome: n, seed: false}))]; let currentGroup = 0;
             todosJogadores.forEach(p => { grupos[currentGroup].push(p); currentGroup = (currentGroup + 1) % numG; });
-
-            renderizarGrupos(grupos); gerarConfrontosGrupos(grupos);
-            document.getElementById('setupContent').style.display = 'none'; document.getElementById('btnToggleSetup').innerText = 'Expandir'; document.getElementById('btnToggleSetup').classList.add('active');
-            calcularEloGeral();
+            renderizarGrupos(grupos); gerarConfrontosGrupos(grupos); document.getElementById('setupContent').style.display = 'none'; document.getElementById('btnToggleSetup').innerText = 'Expandir'; document.getElementById('btnToggleSetup').classList.add('active'); calcularEloGeral();
         }
 
         function renderizarGrupos(grupos) {
-            const container = document.getElementById('groupsDisplay'); container.innerHTML = '';
-            document.getElementById('groupsSection').style.display = 'block'; jogadoresPromovidos = [];
-
+            const container = document.getElementById('groupsDisplay'); container.innerHTML = ''; document.getElementById('groupsSection').style.display = 'block'; jogadoresPromovidos = [];
             grupos.forEach((grupo, idx) => {
                 let html = `<div class="panel" style="padding:20px;"><h3 style="margin-bottom: 15px; font-size:1.1rem; text-align:center;">Grupo ${String.fromCharCode(65 + idx)}</h3><table style="margin-top:0;"><thead><tr><th style="width:20px;"></th><th>Status</th><th style="text-align:left">Jogador</th><th>V</th><th>D</th><th>Pts</th></tr></thead><tbody id="tbody-grupo-${idx}" ondrop="dropPlayer(event)" ondragover="allowDropPlayer(event)">`;
-                grupo.forEach(p => {
-                    html += `<tr class="${p.seed ? 'seed-row' : ''}" data-player="${p.nome}" draggable="true" ondragstart="dragPlayer(event)">
-                        <td class="drag-handle" title="Arraste para mover">☰</td>
-                        <td><button class="btn-promote admin-only" onclick="togglePromote(this, '${p.nome}')">Promover</button></td>
-                        <td style="text-align:left; font-weight:600;">${p.nome}</td>
-                        <td class="cell-v" contenteditable="true" oninput="calcPtsManual(this, ${idx})">0</td>
-                        <td class="cell-d" contenteditable="true">0</td>
-                        <td class="cell-pts" style="font-weight:bold; color:var(--accent-color)">0</td>
-                    </tr>`;
-                });
+                grupo.forEach(p => { html += `<tr class="${p.seed ? 'seed-row' : ''}" data-player="${p.nome}" draggable="true" ondragstart="dragPlayer(event)"><td class="drag-handle" title="Arraste para mover">☰</td><td><button class="btn-promote admin-only" onclick="togglePromote(this, '${p.nome}')">Promover</button></td><td style="text-align:left; font-weight:600;">${p.nome}</td><td class="cell-v" contenteditable="true" oninput="calcPtsManual(this, ${idx})">0</td><td class="cell-d" contenteditable="true">0</td><td class="cell-pts" style="font-weight:bold; color:var(--accent-color)">0</td></tr>`; });
                 html += `</tbody></table></div>`; container.innerHTML += html;
             });
         }
 
-        function togglePromote(btn, nomeJogador) {
-            const row = btn.closest('tr'); row.classList.toggle('promoted');
-            if(row.classList.contains('promoted')) {
-                btn.innerText = "Classificado"; if(!jogadoresPromovidos.includes(nomeJogador)) jogadoresPromovidos.push(nomeJogador);
-            } else {
-                btn.innerText = "Promover"; jogadoresPromovidos = jogadoresPromovidos.filter(j => j !== nomeJogador);
-            }
-            calcularEloGeral();
-        }
+        function togglePromote(btn, nomeJogador) { const row = btn.closest('tr'); row.classList.toggle('promoted'); if(row.classList.contains('promoted')) { btn.innerText = "Classificado"; if(!jogadoresPromovidos.includes(nomeJogador)) jogadoresPromovidos.push(nomeJogador); } else { btn.innerText = "Promover"; jogadoresPromovidos = jogadoresPromovidos.filter(j => j !== nomeJogador); } calcularEloGeral(); }
 
         function atualizarEstatisticasDoGrupo(groupIdx) {
-            const matchCards = document.querySelectorAll(`.match-card[data-group="${groupIdx}"]`);
-            const tbody = document.getElementById(`tbody-grupo-${groupIdx}`);
-            if(!tbody) return;
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            
-            let tally = {}; rows.forEach(row => tally[row.dataset.player] = { v: 0, d: 0 });
-
-            matchCards.forEach(card => {
-                const s1 = parseInt(card.querySelector('.score-p1').value) || 0, s2 = parseInt(card.querySelector('.score-p2').value) || 0;
-                if (s1 > 0 || s2 > 0) {
-                    if(s1 > s2) { tally[card.dataset.p1].v++; tally[card.dataset.p2].d++; } 
-                    else if(s2 > s1) { tally[card.dataset.p2].v++; tally[card.dataset.p1].d++; }
-                }
-            });
-
-            rows.forEach(row => {
-                const pName = row.dataset.player;
-                if(tally[pName]) {
-                    row.querySelector('.cell-v').innerText = tally[pName].v; 
-                    row.querySelector('.cell-d').innerText = tally[pName].d;
-                    row.querySelector('.cell-pts').innerText = tally[pName].v * 3;
-                }
-            });
-            rows.sort((a, b) => parseInt(b.querySelector('.cell-pts').innerText) - parseInt(a.querySelector('.cell-pts').innerText));
-            rows.forEach(r => tbody.appendChild(r));
+            const matchCards = document.querySelectorAll(`.match-card[data-group="${groupIdx}"]`); const tbody = document.getElementById(`tbody-grupo-${groupIdx}`); if(!tbody) return;
+            const rows = Array.from(tbody.querySelectorAll('tr')); let tally = {}; rows.forEach(row => tally[row.dataset.player] = { v: 0, d: 0 });
+            matchCards.forEach(card => { const s1 = parseInt(card.querySelector('.score-p1').value) || 0, s2 = parseInt(card.querySelector('.score-p2').value) || 0; if (s1 > 0 || s2 > 0) { if(s1 > s2) { tally[card.dataset.p1].v++; tally[card.dataset.p2].d++; } else if(s2 > s1) { tally[card.dataset.p2].v++; tally[card.dataset.p1].d++; } } });
+            rows.forEach(row => { const pName = row.dataset.player; if(tally[pName]) { row.querySelector('.cell-v').innerText = tally[pName].v; row.querySelector('.cell-d').innerText = tally[pName].d; row.querySelector('.cell-pts').innerText = tally[pName].v * 3; } });
+            rows.sort((a, b) => parseInt(b.querySelector('.cell-pts').innerText) - parseInt(a.querySelector('.cell-pts').innerText)); rows.forEach(r => tbody.appendChild(r));
         }
 
-        function calcPtsManual(el, groupIdx) {
-            const row = el.closest('tr'); const v = parseInt(row.querySelector('.cell-v').innerText) || 0;
-            row.querySelector('.cell-pts').innerText = v * 3;
-            const tbody = document.getElementById(`tbody-grupo-${groupIdx}`);
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            rows.sort((a, b) => parseInt(b.querySelector('.cell-pts').innerText) - parseInt(a.querySelector('.cell-pts').innerText));
-            rows.forEach(r => tbody.appendChild(r));
-        }
+        function calcPtsManual(el, groupIdx) { const row = el.closest('tr'); const v = parseInt(row.querySelector('.cell-v').innerText) || 0; row.querySelector('.cell-pts').innerText = v * 3; const tbody = document.getElementById(`tbody-grupo-${groupIdx}`); const rows = Array.from(tbody.querySelectorAll('tr')); rows.sort((a, b) => parseInt(b.querySelector('.cell-pts').innerText) - parseInt(a.querySelector('.cell-pts').innerText)); rows.forEach(r => tbody.appendChild(r)); }
 
         function gerarConfrontosGrupos(grupos, restoreState = null) {
             const container = document.getElementById('matchesGroupsContainer'); container.innerHTML = '';
-
             grupos.forEach((grupo, idx) => {
                 let matchesHtml = '';
                 for(let i = 0; i < grupo.length; i++) {
                     for(let j = i + 1; j < grupo.length; j++) {
-                        const matchId = `match_g${idx}_p${i}_p${j}`;
-                        const p1Name = grupo[i].nome, p2Name = grupo[j].nome;
-                        let state = restoreState ? restoreState[`${p1Name}|${p2Name}`] : null;
-                        let streamsStr = state ? state.streams : "[]";
-                        
-                        let godsHtml1 = '', godsHtml2 = '';
-                        let mapsHtml = `<div class="map-row">`;
-                        
+                        const matchId = `match_g${idx}_p${i}_p${j}`; const p1Name = grupo[i].nome, p2Name = grupo[j].nome;
+                        let state = restoreState ? restoreState[`${p1Name}|${p2Name}`] : null; let streamsStr = state ? state.streams : "[]";
+                        let godsHtml1 = '', godsHtml2 = ''; let mapsHtml = `<div class="map-row">`;
                         let ban1 = "", ban2 = "";
-                        if(state && state.bansP1 && state.bansP2) {
-                            if(state.reversed) { ban1 = state.bansP2[0] || ""; ban2 = state.bansP1[0] || ""; }
-                            else { ban1 = state.bansP1[0] || ""; ban2 = state.bansP2[0] || ""; }
-                        }
-                        let banBg1 = ban1 ? `background-image: url('${getGodIconPath(ban1)}'); border-style: solid;` : "";
-                        let banBg2 = ban2 ? `background-image: url('${getGodIconPath(ban2)}'); border-style: solid;` : "";
-
+                        if(state && state.bansP1 && state.bansP2) { if(state.reversed) { ban1 = state.bansP2[0] || ""; ban2 = state.bansP1[0] || ""; } else { ban1 = state.bansP1[0] || ""; ban2 = state.bansP2[0] || ""; } }
+                        let banBg1 = ban1 ? `background-image: url('${getGodIconPath(ban1)}'); border-style: solid;` : ""; let banBg2 = ban2 ? `background-image: url('${getGodIconPath(ban2)}'); border-style: solid;` : "";
                         let banHtml1 = `<div class="ban-group"><div class="god-slot-wrapper"><div class="god-select-btn ban-slot ban-p1 ${matchId}-ban-p1" data-god="${ban1}" style="${banBg1}" onclick="abrirModalDeuses(this)" title="Banir Deus"></div></div><span class="ban-label">BAN</span></div>`;
                         let banHtml2 = `<div class="ban-group"><div class="god-slot-wrapper"><div class="god-select-btn ban-slot ban-p2 ${matchId}-ban-p2" data-god="${ban2}" style="${banBg2}" onclick="abrirModalDeuses(this)" title="Banir Deus"></div></div><span class="ban-label">BAN</span></div>`;
 
                         for(let g=0; g<3; g++) {
-                            let god1 = "", win1Class = "", god2 = "", win2Class = "";
-                            let selectedMap = state && state.maps && state.maps[g] ? state.maps[g] : "";
-                            
-                            if(state && state.gState[g]) {
-                                let gData = state.gState[g];
-                                if(state.reversed) { god1 = gData.god2; win1Class = gData.win2 ? 'is-winner' : ''; god2 = gData.god1; win2Class = gData.win1 ? 'is-winner' : ''; } 
-                                else { god1 = gData.god1; win1Class = gData.win1 ? 'is-winner' : ''; god2 = gData.god2; win2Class = gData.win2 ? 'is-winner' : ''; }
-                            }
-                            let bg1 = god1 ? `background-image: url('${getGodIconPath(god1)}'); border-style: solid;` : "";
-                            let bg2 = god2 ? `background-image: url('${getGodIconPath(god2)}'); border-style: solid;` : "";
-
-                            godsHtml1 += `<div class="god-slot-wrapper pick-slot-wrapper">
-                                <div class="god-select-btn game${g}-slot ${matchId}-slot" data-god="${god1}" style="${bg1}" onclick="abrirModalDeuses(this)"></div>
-                                <button class="win-toggle admin-only ${win1Class}" title="Marcar Vitória" data-match="${matchId}" data-game="${g}" data-player="1" onclick="toggleVitoria(this)">V</button>
-                            </div>`;
-                            godsHtml2 += `<div class="god-slot-wrapper pick-slot-wrapper">
-                                <div class="god-select-btn game${g}-slot ${matchId}-slot" data-god="${god2}" style="${bg2}" onclick="abrirModalDeuses(this)"></div>
-                                <button class="win-toggle admin-only ${win2Class}" title="Marcar Vitória" data-match="${matchId}" data-game="${g}" data-player="2" onclick="toggleVitoria(this)">V</button>
-                            </div>`;
-                            
-                            let mapOpts = listaMapas.map(m => `<option value="${m}" ${selectedMap === m ? 'selected="selected"' : ''}>${m}</option>`).join('');
-                            mapsHtml += `<select class="map-select game${g}-map" data-match="${matchId}" data-game="${g}" onchange="atualizarMapas(this)"><option value="">Mapa ${g+1}</option>${mapOpts}</select>`;
+                            let god1 = "", win1Class = "", god2 = "", win2Class = ""; let selectedMap = state && state.maps && state.maps[g] ? state.maps[g] : "";
+                            if(state && state.gState[g]) { let gData = state.gState[g]; if(state.reversed) { god1 = gData.god2; win1Class = gData.win2 ? 'is-winner' : ''; god2 = gData.god1; win2Class = gData.win1 ? 'is-winner' : ''; } else { god1 = gData.god1; win1Class = gData.win1 ? 'is-winner' : ''; god2 = gData.god2; win2Class = gData.win2 ? 'is-winner' : ''; } }
+                            let bg1 = god1 ? `background-image: url('${getGodIconPath(god1)}'); border-style: solid;` : ""; let bg2 = god2 ? `background-image: url('${getGodIconPath(god2)}'); border-style: solid;` : "";
+                            godsHtml1 += `<div class="god-slot-wrapper pick-slot-wrapper"><div class="god-select-btn game${g}-slot ${matchId}-slot" data-god="${god1}" style="${bg1}" onclick="abrirModalDeuses(this)"></div><button class="win-toggle admin-only ${win1Class}" title="Marcar Vitória" data-match="${matchId}" data-game="${g}" data-player="1" onclick="toggleVitoria(this)">V</button></div>`;
+                            godsHtml2 += `<div class="god-slot-wrapper pick-slot-wrapper"><div class="god-select-btn game${g}-slot ${matchId}-slot" data-god="${god2}" style="${bg2}" onclick="abrirModalDeuses(this)"></div><button class="win-toggle admin-only ${win2Class}" title="Marcar Vitória" data-match="${matchId}" data-game="${g}" data-player="2" onclick="toggleVitoria(this)">V</button></div>`;
+                            let mapOpts = listaMapas.map(m => `<option value="${m}" ${selectedMap === m ? 'selected="selected"' : ''}>${m}</option>`).join(''); mapsHtml += `<select class="map-select game${g}-map" data-match="${matchId}" data-game="${g}" onchange="atualizarMapas(this)"><option value="">Mapa ${g+1}</option>${mapOpts}</select>`;
                         }
-                        mapsHtml += `</div>`;
-                        
-                        let picksHtml1 = `<div class="picks-group">${godsHtml1}</div>`;
-                        let picksHtml2 = `<div class="picks-group">${godsHtml2}</div>`;
-
-                        matchesHtml += `
-                        <div class="match-card" data-group="${idx}" data-p1="${p1Name}" data-p2="${p2Name}" data-streams='${streamsStr}'>
-                            <div class="stream-controls"><button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.6rem; border-style:dashed;" onclick="addStreamLink(this)">🎥 +</button></div>
-                            <div class="match-card-body">
-                                <div class="match-player"><div style="margin-bottom:5px;">${p1Name}</div><div class="draft-section" style="justify-content:center;">${banHtml1}${picksHtml1}</div></div>
-                                <div class="match-score"><input type="number" class="score-p1 score-input" value="0"><span>X</span><input type="number" class="score-p2 score-input" value="0"></div>
-                                <div class="match-player"><div style="margin-bottom:5px;">${p2Name}</div><div class="draft-section" style="justify-content:center;">${banHtml2}${picksHtml2}</div></div>
-                            </div>
-                            ${mapsHtml}
-                        </div>`;
+                        mapsHtml += `</div>`; let picksHtml1 = `<div class="picks-group">${godsHtml1}</div>`; let picksHtml2 = `<div class="picks-group">${godsHtml2}</div>`;
+                        matchesHtml += `<div class="match-card" data-group="${idx}" data-p1="${p1Name}" data-p2="${p2Name}" data-streams='${streamsStr}'><div class="stream-controls"><button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.6rem; border-style:dashed;" onclick="addStreamLink(this)">🎥 +</button></div><div class="match-card-body"><div class="match-player"><div style="margin-bottom:5px;">${p1Name}</div><div class="draft-section" style="justify-content:center;">${banHtml1}${picksHtml1}</div></div><div class="match-score"><input type="number" class="score-p1 score-input" value="0"><span>X</span><input type="number" class="score-p2 score-input" value="0"></div><div class="match-player"><div style="margin-bottom:5px;">${p2Name}</div><div class="draft-section" style="justify-content:center;">${banHtml2}${picksHtml2}</div></div></div>${mapsHtml}</div>`;
                     }
                 }
                 if(matchesHtml !== '') container.innerHTML += `<div class="panel" style="margin-bottom: 30px;"><h3 style="margin-bottom:25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">Confrontos - Grupo ${String.fromCharCode(65 + idx)}</h3><div class="match-list">${matchesHtml}</div></div>`;
@@ -1278,39 +855,17 @@
             renderStreamLinks();
         }
 
-        // =======================
-        // LÓGICA DE DESTINO DO PERDEDOR E CHAVE DINÂMICA
-        // =======================
-        function getLoserDestinationText(r, m, size) {
-            if (r === 0) return `L1-M${Math.floor(m/2) + 1}`;
-            const lRound = r * 2 - 1;
-            let matchesInRound = size / Math.pow(2, r + 1);
-            let crossM = (matchesInRound - 1) - m;
-            if (crossM < 0 || isNaN(crossM)) crossM = m;
-            return `L${lRound + 1}-M${crossM + 1}`;
-        }
+        function getLoserDestinationText(r, m, size) { if (r === 0) return `L1-M${Math.floor(m/2) + 1}`; const lRound = r * 2 - 1; let matchesInRound = size / Math.pow(2, r + 1); let crossM = (matchesInRound - 1) - m; if (crossM < 0 || isNaN(crossM)) crossM = m; return `L${lRound + 1}-M${crossM + 1}`; }
 
         function processByes() {
             let changed = false;
             document.querySelectorAll('.b-match:not(.bye-processed)').forEach(match => {
-                let players = match.querySelectorAll('.p-name');
-                if(players.length < 2) return;
-                
+                let players = match.querySelectorAll('.p-name'); if(players.length < 2) return;
                 let p1 = players[0].innerText.trim(), p2 = players[1].innerText.trim();
-
-                if ((p1 === "BYE" && p2 !== "BYE" && p2 !== "TBD" && !p2.startsWith("Perd.") && !p2.startsWith("Venc.")) || 
-                    (p2 === "BYE" && p1 !== "BYE" && p1 !== "TBD" && !p1.startsWith("Perd.") && !p1.startsWith("Venc.")) || 
-                    (p1 === "BYE" && p2 === "BYE")) {
-                    
-                    match.classList.add('bye-processed');
-                    match.classList.add('is-bye');
-                    
-                    let winnerIdx = 0;
-                    if (p1 === "BYE" && p2 !== "BYE") winnerIdx = 1;
-                    if (p2 === "BYE" && p1 !== "BYE") winnerIdx = 0;
-                    
-                    resolverPartida(match, winnerIdx, true); 
-                    changed = true;
+                if ((p1 === "BYE" && p2 !== "BYE" && p2 !== "TBD" && !p2.startsWith("Perd.") && !p2.startsWith("Venc.")) || (p2 === "BYE" && p1 !== "BYE" && p1 !== "TBD" && !p1.startsWith("Perd.") && !p1.startsWith("Venc.")) || (p1 === "BYE" && p2 === "BYE")) {
+                    match.classList.add('bye-processed'); match.classList.add('is-bye');
+                    let winnerIdx = 0; if (p1 === "BYE" && p2 !== "BYE") winnerIdx = 1; if (p2 === "BYE" && p1 !== "BYE") winnerIdx = 0;
+                    resolverPartida(match, winnerIdx, true); changed = true;
                 }
             });
             if(changed) saveTournament();
@@ -1318,230 +873,82 @@
 
         function puxarPromovidos() {
             if(jogadoresPromovidos.length === 0) return alert("Nenhum jogador classificado! Vá na tabela de grupos e clique em 'Promover' nos jogadores que passaram.");
-            let copia = [...jogadoresPromovidos]; shuffle(copia); 
-
-            let neededSize = 2;
-            while(neededSize < copia.length) neededSize *= 2;
-
-            let matchPairs = Array.from({length: neededSize/2}, () => ["TBD", "TBD"]);
-            let byesToAssign = neededSize - copia.length;
-            let step = Math.max(1, Math.floor((neededSize/2) / (byesToAssign || 1)));
-            
-            for(let i=0; i<byesToAssign; i++) {
-                let matchIdx = (i * step) % (neededSize/2);
-                while(matchPairs[matchIdx][1] === "BYE") matchIdx = (matchIdx + 1) % (neededSize/2);
-                matchPairs[matchIdx][1] = "BYE";
-            }
-            
-            let pIdx = 0;
-            for(let i=0; i<neededSize/2; i++) {
-                if(matchPairs[i][0] === "TBD" && pIdx < copia.length) matchPairs[i][0] = copia[pIdx++];
-                if(matchPairs[i][1] === "TBD" && pIdx < copia.length) matchPairs[i][1] = copia[pIdx++];
-            }
-            
-            let finalArray = [];
-            matchPairs.forEach(pair => finalArray.push(pair[0], pair[1]));
-
-            let select = document.getElementById('bracketSize');
-            let optionExists = Array.from(select.options).some(opt => parseInt(opt.value) === neededSize);
-            if (!optionExists) {
-                let newOpt = document.createElement('option');
-                newOpt.value = neededSize; newOpt.innerText = `Top ${neededSize}`;
-                select.appendChild(newOpt);
-            }
-            select.value = neededSize;
-            select.style.display = 'inline-block'; 
-
-            gerarChave(finalArray);
-            setTimeout(processByes, 200); 
+            let copia = [...jogadoresPromovidos]; shuffle(copia); let neededSize = 2; while(neededSize < copia.length) neededSize *= 2;
+            let matchPairs = Array.from({length: neededSize/2}, () => ["TBD", "TBD"]); let byesToAssign = neededSize - copia.length; let step = Math.max(1, Math.floor((neededSize/2) / (byesToAssign || 1)));
+            for(let i=0; i<byesToAssign; i++) { let matchIdx = (i * step) % (neededSize/2); while(matchPairs[matchIdx][1] === "BYE") matchIdx = (matchIdx + 1) % (neededSize/2); matchPairs[matchIdx][1] = "BYE"; }
+            let pIdx = 0; for(let i=0; i<neededSize/2; i++) { if(matchPairs[i][0] === "TBD" && pIdx < copia.length) matchPairs[i][0] = copia[pIdx++]; if(matchPairs[i][1] === "TBD" && pIdx < copia.length) matchPairs[i][1] = copia[pIdx++]; }
+            let finalArray = []; matchPairs.forEach(pair => finalArray.push(pair[0], pair[1]));
+            let select = document.getElementById('bracketSize'); let optionExists = Array.from(select.options).some(opt => parseInt(opt.value) === neededSize);
+            if (!optionExists) { let newOpt = document.createElement('option'); newOpt.value = neededSize; newOpt.innerText = `Top ${neededSize}`; select.appendChild(newOpt); }
+            select.value = neededSize; select.style.display = 'inline-block'; gerarChave(finalArray); setTimeout(processByes, 200); 
         }
 
         function gerarSlotHtml(pName, idx, maxSlots, matchId) {
             let godBtns = '';
-            for(let i=0; i<maxSlots; i++) {
-                godBtns += `<div class="god-slot-wrapper pick-slot-wrapper">
-                    <div class="god-select-btn game${i}-slot ${matchId}-slot" style="width:16px; height:16px;" data-god="" onclick="abrirModalDeuses(this)"></div>
-                    <button class="win-toggle admin-only" title="Marcar Vitória" style="font-size:0.4rem; padding: 1px 0;" data-match="${matchId}" data-game="${i}" data-player="${idx+1}" onclick="toggleVitoria(this)">V</button>
-                </div>`;
-            }
-            
+            for(let i=0; i<maxSlots; i++) { godBtns += `<div class="god-slot-wrapper pick-slot-wrapper"><div class="god-select-btn game${i}-slot ${matchId}-slot" style="width:16px; height:16px;" data-god="" onclick="abrirModalDeuses(this)"></div><button class="win-toggle admin-only" title="Marcar Vitória" style="font-size:0.4rem; padding: 1px 0;" data-match="${matchId}" data-game="${i}" data-player="${idx+1}" onclick="toggleVitoria(this)">V</button></div>`; }
             let banBtns = '';
-            for(let i=0; i<2; i++) {
-                banBtns += `<div class="god-slot-wrapper">
-                    <div class="god-select-btn ban-slot ${matchId}-ban${i}-p${idx+1}" style="width:14px; height:14px;" data-god="" onclick="abrirModalDeuses(this)" title="Banir Deus"></div>
-                </div>`;
-            }
-            
-            let banHtml = `<div class="ban-group">
-                ${banBtns}
-                <span class="ban-label" style="font-size:0.35rem;">BANS</span>
-            </div>`;
-
+            for(let i=0; i<2; i++) { banBtns += `<div class="god-slot-wrapper"><div class="god-select-btn ban-slot ${matchId}-ban${i}-p${idx+1}" style="width:14px; height:14px;" data-god="" onclick="abrirModalDeuses(this)" title="Banir Deus"></div></div>`; }
+            let banHtml = `<div class="ban-group">${banBtns}<span class="ban-label" style="font-size:0.35rem;">BANS</span></div>`;
             const isPlaceholder = pName.startsWith("Perd.") || pName.startsWith("Venc.");
-            
-            return `
-            <div class="b-player ${pName === 'BYE' ? 'is-empty' : ''}" data-slot="${idx}">
-                <div class="b-player-info">
-                    <span class="p-name ${isPlaceholder ? 'p-placeholder' : ''}" contenteditable="true" oninput="calcularEloGeral()">${pName}</span>
-                    <div class="placar-mata-wrapper">
-                        <button class="btn-advance admin-only" title="Avançar Vencedor" onclick="avancarWinner(this, ${idx})">W</button>
-                        <button class="btn-advance btn-loser admin-only" title="Enviar p/ Repescagem" onclick="avancarLoser(this, ${idx})">L</button>
-                        <input type="number" class="score-input score-p${idx+1}" value="0">
-                    </div>
-                </div>
-                <div class="draft-section mata-draft" style="justify-content: flex-start;">${banHtml}<div class="picks-group">${godBtns}</div></div>
-            </div>`;
+            return `<div class="b-player ${pName === 'BYE' ? 'is-empty' : ''}" data-slot="${idx}"><div class="b-player-info"><span class="p-name ${isPlaceholder ? 'p-placeholder' : ''}" contenteditable="true" oninput="calcularEloGeral()">${pName}</span><div class="placar-mata-wrapper"><button class="btn-advance admin-only" title="Avançar Vencedor" onclick="avancarWinner(this, ${idx})">W</button><button class="btn-advance btn-loser admin-only" title="Enviar p/ Repescagem" onclick="avancarLoser(this, ${idx})">L</button><input type="number" class="score-input score-p${idx+1}" value="0"></div></div><div class="draft-section mata-draft" style="justify-content: flex-start;">${banHtml}<div class="picks-group">${godBtns}</div></div></div>`;
         }
 
         function gerarChave(jogadoresIniciais = []) {
             const size = parseInt(document.getElementById('bracketSize').value);
-            const wContainer = document.getElementById('winnersBracketDisplay');
-            const lContainer = document.getElementById('losersBracketDisplay');
-            const fContainer = document.getElementById('grandFinalsDisplay');
-            wContainer.innerHTML = ''; lContainer.innerHTML = ''; fContainer.innerHTML = '';
+            const wContainer = document.getElementById('winnersBracketDisplay'); const lContainer = document.getElementById('losersBracketDisplay'); const fContainer = document.getElementById('grandFinalsDisplay');
+            wContainer.innerHTML = ''; lContainer.innerHTML = ''; fContainer.innerHTML = ''; let roundsW = Math.log2(size);
             
-            let roundsW = Math.log2(size);
-            
-            // --- WINNERS BRACKET ---
             for(let i=0; i < roundsW; i++) {
-                let matchesNum = size / Math.pow(2, i+1);
-                let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
-                
+                let matchesNum = size / Math.pow(2, i+1); let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
                 let title = i === roundsW - 1 ? "Final (Vencedores)" : (i === roundsW - 2 ? "Semifinal (Vencedores)" : "Round " + (i+1));
                 let isBo5 = i >= roundsW - 2; let slots = isBo5 ? 5 : 3;
                 roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true" onblur="saveTournament()">${title}</h4>`;
-
                 for(let j=0; j < matchesNum; j++) {
-                    let p1 = "TBD", p2 = "TBD";
-                    if (i === 0 && jogadoresIniciais.length > 0) {
-                        p1 = jogadoresIniciais.shift() || "TBD"; p2 = jogadoresIniciais.shift() || "TBD";
-                    }
-                    const mId = `w_${i}_${j}`;
-                    const matchDisplayId = `W${i+1}-M${j+1}`;
-                    const destText = getLoserDestinationText(i, j, size);
-                    
-                    const dropR = (i === 0) ? 0 : (i * 2 - 1);
-                    let crossM = j;
-                    if(i > 0) { let mInR = size / Math.pow(2, i+1); crossM = (mInR - 1) - j; if (crossM < 0 || isNaN(crossM)) crossM = j; }
-                    
+                    let p1 = "TBD", p2 = "TBD"; if (i === 0 && jogadoresIniciais.length > 0) { p1 = jogadoresIniciais.shift() || "TBD"; p2 = jogadoresIniciais.shift() || "TBD"; }
+                    const mId = `w_${i}_${j}`; const matchDisplayId = `W${i+1}-M${j+1}`; const destText = getLoserDestinationText(i, j, size);
+                    const dropR = (i === 0) ? 0 : (i * 2 - 1); let crossM = j; if(i > 0) { let mInR = size / Math.pow(2, i+1); crossM = (mInR - 1) - j; if (crossM < 0 || isNaN(crossM)) crossM = j; }
                     let mapsHtml = `<div class="map-row" style="background:transparent; border-top:1px solid rgba(255,255,255,0.03);">`;
                     for(let g=0; g<slots; g++) mapsHtml += `<select class="map-select" data-match="${mId}" data-game="${g}" onchange="atualizarMapas(this)"><option value="">Mapa ${g+1}</option>${listaMapas.map(m => `<option value="${m}">${m}</option>`).join('')}</select>`;
                     mapsHtml += `</div>`;
-
-                    roundDiv.innerHTML += `
-                        <div class="match-wrapper">
-                            <div class="match-badges">
-                                ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}
-                                <span class="id-badge">${matchDisplayId}</span>
-                            </div>
-                            <div class="b-match" data-bracket="W" data-round="${i}" data-match="${j}" data-drop-r="${dropR}" data-drop-m="${crossM}">
-                                <div class="stream-controls" style="top: 6px; right: 6px; left: auto; transform: none; width: auto; justify-content: flex-end;">
-                                    <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 4px; font-size: 0.5rem; background:rgba(0,0,0,0.5); border-color:#555;" onclick="addStreamLink(this)">🎥 +</button>
-                                </div>
-                                ${gerarSlotHtml(p1, 0, slots, mId)}
-                                ${gerarSlotHtml(p2, 1, slots, mId)}
-                                ${mapsHtml}
-                                <div class="loser-drop-label">⬇ CAI P/ ${destText}</div>
-                            </div>
-                        </div>`;
+                    roundDiv.innerHTML += `<div class="match-wrapper"><div class="match-badges">${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}<span class="id-badge">${matchDisplayId}</span></div><div class="b-match" data-bracket="W" data-round="${i}" data-match="${j}" data-drop-r="${dropR}" data-drop-m="${crossM}"><div class="stream-controls" style="top: 6px; right: 6px; left: auto; transform: none; width: auto; justify-content: flex-end;"><button class="nav-btn admin-only add-stream-btn" style="padding: 2px 4px; font-size: 0.5rem; background:rgba(0,0,0,0.5); border-color:#555;" onclick="addStreamLink(this)">🎥 +</button></div>${gerarSlotHtml(p1, 0, slots, mId)}${gerarSlotHtml(p2, 1, slots, mId)}${mapsHtml}</div></div>`;
                 }
                 wContainer.appendChild(roundDiv);
             }
 
-            // --- LOSERS BRACKET ---
             let roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1; 
             for(let i=0; i < roundsL; i++) {
-                let matchesNum = size / Math.pow(2, Math.floor(i/2) + 2);
-                if (matchesNum < 1) matchesNum = 1;
-                
+                let matchesNum = size / Math.pow(2, Math.floor(i/2) + 2); if (matchesNum < 1) matchesNum = 1;
                 let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
                 let title = i === roundsL - 1 ? "Final (Repescagem)" : "Round " + (i+1) + " (Repescagem)";
                 let isBo5 = i >= roundsL - 2; let slots = isBo5 ? 5 : 3;
                 roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true" onblur="saveTournament()">${title}</h4>`;
-
                 for(let j=0; j < matchesNum; j++) {
-                    const mId = `l_${i}_${j}`;
-                    const matchDisplayId = `L${i+1}-M${j+1}`;
-                    
+                    const mId = `l_${i}_${j}`; const matchDisplayId = `L${i+1}-M${j+1}`;
                     let mapsHtml = `<div class="map-row" style="background:transparent; border-top:1px solid rgba(255,255,255,0.03);">`;
                     for(let g=0; g<slots; g++) mapsHtml += `<select class="map-select" data-match="${mId}" data-game="${g}" onchange="atualizarMapas(this)"><option value="">Mapa ${g+1}</option>${listaMapas.map(m => `<option value="${m}">${m}</option>`).join('')}</select>`;
                     mapsHtml += `</div>`;
-
-                    roundDiv.innerHTML += `
-                        <div class="match-wrapper">
-                            <div class="match-badges">
-                                ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}
-                                <span class="id-badge">${matchDisplayId}</span>
-                            </div>
-                            <div class="b-match" data-bracket="L" data-round="${i}" data-match="${j}">
-                                <div class="stream-controls" style="top: 6px; right: 6px; left: auto; transform: none; width: auto; justify-content: flex-end;">
-                                    <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 4px; font-size: 0.5rem; background:rgba(0,0,0,0.5); border-color:#555;" onclick="addStreamLink(this)">🎥 +</button>
-                                </div>
-                                ${gerarSlotHtml("TBD", 0, slots, mId)}
-                                ${gerarSlotHtml("TBD", 1, slots, mId)}
-                                ${mapsHtml}
-                            </div>
-                        </div>`;
+                    roundDiv.innerHTML += `<div class="match-wrapper"><div class="match-badges">${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}<span class="id-badge">${matchDisplayId}</span></div><div class="b-match" data-bracket="L" data-round="${i}" data-match="${j}"><div class="stream-controls" style="top: 6px; right: 6px; left: auto; transform: none; width: auto; justify-content: flex-end;"><button class="nav-btn admin-only add-stream-btn" style="padding: 2px 4px; font-size: 0.5rem; background:rgba(0,0,0,0.5); border-color:#555;" onclick="addStreamLink(this)">🎥 +</button></div>${gerarSlotHtml("TBD", 0, slots, mId)}${gerarSlotHtml("TBD", 1, slots, mId)}${mapsHtml}</div></div>`;
                 }
                 lContainer.appendChild(roundDiv);
             }
 
-            // --- GRAND FINALS ---
-            fContainer.innerHTML = `
-                <div class="bracket-round round-champion" style="min-width: 300px;">
-                    <h4 class="round-title" style="color:#FFD700;" contenteditable="true" onblur="saveTournament()">GRAND FINALS (TITANS)</h4>
-                    <div class="match-wrapper" style="justify-content: center; padding-top: 30px;">
-                        <div class="match-badges" style="left: 50%; transform: translateX(-50%);">
-                            <span class="format-badge" style="background:#FFD700; color:#000;">MD7</span>
-                            <span class="id-badge">GF</span>
-                        </div>
-                        <div class="b-match glow-box" style="border-color:#FFD700;" data-bracket="F" data-round="0" data-match="0">
-                            <div class="stream-controls" style="top: 6px; right: 6px; left: auto; transform: none; width: auto; justify-content: flex-end;">
-                                <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 4px; font-size: 0.5rem; background:rgba(0,0,0,0.5); border-color:#555;" onclick="addStreamLink(this)">🎥 +</button>
-                            </div>
-                            ${gerarSlotHtml("Venc. Chave Superior", 0, 7, "f_0_0")}
-                            ${gerarSlotHtml("Venc. Repescagem", 1, 7, "f_0_0")}
-                            <div class="map-row" style="background:transparent; border-top:1px solid rgba(255,255,255,0.03); flex-wrap:wrap; padding:10px 4px;">
-                                ${[...Array(7)].map((_,g) => `<select class="map-select" data-match="f_0_0" data-game="${g}" onchange="atualizarMapas(this)"><option value="">Map ${g+1}</option>${listaMapas.map(m => `<option value="${m}">${m}</option>`).join('')}</select>`).join('')}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            attachHoverEvents();
-            renderStreamLinks();
-            setTimeout(processByes, 100);
+            fContainer.innerHTML = `<div class="bracket-round round-champion" style="min-width: 300px;"><h4 class="round-title" style="color:#FFD700;" contenteditable="true" onblur="saveTournament()">GRAND FINALS (TITANS)</h4><div class="match-wrapper" style="justify-content: center; padding-top: 30px;"><div class="match-badges" style="left: 50%; transform: translateX(-50%);"><span class="format-badge" style="background:#FFD700; color:#000;">MD7</span><span class="id-badge">GF</span></div><div class="b-match glow-box" style="border-color:#FFD700;" data-bracket="F" data-round="0" data-match="0"><div class="stream-controls" style="top: 6px; right: 6px; left: auto; transform: none; width: auto; justify-content: flex-end;"><button class="nav-btn admin-only add-stream-btn" style="padding: 2px 4px; font-size: 0.5rem; background:rgba(0,0,0,0.5); border-color:#555;" onclick="addStreamLink(this)">🎥 +</button></div>${gerarSlotHtml("Venc. Chave Superior", 0, 7, "f_0_0")}${gerarSlotHtml("Venc. Repescagem", 1, 7, "f_0_0")}<div class="map-row" style="background:transparent; border-top:1px solid rgba(255,255,255,0.03); flex-wrap:wrap; padding:10px 4px;">${[...Array(7)].map((_,g) => `<select class="map-select" data-match="f_0_0" data-game="${g}" onchange="atualizarMapas(this)"><option value="">Map ${g+1}</option>${listaMapas.map(m => `<option value="${m}">${m}</option>`).join('')}</select>`).join('')}</div></div></div></div>`;
+            attachHoverEvents(); renderStreamLinks(); setTimeout(processByes, 100);
         }
 
-        // --- SISTEMA INTELIGENTE DE RASTRO ---
         function attachHoverEvents() {
             const wrappers = document.querySelectorAll('.match-wrapper');
             wrappers.forEach(wrapper => {
                 wrapper.addEventListener('mouseenter', (e) => {
                     const matchBox = e.currentTarget.querySelector('.b-match');
                     if (matchBox && matchBox.getAttribute('data-bracket') === 'W') {
-                        const r = parseInt(matchBox.getAttribute('data-round'));
-                        const m = parseInt(matchBox.getAttribute('data-match'));
-                        
-                        if (r > 0) {
-                            const p1 = document.querySelector(`.b-match[data-bracket="W"][data-round="${r-1}"][data-match="${m*2}"]`);
-                            const p2 = document.querySelector(`.b-match[data-bracket="W"][data-round="${r-1}"][data-match="${m*2+1}"]`);
-                            if(p1) { p1.classList.add('glow-box'); p1.closest('.match-wrapper').classList.add('glow-outgoing'); }
-                            if(p2) { p2.classList.add('glow-box'); p2.closest('.match-wrapper').classList.add('glow-outgoing'); }
-                        }
-
-                        const dropR = matchBox.getAttribute('data-drop-r');
-                        const dropM = matchBox.getAttribute('data-drop-m');
-                        if (dropR !== null && dropM !== null) {
-                            const dropTarget = document.querySelector(`.b-match[data-bracket="L"][data-round="${dropR}"][data-match="${dropM}"]`);
-                            if (dropTarget) dropTarget.classList.add('glow-drop');
-                        }
+                        const r = parseInt(matchBox.getAttribute('data-round')); const m = parseInt(matchBox.getAttribute('data-match'));
+                        if (r > 0) { const p1 = document.querySelector(`.b-match[data-bracket="W"][data-round="${r-1}"][data-match="${m*2}"]`); const p2 = document.querySelector(`.b-match[data-bracket="W"][data-round="${r-1}"][data-match="${m*2+1}"]`); if(p1) { p1.classList.add('glow-box'); p1.closest('.match-wrapper').classList.add('glow-outgoing'); } if(p2) { p2.classList.add('glow-box'); p2.closest('.match-wrapper').classList.add('glow-outgoing'); } }
+                        const dropR = matchBox.getAttribute('data-drop-r'); const dropM = matchBox.getAttribute('data-drop-m');
+                        if (dropR !== null && dropM !== null) { const dropTarget = document.querySelector(`.b-match[data-bracket="L"][data-round="${dropR}"][data-match="${dropM}"]`); if (dropTarget) dropTarget.classList.add('glow-drop'); }
                     }
                 });
-                wrapper.addEventListener('mouseleave', () => { 
-                    document.querySelectorAll('.glow-box, .glow-outgoing, .glow-drop').forEach(el => el.classList.remove('glow-box', 'glow-outgoing', 'glow-drop')); 
-                });
+                wrapper.addEventListener('mouseleave', () => { document.querySelectorAll('.glow-box, .glow-outgoing, .glow-drop').forEach(el => el.classList.remove('glow-box', 'glow-outgoing', 'glow-drop')); });
             });
         }
 
@@ -1549,77 +956,42 @@
         function avancarLoser(btn, slotIdx) { resolverPartida(btn.closest('.b-match'), slotIdx === 0 ? 1 : 0); }
 
         function resolverPartida(matchDiv, winnerSlotIdx, isAutoBye = false) {
-            const players = matchDiv.querySelectorAll('.b-player');
-            const loserSlotIdx = winnerSlotIdx === 0 ? 1 : 0;
-
-            players[winnerSlotIdx].classList.add('winner-slot');
-            players[winnerSlotIdx].classList.remove('loser-slot');
-            players[loserSlotIdx].classList.add('loser-slot');
-            players[loserSlotIdx].classList.remove('winner-slot');
-
-            const winnerNameSpan = players[winnerSlotIdx].querySelector('.p-name');
-            const loserNameSpan = players[loserSlotIdx].querySelector('.p-name');
-            const winnerName = winnerNameSpan.innerText.trim();
-            const loserName = loserNameSpan.innerText.trim();
-
-            const bracket = matchDiv.getAttribute('data-bracket');
-            const r = parseInt(matchDiv.getAttribute('data-round'));
-            const m = parseInt(matchDiv.getAttribute('data-match'));
-            const size = parseInt(document.getElementById('bracketSize').value);
-            
-            const roundsW = Math.log2(size);
-            const roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1;
+            const players = matchDiv.querySelectorAll('.b-player'); const loserSlotIdx = winnerSlotIdx === 0 ? 1 : 0;
+            players[winnerSlotIdx].classList.add('winner-slot'); players[winnerSlotIdx].classList.remove('loser-slot'); players[loserSlotIdx].classList.add('loser-slot'); players[loserSlotIdx].classList.remove('winner-slot');
+            const winnerName = players[winnerSlotIdx].querySelector('.p-name').innerText.trim(); const loserName = players[loserSlotIdx].querySelector('.p-name').innerText.trim();
+            const bracket = matchDiv.getAttribute('data-bracket'); const r = parseInt(matchDiv.getAttribute('data-round')); const m = parseInt(matchDiv.getAttribute('data-match')); const size = parseInt(document.getElementById('bracketSize').value);
+            const roundsW = Math.log2(size); const roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1;
 
             function moveTo(targetBracket, targetR, targetM, targetSlot, pName) {
                 const targetMatch = document.querySelector(`.b-match[data-bracket="${targetBracket}"][data-round="${targetR}"][data-match="${targetM}"]`);
                 if(targetMatch) {
                     const playerSlot = targetMatch.querySelectorAll('.b-player')[targetSlot];
                     if(playerSlot) {
-                        const nameEl = playerSlot.querySelector('.p-name');
-                        nameEl.innerText = pName;
-                        nameEl.classList.remove('p-placeholder');
-                        playerSlot.classList.remove('winner-slot', 'loser-slot');
-                        playerSlot.classList.remove('is-empty');
-                        
+                        playerSlot.querySelector('.p-name').innerText = pName; playerSlot.querySelector('.p-name').classList.remove('p-placeholder');
+                        playerSlot.classList.remove('winner-slot', 'loser-slot', 'is-empty');
                         if(pName === "BYE" && targetBracket === "W") {
                              const btnVitoriaOp = targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.btn-advance.w') || targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('button[title="Avançar Vencedor"]');
-                             if(btnVitoriaOp && targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.p-name').innerText !== "TBD") {
-                                 setTimeout(() => btnVitoriaOp.click(), 100);
-                             }
+                             if(btnVitoriaOp && targetMatch.querySelectorAll('.b-player')[targetSlot === 0 ? 1 : 0].querySelector('.p-name').innerText !== "TBD") setTimeout(() => btnVitoriaOp.click(), 100);
                         }
                     }
                 }
             }
 
             if (bracket === 'W') {
-                if (r < roundsW - 1) moveTo('W', r + 1, Math.floor(m / 2), m % 2, winnerName);
-                else moveTo('F', 0, 0, 0, winnerName);
-
+                if (r < roundsW - 1) moveTo('W', r + 1, Math.floor(m / 2), m % 2, winnerName); else moveTo('F', 0, 0, 0, winnerName);
                 if (r === 0) moveTo('L', 0, Math.floor(m / 2), m % 2, loserName);
-                else {
-                    const lRound = r * 2 - 1; let matchesInRound = size / Math.pow(2, r + 1);
-                    let crossM = (matchesInRound - 1) - m; if (crossM < 0 || isNaN(crossM)) crossM = m; 
-                    moveTo('L', lRound, crossM, 0, loserName);
-                }
+                else { const lRound = r * 2 - 1; let matchesInRound = size / Math.pow(2, r + 1); let crossM = (matchesInRound - 1) - m; if (crossM < 0 || isNaN(crossM)) crossM = m; moveTo('L', lRound, crossM, 0, loserName); }
             } else if (bracket === 'L') {
-                if (r < roundsL - 1) {
-                    if (r % 2 === 0) moveTo('L', r + 1, m, 1, winnerName);
-                    else moveTo('L', r + 1, Math.floor(m / 2), m % 2, winnerName);
-                } else moveTo('F', 0, 0, 1, winnerName); 
+                if (r < roundsL - 1) { if (r % 2 === 0) moveTo('L', r + 1, m, 1, winnerName); else moveTo('L', r + 1, Math.floor(m / 2), m % 2, winnerName); } 
+                else moveTo('F', 0, 0, 1, winnerName); 
             }
-
-            if(!isAutoBye) { calcularEloGeral(); saveTournament(); }
-            setTimeout(processByes, 50);
+            if(!isAutoBye) { calcularEloGeral(); saveTournament(); } setTimeout(processByes, 50);
         }
 
         function initDragToScroll() {
             document.querySelectorAll('.bracket-container').forEach(slider => {
                 let isDown = false, startX, scrollLeft;
-                slider.addEventListener('mousedown', (e) => {
-                    if(e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT' || e.target.getAttribute('contenteditable') === 'true' || e.target.classList.contains('drag-handle')) return;
-                    isDown = true; slider.style.cursor = 'grabbing';
-                    startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft;
-                });
+                slider.addEventListener('mousedown', (e) => { if(e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT' || e.target.getAttribute('contenteditable') === 'true' || e.target.classList.contains('drag-handle')) return; isDown = true; slider.style.cursor = 'grabbing'; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
                 slider.addEventListener('mouseleave', () => { isDown = false; slider.style.cursor = 'grab'; });
                 slider.addEventListener('mouseup', () => { isDown = false; slider.style.cursor = 'grab'; });
-                slider.addEventListener('mousemoveNormally I can help with things like this, but I don't seem to have access to that content. You can try again or ask me for something else.
+                slider.addEventListener('mousemove', (e) => { if (!Normally I can help with things like this, but I don't seem to have access to that content. You can try again or ask me for something else.
