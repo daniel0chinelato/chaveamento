@@ -30,6 +30,7 @@
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+        html { overflow-x: hidden; }
         body {
             background-color: var(--bg-color);
             background-image: radial-gradient(circle at 50% 0%, var(--panel-surface) 0%, transparent 70%);
@@ -38,6 +39,7 @@
             font-family: 'Montserrat', sans-serif;
             margin: 0; padding: 0; line-height: 1.6;
             min-height: 100vh;
+            overflow-x: hidden;
         }
         h2, h3, h4 { font-family: 'Cinzel', serif; color: var(--accent-color); font-weight: 600; margin-top: 0; letter-spacing: 2px; text-transform: uppercase; }
         .header-container { width: 100%; margin: 20px 0 40px 0; display: flex; justify-content: center; align-items: center; }
@@ -584,7 +586,11 @@
             let activeThumb = document.getElementById('thumb-' + mapaEscolhido.replace(/\s+/g, '-'));
             if(activeThumb) {
                 activeThumb.classList.add('active');
-                activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                const slider = document.getElementById('mapThumbSelector');
+                if(slider) {
+                    const alvo = activeThumb.offsetLeft - (slider.clientWidth / 2) + (activeThumb.offsetWidth / 2);
+                    slider.scrollTo({ left: alvo, behavior: 'smooth' });
+                }
             }
             let bgImg = mapaImagens[mapaEscolhido] || 'header.png';
             setMapBackground(bgImg);
