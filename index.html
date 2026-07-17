@@ -209,8 +209,10 @@
            PÁGINA FULL-BLEED INTERATIVA DE MAPAS E PODIO FLUTUANTE
            ======================================= */
         #page-maps { padding: 0 !important; max-width: 100% !important; height: calc(100vh - 65px); position: relative; overflow: hidden; background: #000; }
+        .immersive-bg-blur { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; background-size: cover; background-position: center; filter: blur(70px) saturate(1.6) brightness(0.5); transform: scale(1.15); transition: background-image 0.6s ease-in-out; z-index: -1; }
         .immersive-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center; transition: background-image 0.6s ease-in-out, filter 0.5s ease-in-out; z-index: 0; }
         .immersive-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(5,5,8,0.95) 0%, rgba(5,5,8,0.6) 40%, rgba(5,5,8,0.3) 60%, rgba(5,5,8,0.8) 100%), linear-gradient(0deg, rgba(5,5,8,0.95) 0%, transparent 30%); z-index: 1; transition: opacity 0.6s; }
+        .map-vignette { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; box-shadow: inset 0 0 160px 20px rgba(0,0,0,0.7); }
         #mainMapUI { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; transition: opacity 0.4s ease, pointer-events 0.4s; }
         /* Layout Superior */
         .map-stats-top { display: flex; justify-content: space-between; align-items: flex-start; padding: 40px 60px; width: 100%; box-sizing: border-box; flex: 1; position: relative;}
@@ -366,10 +368,13 @@
     </div>
     <!-- PÁGINA DE MAPAS: ESTATÍSTICAS AVANÇADAS IMERSIVAS -->
     <div id="page-maps" class="page">
+        <!-- Fundo Ambiente Desfocado (mascara as bordas sem cortar a imagem) -->
+        <div id="immersiveMapBgBlur" class="immersive-bg-blur"></div>
         <!-- Mapa de Fundo -->
         <div id="immersiveMapBg" class="immersive-bg">
             <div class="immersive-overlay"></div>
         </div>
+        <div class="map-vignette"></div>
         <div id="mainMapUI" class="immersive-content">
             <!-- Lado Superior (Esquerda e Direita) -->
             <div class="map-stats-top">
@@ -547,24 +552,28 @@
         // =======================
         let mapaAtivoGlobal = "Anatólia";
         let mostrandoDicas = false;
+        function setMapBackground(url) {
+            const bg = document.getElementById('immersiveMapBg'), blur = document.getElementById('immersiveMapBgBlur');
+            if(bg) bg.style.backgroundImage = `url('${url}')`;
+            if(blur) blur.style.backgroundImage = `url('${url}')`;
+        }
         function toggleDicas() {
             const uiContent = document.getElementById('mainMapUI');
             const hintContainer = document.getElementById('hintContainer');
-            const mapBg = document.getElementById('immersiveMapBg');
             mostrandoDicas = !mostrandoDicas;
             if(mostrandoDicas) {
                 uiContent.style.opacity = '0';
                 uiContent.style.pointerEvents = 'none';
                 hintContainer.classList.add('active');
                 // O fundo vira a imagem da dica sem blur
-                mapBg.style.backgroundImage = `url('${getMapHintPath(mapaAtivoGlobal)}')`;
+                setMapBackground(getMapHintPath(mapaAtivoGlobal));
                 document.querySelector('.immersive-overlay').style.opacity = '0';
             } else {
                 uiContent.style.opacity = '1';
                 uiContent.style.pointerEvents = 'auto';
                 hintContainer.classList.remove('active');
                 // Retorna a imagem do mapa original com a máscara
-                mapBg.style.backgroundImage = `url('${mapaImagens[mapaAtivoGlobal]}')`;
+                setMapBackground(mapaImagens[mapaAtivoGlobal]);
                 document.querySelector('.immersive-overlay').style.opacity = '1';
             }
         }
@@ -578,8 +587,7 @@
                 activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
             let bgImg = mapaImagens[mapaEscolhido] || 'header.png';
-            let container = document.getElementById('immersiveMapBg');
-            if(container) container.style.backgroundImage = `url('${bgImg}')`;
+            setMapBackground(bgImg);
             let titulo = document.getElementById('mapaDestaqueTitulo');
             if(titulo) titulo.innerText = mapaEscolhido;
             // Coleta de dados blindada contra crash no DOM
