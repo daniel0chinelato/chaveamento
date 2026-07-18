@@ -1732,6 +1732,27 @@
                   .catch((e) => { if(btnSave) btnSave.style.display = 'none'; showToast("Erro ao salvar na Nuvem: " + e.message, 'error'); });
             } catch(e) { if(btnSave) btnSave.style.display = 'none'; showToast("Erro interno ao salvar: " + e.message, 'error'); }
         }
+        // Garante que o botão ⟳ de recalcular exista em cada card de grupo, mesmo
+        // em grupos que já estavam salvos na nuvem (com HTML gerado antes dessa função existir).
+        function garantirBotoesRecalcGrupo() {
+            document.querySelectorAll('#groupsDisplay > .panel').forEach((panel, idx) => {
+                if (panel.querySelector('.btn-recalc-grupo')) return;
+                const h3 = panel.querySelector('h3');
+                if (!h3) return;
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = 'display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom:15px; position:relative;';
+                h3.style.margin = '0';
+                h3.parentNode.insertBefore(wrapper, h3);
+                wrapper.appendChild(h3);
+                const btn = document.createElement('button');
+                btn.className = 'btn-recalc-grupo admin-only';
+                btn.style.cssText = 'position:absolute; right:0;';
+                btn.title = 'Recalcular confrontos deste grupo';
+                btn.textContent = '⟳';
+                btn.onclick = () => recalcularGrupoUnico(idx);
+                wrapper.appendChild(btn);
+            });
+        }
         function loadTournament() {
             db.ref('tavernas_data').once('value').then((snapshot) => {
                 const data = snapshot.val();
@@ -1759,7 +1780,7 @@
                     select.value = data.bracketSize;
                     select.style.display = 'inline-block';
                 }
-                attachHoverEvents(); calcularEloGeral(); renderizarFiltrosDeMapas(); initDragToScroll(); renderStreamLinks();
+                attachHoverEvents(); calcularEloGeral(); renderizarFiltrosDeMapas(); initDragToScroll(); renderStreamLinks(); garantirBotoesRecalcGrupo();
                 hideInitialLoadOverlay();
             }).catch(e => {
                 if(!document.body.classList.contains('is-viewer')) gerarChave();
