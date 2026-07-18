@@ -91,6 +91,8 @@
         .btn-promote { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: 0.3s; }
         .btn-promote:hover { border-color: var(--accent-color); color: var(--accent-color); }
         .promoted .btn-promote { background: var(--accent-color); color: #000; border-color: var(--accent-color); font-weight: 600; }
+        .btn-recalc-grupo { background: transparent; border: none; color: var(--text-muted); font-size: 0.9rem; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+        .btn-recalc-grupo:hover { color: var(--accent-color); background: var(--accent-glow); transform: rotate(90deg); }
         .groups-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; }
         .match-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 30px;}
         /* MATCH CARD GERAL */
@@ -397,12 +399,9 @@
             </div>
         </div>
         <div id="groupsSection" style="display:none; margin-top: 40px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
                 <h2 style="margin:0;">Fase de Grupos (Mortals)</h2>
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <button class="nav-btn admin-only" style="padding: 6px 16px; font-size: 0.7rem;" onclick="reprocessarGruposAposDrag()" title="Reconstrói os confrontos de todos os grupos a partir dos jogadores que estão nas tabelas agora">Recalcular Confrontos</button>
-                    <p class="admin-only" style="font-size:0.7rem; color:var(--text-muted); margin:0; font-style:italic;">Dica: Arraste os jogadores pelo ícone ☰ para trocar de grupo.</p>
-                </div>
+                <p class="admin-only" style="font-size:0.7rem; color:var(--text-muted); margin:0; font-style:italic;">Dica: Arraste os jogadores pelo ícone ☰ para trocar de grupo, ou use o ⟳ no card do grupo para recalcular só ele.</p>
             </div>
             <div class="groups-grid" id="groupsDisplay"></div>
         </div>
@@ -931,6 +930,20 @@
             document.querySelectorAll('.match-card').forEach(card => calcularPlacarGlobal(card, false));
             calcularEloGeral(); saveTournament();
         }
+        // Recalcula os confrontos de APENAS um grupo (não mexe nos outros).
+        // Útil quando um grupo específico ficou com jogadores faltando nos confrontos.
+        function recalcularGrupoUnico(idx) {
+            const tbody = document.getElementById(`tbody-grupo-${idx}`);
+            if(!tbody) return;
+            let state = saveCurrentMatchesState();
+            let grupo = [];
+            tbody.querySelectorAll('tr').forEach(tr => { if(tr.dataset.player) grupo.push({ nome: tr.dataset.player, seed: tr.classList.contains('seed-row') }); });
+            let grupos = []; grupos[idx] = grupo;
+            gerarConfrontosGrupos(grupos, state, idx);
+            document.querySelectorAll(`.match-card[data-group="${idx}"]`).forEach(card => calcularPlacarGlobal(card, false));
+            calcularEloGeral(); saveTournament();
+            showToast(`Confrontos do Grupo ${String.fromCharCode(65 + idx)} recalculados.`, 'success');
+        }
         // =======================
         // SISTEMA AUTOMÁTICO DE VITÓRIAS E DEUSES
         // =======================
@@ -1102,7 +1115,7 @@
             const container = document.getElementById('groupsDisplay'); container.innerHTML = '';
             document.getElementById('groupsSection').style.display = 'block'; jogadoresPromovidos = [];
             grupos.forEach((grupo, idx) => {
-                let html = `<div class="panel" style="padding:20px;"><h3 style="margin-bottom: 15px; font-size:1.1rem; text-align:center;">Grupo ${String.fromCharCode(65 + idx)}</h3><table style="margin-top:0;"><thead><tr><th style="width:20px;"></th><th>Status</th><th style="text-align:left">Jogador</th><th>V</th><th>D</th><th>Pts</th></tr></thead><tbody id="tbody-grupo-${idx}" ondrop="dropPlayer(event)" ondragover="allowDropPlayer(event)">`;
+                let html = `<div class="panel" style="padding:20px;"><div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom: 15px; position:relative;"><h3 style="margin:0; font-size:1.1rem;">Grupo ${String.fromCharCode(65 + idx)}</h3><button class="btn-recalc-grupo admin-only" style="position:absolute; right:0;" onclick="recalcularGrupoUnico(${idx})" title="Recalcular confrontos deste grupo">⟳</button></div><table style="margin-top:0;"><thead><tr><th style="width:20px;"></th><th>Status</th><th style="text-align:left">Jogador</th><th>V</th><th>D</th><th>Pts</th></tr></thead><tbody id="tbody-grupo-${idx}" ondrop="dropPlayer(event)" ondragover="allowDropPlayer(event)">`;
                 grupo.forEach(p => {
                     html += `<tr class="${p.seed ? 'seed-row' : ''}" data-player="${p.nome}" draggable="true" ondragstart="dragPlayer(event)">
                         <td class="drag-handle" title="Arraste para mover">☰</td>
@@ -1185,9 +1198,12 @@
             rows.sort((a, b) => parseInt(b.querySelector('.cell-pts').innerText) - parseInt(a.querySelector('.cell-pts').innerText));
             rows.forEach(r => tbody.appendChild(r));
         }
-        function gerarConfrontosGrupos(grupos, restoreState = null) {
-            const container = document.getElementById('matchesGroupsContainer'); container.innerHTML = '';
-            grupos.forEach((grupo, idx) => {
+        function gerarConfrontosGrupos(grupos, restoreState = null, onlyGroupIdx = null) {
+            const container = document.getElementById('matchesGroupsContainer');
+            if (onlyGroupIdx === null) container.innerHTML = '';
+            const indexesAlvo = onlyGroupIdx !== null ? [onlyGroupIdx] : grupos.map((_, i) => i);
+            indexesAlvo.forEach((idx) => {
+                const grupo = grupos[idx] || [];
                 let matchesHtml = '';
                 for(let i = 0; i < grupo.length; i++) {
                     for(let j = i + 1; j < grupo.length; j++) {
@@ -1242,7 +1258,15 @@
                         </div>`;
                     }
                 }
-                if(matchesHtml !== '') container.innerHTML += `<div class="panel" style="margin-bottom: 30px;"><h3 style="margin-bottom:25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">Confrontos - Grupo ${String.fromCharCode(65 + idx)}</h3><div class="match-list">${matchesHtml}</div></div>`;
+                const panelId = `group-matches-panel-${idx}`;
+                const existingPanel = document.getElementById(panelId);
+                if(matchesHtml !== '') {
+                    const panelHtml = `<div class="panel" id="${panelId}" style="margin-bottom: 30px;"><h3 style="margin-bottom:25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">Confrontos - Grupo ${String.fromCharCode(65 + idx)}</h3><div class="match-list">${matchesHtml}</div></div>`;
+                    if(existingPanel) existingPanel.outerHTML = panelHtml;
+                    else container.insertAdjacentHTML('beforeend', panelHtml);
+                } else if(existingPanel) {
+                    existingPanel.remove();
+                }
             });
             renderStreamLinks();
         }
