@@ -1260,12 +1260,22 @@
                 }
                 const panelId = `group-matches-panel-${idx}`;
                 const tituloEsperado = `Confrontos - Grupo ${String.fromCharCode(65 + idx)}`;
-                // Remove qualquer painel já existente desse grupo, seja o novo (com id)
-                // ou um antigo salvo antes desse id existir (identificado pelo título).
+                // Remove qualquer painel já existente desse grupo. Cobrimos 3 casos:
+                // 1) o novo painel (identificado pelo id), 2) um antigo salvo antes
+                // do id existir (identificado pelo título), 3) qualquer painel que
+                // contenha confrontos com data-group desse índice (o jeito mais
+                // confiável, pois esse atributo sempre existiu nos confrontos).
+                const paineisParaRemover = new Set();
                 Array.from(container.children).forEach(el => {
+                    if (!el.classList || !el.classList.contains('panel')) return;
                     const h3 = el.querySelector(':scope > h3');
-                    if (el.id === panelId || (h3 && h3.textContent.trim() === tituloEsperado)) el.remove();
+                    if (el.id === panelId || (h3 && h3.textContent.trim() === tituloEsperado)) paineisParaRemover.add(el);
                 });
+                container.querySelectorAll(`.match-card[data-group="${idx}"]`).forEach(card => {
+                    const panel = card.closest('.panel');
+                    if (panel && panel.parentElement === container) paineisParaRemover.add(panel);
+                });
+                paineisParaRemover.forEach(p => p.remove());
                 if(matchesHtml !== '') {
                     const panelHtml = `<div class="panel" id="${panelId}" style="margin-bottom: 30px;"><h3 style="margin-bottom:25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">${tituloEsperado}</h3><div class="match-list">${matchesHtml}</div></div>`;
                     container.insertAdjacentHTML('beforeend', panelHtml);
