@@ -397,9 +397,12 @@
             </div>
         </div>
         <div id="groupsSection" style="display:none; margin-top: 40px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap;">
                 <h2 style="margin:0;">Fase de Grupos (Mortals)</h2>
-                <p class="admin-only" style="font-size:0.7rem; color:var(--text-muted); margin:0; font-style:italic;">Dica: Arraste os jogadores pelo ícone ☰ para trocar de grupo.</p>
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <button class="nav-btn admin-only" style="padding: 6px 16px; font-size: 0.7rem;" onclick="reprocessarGruposAposDrag()" title="Reconstrói os confrontos de todos os grupos a partir dos jogadores que estão nas tabelas agora">Recalcular Confrontos</button>
+                    <p class="admin-only" style="font-size:0.7rem; color:var(--text-muted); margin:0; font-style:italic;">Dica: Arraste os jogadores pelo ícone ☰ para trocar de grupo.</p>
+                </div>
             </div>
             <div class="groups-grid" id="groupsDisplay"></div>
         </div>
