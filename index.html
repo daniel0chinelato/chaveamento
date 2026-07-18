@@ -211,8 +211,14 @@
            PÁGINA FULL-BLEED INTERATIVA DE MAPAS E PODIO FLUTUANTE
            ======================================= */
         #page-maps { padding: 0 !important; max-width: 100% !important; height: calc(100vh - 65px); position: relative; overflow: hidden; background: #000; }
-        .immersive-bg-blur { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; background-size: cover; background-position: center; filter: blur(70px) saturate(1.6) brightness(0.5); transform: scale(1.15); transition: background-image 0.6s ease-in-out; z-index: 0; }
-        .immersive-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center; transition: background-image 0.6s ease-in-out, filter 0.5s ease-in-out; z-index: 1; }
+        .immersive-bg-blur { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; filter: blur(70px) saturate(1.6) brightness(0.5); transform: scale(1.15); transition: filter 0.5s ease-in-out; z-index: 0; }
+        .immersive-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.5s ease-in-out; z-index: 1; }
+        /* Camadas de crossfade: background-image NAO pode ser animado nativamente pelo CSS,
+           entao usamos duas camadas empilhadas e cruzamos a opacidade entre elas (isso sim anima). */
+        .bg-layer-blur, .bg-layer-main { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.6s ease-in-out; }
+        .bg-layer-blur { background-size: cover; background-position: center; }
+        .bg-layer-main { background-size: contain; background-repeat: no-repeat; background-position: center; }
+        .bg-layer-blur.active, .bg-layer-main.active { opacity: 1; }
         .immersive-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(5,5,8,0.95) 0%, rgba(5,5,8,0.6) 40%, rgba(5,5,8,0.3) 60%, rgba(5,5,8,0.8) 100%), linear-gradient(0deg, rgba(5,5,8,0.95) 0%, transparent 30%); z-index: 2; transition: opacity 0.6s; }
         .map-vignette { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; box-shadow: inset 0 0 160px 20px rgba(0,0,0,0.7); }
         #mainMapUI { position: relative; z-index: 3; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; transition: opacity 0.4s ease, pointer-events 0.4s; }
@@ -554,10 +560,29 @@
         // =======================
         let mapaAtivoGlobal = "Anatólia";
         let mostrandoDicas = false;
+        function crossfadeLayer(containerId, layerClass, url) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            let layers = Array.from(container.querySelectorAll(':scope > .' + layerClass));
+            // Cria as duas camadas na primeira vez que a função é usada
+            while (layers.length < 2) {
+                const div = document.createElement('div');
+                div.className = layerClass;
+                container.insertBefore(div, container.firstChild);
+                layers.unshift(div);
+            }
+            let front = layers.find(l => l.classList.contains('active')) || layers[0];
+            let back = (front === layers[0]) ? layers[1] : layers[0];
+            back.style.backgroundImage = `url('${url}')`;
+            // Força o navegador a registrar o novo background antes de iniciar a transição de opacity,
+            // senão ele "pula" direto pro estado final sem animar.
+            void back.offsetHeight;
+            back.classList.add('active');
+            front.classList.remove('active');
+        }
         function setMapBackground(url) {
-            const bg = document.getElementById('immersiveMapBg'), blur = document.getElementById('immersiveMapBgBlur');
-            if(bg) bg.style.backgroundImage = `url('${url}')`;
-            if(blur) blur.style.backgroundImage = `url('${url}')`;
+            crossfadeLayer('immersiveMapBg', 'bg-layer-main', url);
+            crossfadeLayer('immersiveMapBgBlur', 'bg-layer-blur', url);
         }
         function toggleDicas() {
             const uiContent = document.getElementById('mainMapUI');
@@ -1533,7 +1558,7 @@
                     select.value = data.bracketSize;
                     select.style.display = 'inline-block';
                 }
-                attachHoverEvents(); calcularEloGeral(); renderFiltrosDeMapas(); initDragToScroll(); renderStreamLinks();
+                attachHoverEvents(); calcularEloGeral(); renderizarFiltrosDeMapas(); initDragToScroll(); renderStreamLinks();
             }).catch(e => {
                 if(!document.body.classList.contains('is-viewer')) gerarChave();
                 initDragToScroll();
