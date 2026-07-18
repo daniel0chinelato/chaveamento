@@ -314,7 +314,7 @@
         .modal-close:hover { color: var(--danger-color); }
         body.is-viewer .god-select-btn { pointer-events: none !important; border-style: solid !important; }
         body.is-viewer .win-toggle { display: none !important; }
-        body.is-viewer .drag-handle { display: none !important; }
+        body.is-viewer .drag-handle { visibility: hidden !important; }
         body.is-viewer .navbar .btn-save, body.is-viewer .navbar .btn-reset, body.is-viewer .navbar .btn-copy { display: none !important; }
         body.is-viewer select.map-select:not(#mapFilter) { pointer-events: none !important; appearance: none; -webkit-appearance: none; border: none; background: transparent; color: var(--accent-color); font-weight: bold; text-align: center; padding:0;}
         body.is-viewer #mapFilter { pointer-events: auto !important; appearance: auto !important; -webkit-appearance: auto !important; border: 1px solid #333 !important; background: #0a0a0d !important; padding: 4px 8px !important;}
@@ -722,7 +722,16 @@
         }
         function atualizarPainelMapas(mapaEscolhido = mapaAtivoGlobal) {
             mapaAtivoGlobal = mapaEscolhido;
-            if(mostrandoDicas) toggleDicas(); // Força fechar dica ao mudar de mapa
+            // Fecha a tela de dicas de forma DIRETA (não por toggle) sempre que o mapa muda.
+            // Antes isso dependia da variável mostrandoDicas estar em sincronia com o estado
+            // visual; se ela dessincronizasse por qualquer motivo, "fechar" virava "abrir".
+            mostrandoDicas = false;
+            const uiContentReset = document.getElementById('mainMapUI');
+            const hintContainerReset = document.getElementById('hintContainer');
+            if (uiContentReset) { uiContentReset.style.opacity = '1'; uiContentReset.style.pointerEvents = 'auto'; }
+            if (hintContainerReset) hintContainerReset.classList.remove('active');
+            const overlayReset = document.querySelector('.immersive-overlay');
+            if (overlayReset) overlayReset.style.opacity = '1';
             document.querySelectorAll('.map-thumb').forEach(t => t.classList.remove('active'));
             let activeThumb = document.getElementById('thumb-' + mapaEscolhido.replace(/\s+/g, '-'));
             if(activeThumb) {
