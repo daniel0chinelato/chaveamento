@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
     <style>
         :root {
             --bg-color: #030304;
@@ -298,6 +299,13 @@
         .map-thumb.active span { color: var(--accent-color); text-shadow: 0 1px 3px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.8); }
         /* AJUSTES DO MODO ESPECTADOR */
         body.is-viewer .admin-only, body.is-viewer .btn-advance, body.is-viewer .btn-promote { display: none !important; }
+        body:not(.is-viewer) .viewer-only { display: none !important; }
+        .btn-login { border-color: var(--accent-color); color: var(--accent-color); }
+        .btn-login:hover { background-color: var(--accent-color); color: #000; }
+        .login-field { margin-bottom: 16px; }
+        .login-field input { width: 100%; background-color: var(--panel-surface); color: var(--text-main); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 8px; box-sizing: border-box; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; }
+        .login-field input:focus { outline: none; border-color: var(--accent-color); }
+        .login-error { color: var(--danger-color); font-size: 0.8rem; margin-top: 10px; display: none; text-align: center; }
         body.is-viewer input, body.is-viewer [contenteditable="true"], body.is-viewer textarea { pointer-events: none !important; border: none !important; outline: none !important; background: transparent !important; }
         body.is-viewer .god-select-btn { pointer-events: none !important; border-style: solid !important; }
         body.is-viewer .win-toggle { display: none !important; }
@@ -344,6 +352,24 @@
         <button class="nav-btn btn-save admin-only" onclick="saveTournament()">Salvar na Nuvem <span class="loader" id="saveLoader"></span></button>
         <button class="nav-btn btn-reset admin-only" onclick="resetTournament()">Resetar</button>
         <button class="btn-copy admin-only" onclick="copiarLinkPublico(this)" title="Copiar link para os espectadores">Link Público</button>
+        <button class="nav-btn btn-login viewer-only" onclick="abrirLoginAdmin()">Login Admin</button>
+        <button class="btn-copy admin-only" onclick="sairAdmin()" title="Sair do modo admin">Sair</button>
+    </div>
+    <!-- MODAL DE LOGIN ADMIN -->
+    <div id="loginModal" class="modal-overlay" onclick="fecharLoginAdmin(event)">
+        <div class="modal-box" onclick="event.stopPropagation()" style="max-width: 340px;">
+            <h3 style="margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Login Admin</h3>
+            <div class="login-field">
+                <label>E-mail</label>
+                <input type="email" id="loginEmail" autocomplete="username">
+            </div>
+            <div class="login-field">
+                <label>Senha</label>
+                <input type="password" id="loginSenha" autocomplete="current-password" onkeydown="if(event.key==='Enter'){fazerLoginAdmin();}">
+            </div>
+            <button class="action-btn" onclick="fazerLoginAdmin()">Entrar</button>
+            <p class="login-error" id="loginErro">E-mail ou senha inválidos.</p>
+        </div>
     </div>
     <!-- PAINEL PRINCIPAL -->
     <div id="page-main" class="container page active">
@@ -498,9 +524,61 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const SENHA_ADMIN = "2milanopain6"; 
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('admin') !== SENHA_ADMIN) { document.body.classList.add('is-viewer'); }
+        const auth = firebase.auth();
+
+        // ===== CONTROLE DE ACESSO (via Firebase Authentication) =====
+        // Por padrão SEMPRE trata como visualizador. Só vira admin depois que o
+        // Firebase confirmar (de forma assíncrona e segura) que há um login válido.
+        document.body.classList.add('is-viewer');
+
+        // Seletor de todos os elementos que devem ser editáveis SOMENTE pelo admin.
+        // Usamos essa lista (em vez de confiar apenas no atributo contenteditable já
+        // presente no HTML) porque esse atributo vem junto com os dados salvos no
+        // Firebase e pode acabar carregado como "true" também na tela do visualizador.
+        const EDITABLE_SELECTOR = '.cell-nome-jogador, .cell-v, .cell-d, .p-name, .round-title';
+        function applyViewerLock() {
+            const isViewer = document.body.classList.contains('is-viewer');
+            document.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+                el.setAttribute('contenteditable', isViewer ? 'false' : 'true');
+            });
+        }
+        // Reaplica a trava sempre que o conteúdo da página mudar (ex: quando os dados
+        // chegam do Firebase e são inseridos via innerHTML), garantindo que nenhum
+        // campo fique editável para quem não está logado como admin.
+        new MutationObserver(applyViewerLock).observe(document.body, { childList: true, subtree: true });
+
+        auth.onAuthStateChanged(function(user) {
+            document.body.classList.toggle('is-viewer', !user);
+            applyViewerLock();
+        });
+
+        function abrirLoginAdmin() {
+            document.getElementById('loginErro').style.display = 'none';
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+        function fecharLoginAdmin(e) {
+            if (!e || e.target.id === 'loginModal') document.getElementById('loginModal').style.display = 'none';
+        }
+        function fazerLoginAdmin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const senha = document.getElementById('loginSenha').value;
+            const erroEl = document.getElementById('loginErro');
+            erroEl.style.display = 'none';
+            auth.signInWithEmailAndPassword(email, senha)
+                .then(() => {
+                    fecharLoginAdmin();
+                    document.getElementById('loginEmail').value = '';
+                    document.getElementById('loginSenha').value = '';
+                    showToast('Login realizado com sucesso!', 'success');
+                })
+                .catch(() => {
+                    erroEl.textContent = 'E-mail ou senha inválidos.';
+                    erroEl.style.display = 'block';
+                });
+        }
+        function sairAdmin() {
+            auth.signOut().then(() => showToast('Você saiu do modo admin.', 'success'));
+        }
         function copiarLinkPublico(btn) {
             const linkLimpo = window.location.origin + window.location.pathname;
             navigator.clipboard.writeText(linkLimpo).then(() => {
