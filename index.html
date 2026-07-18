@@ -307,6 +307,9 @@
         .login-field input:focus { outline: none; border-color: var(--accent-color); }
         .login-error { color: var(--danger-color); font-size: 0.8rem; margin-top: 10px; display: none; text-align: center; }
         body.is-viewer input, body.is-viewer [contenteditable="true"], body.is-viewer textarea { pointer-events: none !important; border: none !important; outline: none !important; background: transparent !important; }
+        body.is-viewer #loginModal input { pointer-events: auto !important; border: 1px solid var(--border-color) !important; outline: none !important; background-color: var(--panel-surface) !important; }
+        .modal-close { position: absolute; top: 14px; right: 16px; background: transparent; border: none; color: var(--text-muted); font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 4px 8px; transition: 0.3s; }
+        .modal-close:hover { color: var(--danger-color); }
         body.is-viewer .god-select-btn { pointer-events: none !important; border-style: solid !important; }
         body.is-viewer .win-toggle { display: none !important; }
         body.is-viewer .drag-handle { display: none !important; }
@@ -357,7 +360,8 @@
     </div>
     <!-- MODAL DE LOGIN ADMIN -->
     <div id="loginModal" class="modal-overlay" onclick="fecharLoginAdmin(event)">
-        <div class="modal-box" onclick="event.stopPropagation()" style="max-width: 340px;">
+        <div class="modal-box" onclick="event.stopPropagation()" style="max-width: 340px; position: relative;">
+            <button class="modal-close" onclick="fecharLoginAdmin()" title="Fechar">&times;</button>
             <h3 style="margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Login Admin</h3>
             <div class="login-field">
                 <label>E-mail</label>
