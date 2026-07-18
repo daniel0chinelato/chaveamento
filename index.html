@@ -1278,7 +1278,20 @@
                 paineisParaRemover.forEach(p => p.remove());
                 if(matchesHtml !== '') {
                     const panelHtml = `<div class="panel" id="${panelId}" style="margin-bottom: 30px;"><h3 style="margin-bottom:25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">${tituloEsperado}</h3><div class="match-list">${matchesHtml}</div></div>`;
-                    container.insertAdjacentHTML('beforeend', panelHtml);
+                    // Insere na posição correta (ordem alfabética dos grupos), não
+                    // sempre no fim: procura o primeiro painel de um grupo posterior
+                    // e insere antes dele; se não houver, aí sim vai pro final.
+                    let referencia = null;
+                    Array.from(container.children).some(el => {
+                        if (!el.classList || !el.classList.contains('panel')) return false;
+                        const card = el.querySelector('.match-card[data-group]');
+                        if (!card) return false;
+                        const outroIdx = parseInt(card.getAttribute('data-group'), 10);
+                        if (outroIdx > idx) { referencia = el; return true; }
+                        return false;
+                    });
+                    if (referencia) referencia.insertAdjacentHTML('beforebegin', panelHtml);
+                    else container.insertAdjacentHTML('beforeend', panelHtml);
                 }
             });
             renderStreamLinks();
@@ -1766,6 +1779,23 @@
                 wrapper.appendChild(btn);
             });
         }
+        // Remove painéis de confrontos duplicados para o mesmo grupo (identificado
+        // pelo data-group dos confrontos dentro dele, não por id/título — assim
+        // funciona mesmo com painéis salvos por versões antigas do sistema).
+        // Quando há mais de um painel para o mesmo grupo, mantém o último (mais recente).
+        function removerPaineisDuplicadosDeGrupo() {
+            const container = document.getElementById('matchesGroupsContainer');
+            if (!container) return;
+            const ultimoPorGrupo = new Map();
+            Array.from(container.children).forEach(el => {
+                if (!el.classList || !el.classList.contains('panel')) return;
+                const card = el.querySelector('.match-card[data-group]');
+                if (!card) return;
+                const idx = card.getAttribute('data-group');
+                if (ultimoPorGrupo.has(idx)) ultimoPorGrupo.get(idx).remove();
+                ultimoPorGrupo.set(idx, el);
+            });
+        }
         function loadTournament() {
             db.ref('tavernas_data').once('value').then((snapshot) => {
                 const data = snapshot.val();
@@ -1793,7 +1823,7 @@
                     select.value = data.bracketSize;
                     select.style.display = 'inline-block';
                 }
-                attachHoverEvents(); calcularEloGeral(); renderizarFiltrosDeMapas(); initDragToScroll(); renderStreamLinks(); garantirBotoesRecalcGrupo();
+                attachHoverEvents(); calcularEloGeral(); renderizarFiltrosDeMapas(); initDragToScroll(); renderStreamLinks(); garantirBotoesRecalcGrupo(); removerPaineisDuplicadosDeGrupo(); saveTournament();
                 hideInitialLoadOverlay();
             }).catch(e => {
                 if(!document.body.classList.contains('is-viewer')) gerarChave();
