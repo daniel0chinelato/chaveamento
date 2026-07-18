@@ -1021,8 +1021,8 @@
                 grupo.forEach(p => {
                     html += `<tr class="${p.seed ? 'seed-row' : ''}" data-player="${p.nome}" draggable="true" ondragstart="dragPlayer(event)">
                         <td class="drag-handle" title="Arraste para mover">☰</td>
-                        <td><button class="btn-promote admin-only" onclick="togglePromote(this, '${p.nome}')">Promover</button></td>
-                        <td style="text-align:left; font-weight:600;">${p.nome}</td>
+                        <td><button class="btn-promote admin-only" onclick="togglePromote(this)">Promover</button></td>
+                        <td style="text-align:left; font-weight:600;" class="cell-nome-jogador" contenteditable="true" onblur="renomeJogadorGrupo(this, ${idx})" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.blur();}">${p.nome}</td>
                         <td class="cell-v" contenteditable="true" oninput="calcPtsManual(this, ${idx})">0</td>
                         <td class="cell-d" contenteditable="true">0</td>
                         <td class="cell-pts" style="font-weight:bold; color:var(--accent-color)">0</td>
@@ -1031,14 +1031,42 @@
                 html += `</tbody></table></div>`; container.innerHTML += html;
             });
         }
-        function togglePromote(btn, nomeJogador) {
-            const row = btn.closest('tr'); row.classList.toggle('promoted');
+        function togglePromote(btn) {
+            const row = btn.closest('tr'); const nomeJogador = row.dataset.player;
+            row.classList.toggle('promoted');
             if(row.classList.contains('promoted')) {
                 btn.innerText = "Classificado"; if(!jogadoresPromovidos.includes(nomeJogador)) jogadoresPromovidos.push(nomeJogador);
             } else {
                 btn.innerText = "Promover"; jogadoresPromovidos = jogadoresPromovidos.filter(j => j !== nomeJogador);
             }
             calcularEloGeral();
+        }
+        function renomeJogadorGrupo(cell, groupIdx) {
+            const row = cell.closest('tr');
+            const oldName = row.dataset.player;
+            let newName = cell.innerText.replace(/\s+/g, ' ').trim();
+            if (!newName) { cell.innerText = oldName; return; }
+            if (newName === oldName) return;
+            row.dataset.player = newName;
+            // Mantem o botao "Promover/Classificado" e a lista de classificados em sincronia
+            const promIdx = jogadoresPromovidos.indexOf(oldName);
+            if (promIdx > -1) jogadoresPromovidos[promIdx] = newName;
+            // Atualiza os cards de confronto do grupo (nome exibido + referencia usada nas estatisticas)
+            document.querySelectorAll(`.match-card[data-group="${groupIdx}"]`).forEach(card => {
+                if (card.dataset.p1 === oldName) {
+                    card.dataset.p1 = newName;
+                    const nameEl = card.querySelector('.match-player[data-slot="p1"] .mp-name');
+                    if (nameEl) nameEl.innerText = newName;
+                }
+                if (card.dataset.p2 === oldName) {
+                    card.dataset.p2 = newName;
+                    const nameEl = card.querySelector('.match-player[data-slot="p2"] .mp-name');
+                    if (nameEl) nameEl.innerText = newName;
+                }
+            });
+            calcularEloGeral();
+            atualizarEstatisticasDoGrupo(groupIdx);
+            saveTournament();
         }
         function atualizarEstatisticasDoGrupo(groupIdx) {
             const matchCards = document.querySelectorAll(`.match-card[data-group="${groupIdx}"]`);
@@ -1121,9 +1149,9 @@
                         <div class="match-card" data-group="${idx}" data-p1="${p1Name}" data-p2="${p2Name}" data-streams='${streamsStr}'>
                             <div class="stream-controls"><button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.6rem; border-style:dashed;" onclick="addStreamLink(this)">🎥 +</button></div>
                             <div class="match-card-body">
-                                <div class="match-player"><div style="margin-bottom:5px;">${p1Name}</div><div class="draft-section" style="justify-content:center;">${banHtml1}${picksHtml1}</div></div>
+                                <div class="match-player" data-slot="p1"><div class="mp-name" style="margin-bottom:5px;">${p1Name}</div><div class="draft-section" style="justify-content:center;">${banHtml1}${picksHtml1}</div></div>
                                 <div class="match-score"><input type="number" class="score-p1 score-input" value="0"><span>X</span><input type="number" class="score-p2 score-input" value="0"></div>
-                                <div class="match-player"><div style="margin-bottom:5px;">${p2Name}</div><div class="draft-section" style="justify-content:center;">${banHtml2}${picksHtml2}</div></div>
+                                <div class="match-player" data-slot="p2"><div class="mp-name" style="margin-bottom:5px;">${p2Name}</div><div class="draft-section" style="justify-content:center;">${banHtml2}${picksHtml2}</div></div>
                             </div>
                             ${mapsHtml}
                         </div>`;
