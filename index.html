@@ -300,9 +300,32 @@
         body.is-viewer .btn-hint { pointer-events: auto !important; }
         body.is-viewer .btn-fechar-dica { pointer-events: auto !important; }
         body.is-viewer .podium-item { pointer-events: auto !important; cursor: pointer !important; }
+        /* ===== TOAST NOTIFICATIONS (substitui alert() para nao travar a UI) ===== */
+        #toastContainer { position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--panel-bg); border: 1px solid var(--border-highlight); border-left: 4px solid var(--accent-color); color: var(--text-main); padding: 14px 20px; border-radius: 8px; font-size: 0.85rem; box-shadow: 0 10px 30px rgba(0,0,0,0.6); max-width: 340px; opacity: 0; transform: translateX(20px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: auto; }
+        .toast.show { opacity: 1; transform: translateX(0); }
+        .toast.toast-error { border-left-color: var(--danger-color); }
+        .toast.toast-success { border-left-color: #4ade80; }
+        /* ===== LOADING OVERLAY (carregamento inicial dos dados da Nuvem) ===== */
+        #initialLoadOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; transition: opacity 0.4s ease; }
+        #initialLoadOverlay.hidden { opacity: 0; pointer-events: none; }
+        .load-spinner { border: 3px solid rgba(212, 175, 55, 0.15); border-top: 3px solid var(--accent-color); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        .load-label { font-family: 'Cinzel', serif; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; font-size: 0.75rem; }
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 900px) {
+            .setup-grid { grid-template-columns: 1fr !important; }
+            .map-stats-top { flex-direction: column; padding: 20px; gap: 20px; }
+            .map-podium-right { width: 100%; margin-right: 0; }
+            .groups-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
+    <div id="initialLoadOverlay">
+        <div class="load-spinner"></div>
+        <div class="load-label">Carregando dados da Taverna...</div>
+    </div>
+    <div id="toastContainer"></div>
     <div class="navbar">
         <button class="nav-btn active" onclick="switchTab('page-main', this)">Painel Principal</button>
         <button class="nav-btn" onclick="switchTab('page-matches', this)">Tavernas of Mortals</button>
@@ -511,11 +534,11 @@
         }
         function renderizarGodGrid() {
             const grid = document.getElementById('godGrid'); grid.innerHTML = '';
-            listaDeuses.forEach(deus => { grid.innerHTML += `<img src="${getGodIconPath(deus)}" class="god-grid-item" title="${deus}" onclick="selecionarDeus('${deus}', '${getGodIconPath(deus)}')">`; });
+            listaDeuses.forEach(deus => { grid.innerHTML += `<img src="${getGodIconPath(deus)}" class="god-grid-item" title="${deus}" alt="${deus}" onclick="selecionarDeus('${deus}', '${getGodIconPath(deus)}')">`; });
         }
         function renderizarGodsTable() {
             const tbody = document.getElementById('godsTable'); if(!tbody) return;
-            tbody.innerHTML = listaDeuses.map(g => `<tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="${getGodIconPath(g)}" class="god-icon" onerror="this.style.display='none'"><span>${g}</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>`).join('');
+            tbody.innerHTML = listaDeuses.map(g => `<tr class="god-row" data-v="0" data-wr="0" data-j="0" data-b="0"><td style="text-align:left"><div style="display:flex; align-items:center; gap:8px;"><img src="${getGodIconPath(g)}" class="god-icon" alt="${g}" onerror="this.style.display='none'"><span>${g}</span></div></td><td><input type="number" value="0" class="stat-input"></td><td><input type="number" value="0" class="stat-input"></td><td class="g-d">0</td><td class="g-b" style="color:var(--danger-color); font-weight:bold;">0</td><td class="g-w" style="font-weight:bold; color:var(--accent-color);">0%</td></tr>`).join('');
         }
         renderizarGodsTable();
         function renderizarFiltrosDeMapas() {
@@ -726,7 +749,7 @@
                     othersHtml += `
                     <div class="mini-stat-card">
                         <span class="pos">${i+1}º</span>
-                        <img src="${getGodIconPath(g)}">
+                        <img src="${getGodIconPath(g)}" alt="${g}">
                         <span style="color:#fff; font-size:0.75rem; font-weight:bold;">${g}</span>
                         <span class="wr">${wr}%</span>
                     </div>`;
@@ -965,7 +988,7 @@
             const regulars = document.getElementById('regularsInput').value.split('\n').filter(n => n.trim() !== '');
             const pPerGroup = parseInt(document.getElementById('playersPerGroup').value);
             const totalJogadores = seeds.length + regulars.length;
-            if (totalJogadores < 2) return alert("Insira os jogadores!");
+            if (totalJogadores < 2) { showToast("Insira os jogadores!", 'error'); return; }
             const numG = Math.ceil(totalJogadores / pPerGroup);
             shuffle(seeds); shuffle(regulars);
             const grupos = Array.from({ length: numG }, () => []);
@@ -1128,7 +1151,7 @@
             if(changed) saveTournament();
         }
         function puxarPromovidos() {
-            if(jogadoresPromovidos.length === 0) return alert("Nenhum jogador classificado! Vá na tabela de grupos e clique em 'Promover' nos jogadores que passaram.");
+            if(jogadoresPromovidos.length === 0) { showToast("Nenhum jogador classificado! Vá na tabela de grupos e clique em 'Promover' nos jogadores que passaram.", 'error', 6000); return; }
             let copia = [...jogadoresPromovidos]; shuffle(copia); 
             let neededSize = 2;
             while(neededSize < copia.length) neededSize *= 2;
@@ -1505,10 +1528,37 @@
                 console.error("Erro no ELO:", error);
             }
         }
+        // ===== TOAST NOTIFICATIONS =====
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('toastContainer');
+            if (!container) { console.log(message); return; }
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+        function hideInitialLoadOverlay() {
+            const overlay = document.getElementById('initialLoadOverlay');
+            if (overlay) { overlay.classList.add('hidden'); setTimeout(() => overlay.remove(), 500); }
+        }
+        // ===== SALVAMENTO COM DEBOUNCE =====
+        // Evita disparar uma escrita no Firebase a cada clique/alteração rápida:
+        // o loader some visualmente na hora, mas a escrita real só acontece
+        // ~600ms depois da última chamada (agrupa várias ações em uma única gravação).
+        let _saveDebounceTimer = null;
         function saveTournament() {
-            if(document.body.classList.contains('is-viewer')) return; 
+            if(document.body.classList.contains('is-viewer')) return;
             const btnSave = document.getElementById('saveLoader');
             if(btnSave) btnSave.style.display = 'inline-block';
+            clearTimeout(_saveDebounceTimer);
+            _saveDebounceTimer = setTimeout(() => { executeSaveTournament(btnSave); }, 600);
+        }
+        function executeSaveTournament(btnSave) {
             try {
                 document.querySelectorAll('input:not(.score-input)').forEach(input => input.setAttribute('value', input.value));
                 document.querySelectorAll('.score-input').forEach(input => input.setAttribute('value', input.value));
@@ -1528,13 +1578,13 @@
                 };
                 db.ref('tavernas_data').set(data)
                   .then(() => { if(btnSave) btnSave.style.display = 'none'; })
-                  .catch((e) => { if(btnSave) btnSave.style.display = 'none'; alert("Erro Firebase: " + e.message); });
-            } catch(e) { if(btnSave) btnSave.style.display = 'none'; alert("Erro interno: " + e.message); }
+                  .catch((e) => { if(btnSave) btnSave.style.display = 'none'; showToast("Erro ao salvar na Nuvem: " + e.message, 'error'); });
+            } catch(e) { if(btnSave) btnSave.style.display = 'none'; showToast("Erro interno ao salvar: " + e.message, 'error'); }
         }
         function loadTournament() {
             db.ref('tavernas_data').once('value').then((snapshot) => {
                 const data = snapshot.val();
-                if (!data) { if(!document.body.classList.contains('is-viewer')) gerarChave(); initDragToScroll(); return; }
+                if (!data) { if(!document.body.classList.contains('is-viewer')) gerarChave(); initDragToScroll(); hideInitialLoadOverlay(); return; }
                 if(data.seeds) document.getElementById('seedsInput').value = data.seeds; 
                 if(data.regulars) document.getElementById('regularsInput').value = data.regulars;
                 if(data.playersPerGroup) document.getElementById('playersPerGroup').value = data.playersPerGroup;
@@ -1559,9 +1609,12 @@
                     select.style.display = 'inline-block';
                 }
                 attachHoverEvents(); calcularEloGeral(); renderizarFiltrosDeMapas(); initDragToScroll(); renderStreamLinks();
+                hideInitialLoadOverlay();
             }).catch(e => {
                 if(!document.body.classList.contains('is-viewer')) gerarChave();
                 initDragToScroll();
+                showToast("Não foi possível carregar os dados salvos, iniciando um torneio novo.", 'error');
+                hideInitialLoadOverlay();
             });
         }
         function resetTournament() {
@@ -1569,7 +1622,12 @@
                 db.ref('tavernas_data').remove().then(() => { location.reload(); });
             }
         }
-        window.onload = () => { renderizarGodGrid(); renderizarFiltrosDeMapas(); loadTournament(); };
+        // ===== PRÉ-CARREGAMENTO DAS IMAGENS DOS MAPAS =====
+        // Evita qualquer "pop"/atraso no crossfade quando o usuário troca de mapa rapidamente.
+        function preloadMapImages() {
+            Object.values(mapaImagens).forEach(url => { const img = new Image(); img.src = url; });
+        }
+        window.onload = () => { renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); };
     </script>
 </body>
 </html>
