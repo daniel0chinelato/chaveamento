@@ -128,6 +128,12 @@
         .match-num-badge { position: absolute; right: -13px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border-radius: 50%; background: #1c1c1c; border: 1px solid #444; color: #999; font-size: 0.6rem; font-weight: 700; display: flex; align-items: center; justify-content: center; z-index: 6; font-family: 'Montserrat', sans-serif; }
         .bracket-round:last-child .match-num-badge { display: none; }
         .seed-num { color: #666; font-size: 0.65rem; font-weight: 700; min-width: 14px; text-align: right; margin-right: 6px; font-family: 'Montserrat', sans-serif; flex-shrink: 0; }
+        .bracket-round.round-idle { opacity: 0.3; filter: grayscale(0.7) brightness(0.75); transition: opacity 0.3s ease, filter 0.3s ease; }
+        .bracket-round.round-idle:hover { opacity: 0.85; filter: grayscale(0.15) brightness(1); }
+        .bracket-round.round-skipped { opacity: 0.18; max-width: 70px; overflow: hidden; transition: opacity 0.3s ease, max-width 0.3s ease; }
+        .bracket-round.round-skipped:hover { opacity: 0.7; max-width: 260px; }
+        .bracket-container.container-idle { opacity: 0.32; filter: grayscale(0.65) brightness(0.8); transition: opacity 0.3s ease, filter 0.3s ease; }
+        .bracket-container.container-idle:hover { opacity: 0.9; filter: grayscale(0.1) brightness(1); }
         .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: center; width: 80%; }
         .viewer-stream-link { 
             --live-color: #ff4d4d; display: flex; align-items: center; justify-content: center; gap: 5px; 
@@ -1319,6 +1325,38 @@
             if (crossM < 0 || isNaN(crossM)) crossM = m;
             return `L${lRound + 1}-M${crossM + 1}`;
         }
+        // Deixa discretas: (1) rodadas 100% resolvidas por BYE (ninguém jogou ali de
+        // verdade), (2) rodadas dos vencedores ainda não alcançadas (futuras) e
+        // (3) a repescagem inteira, enquanto nenhum confronto real aconteceu nela.
+        // Passar o mouse revela normalmente. Não mexe em nenhum dado, só classes CSS.
+        function atualizarFocoChave() {
+            const roundsWinners = Array.from(document.querySelectorAll('#winnersBracketDisplay .bracket-round'));
+            const roundsLosers = Array.from(document.querySelectorAll('#losersBracketDisplay .bracket-round'));
+            [...roundsWinners, ...roundsLosers].forEach(round => {
+                const matches = round.querySelectorAll('.b-match');
+                const temPartida = matches.length > 0;
+                const todasBye = temPartida && Array.from(matches).every(m => m.classList.contains('is-bye'));
+                round.classList.toggle('round-skipped', todasBye);
+                if (todasBye) round.classList.remove('round-idle');
+            });
+            let idxAtual = roundsWinners.findIndex(round =>
+                !round.classList.contains('round-skipped') &&
+                Array.from(round.querySelectorAll('.b-match:not(.is-bye)')).some(m => !m.querySelector('.winner-slot'))
+            );
+            if (idxAtual === -1) idxAtual = roundsWinners.length - 1;
+            roundsWinners.forEach((round, i) => {
+                if (round.classList.contains('round-skipped')) return;
+                round.classList.toggle('round-idle', i > idxAtual);
+            });
+            const lContainer = document.getElementById('losersBracketDisplay');
+            if (lContainer) {
+                const temUso = Array.from(lContainer.querySelectorAll('.b-match')).some(m =>
+                    m.querySelector('.winner-slot') ||
+                    (!m.classList.contains('is-bye') && Array.from(m.querySelectorAll('.p-name')).some(n => n.textContent.trim() !== 'TBD'))
+                );
+                lContainer.classList.toggle('container-idle', !temUso);
+            }
+        }
         function processByes() {
             let changed = false;
             document.querySelectorAll('.b-match:not(.bye-processed)').forEach(match => {
@@ -1338,6 +1376,7 @@
                 }
             });
             if(changed) saveTournament();
+            atualizarFocoChave();
         }
         // Gera a ordem de posições de uma chave com seed profissional (1x16, 8x9, 4x13, 5x12...).
         // Isso garante que os melhores colocados só se encontrem nas fases finais.
@@ -1876,6 +1915,7 @@
                 if(data.winnersDisplay) document.getElementById('winnersBracketDisplay').innerHTML = data.winnersDisplay;
                 if(data.losersDisplay) document.getElementById('losersBracketDisplay').innerHTML = data.losersDisplay;
                 if(data.finalsDisplay) document.getElementById('grandFinalsDisplay').innerHTML = data.finalsDisplay;
+                atualizarFocoChave();
                 jogadoresPromovidos = data.promotedList || [];
                 if(data.bracketSize) {
                     let select = document.getElementById('bracketSize');
