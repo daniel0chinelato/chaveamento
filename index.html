@@ -128,12 +128,12 @@
         .match-num-badge { position: absolute; right: -13px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border-radius: 50%; background: #1c1c1c; border: 1px solid #444; color: #999; font-size: 0.6rem; font-weight: 700; display: flex; align-items: center; justify-content: center; z-index: 6; font-family: 'Montserrat', sans-serif; }
         .bracket-round:last-child .match-num-badge { display: none; }
         .seed-num { color: #666; font-size: 0.65rem; font-weight: 700; min-width: 14px; text-align: right; margin-right: 6px; font-family: 'Montserrat', sans-serif; flex-shrink: 0; }
-        .bracket-round.round-idle { opacity: 0.3; filter: grayscale(0.7) brightness(0.75); transition: opacity 0.3s ease, filter 0.3s ease; }
-        .bracket-round.round-idle:hover { opacity: 0.85; filter: grayscale(0.15) brightness(1); }
-        .bracket-round.round-skipped { opacity: 0.18; max-width: 70px; overflow: hidden; transition: opacity 0.3s ease, max-width 0.3s ease; }
-        .bracket-round.round-skipped:hover { opacity: 0.7; max-width: 260px; }
-        .bracket-container.container-idle { opacity: 0.32; filter: grayscale(0.65) brightness(0.8); transition: opacity 0.3s ease, filter 0.3s ease; }
-        .bracket-container.container-idle:hover { opacity: 0.9; filter: grayscale(0.1) brightness(1); }
+        .bracket-round.round-idle { opacity: 0.22; filter: grayscale(0.85) brightness(0.45); transition: opacity 0.3s ease, filter 0.3s ease; }
+        .bracket-round.round-idle:hover { opacity: 0.9; filter: grayscale(0.1) brightness(1); }
+        .bracket-round.round-skipped { max-width: 0 !important; min-width: 0 !important; padding: 0 !important; margin: 0 !important; opacity: 0; overflow: hidden; pointer-events: none; transition: max-width 0.3s ease, opacity 0.2s ease, padding 0.3s ease; }
+        .bracket-container.container-idle { min-height: 70px; align-items: center; justify-content: center; border: 1px dashed #2a2a2a; border-radius: 10px; background: rgba(255,255,255,0.01); overflow: visible; }
+        .bracket-container.container-idle .bracket-round { display: none; }
+        .bracket-container.container-idle::after { content: '⚔ Repescagem — aguardando os primeiros resultados'; color: #555; font-family: 'Cinzel', serif; letter-spacing: 2px; text-transform: uppercase; font-size: 0.7rem; }
         .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: center; width: 80%; }
         .viewer-stream-link { 
             --live-color: #ff4d4d; display: flex; align-items: center; justify-content: center; gap: 5px; 
