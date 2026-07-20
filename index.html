@@ -1339,26 +1339,37 @@
             });
             if(changed) saveTournament();
         }
+        // Gera a ordem de posições de uma chave com seed profissional (1x16, 8x9, 4x13, 5x12...).
+        // Isso garante que os melhores colocados só se encontrem nas fases finais.
+        function gerarOrdemSeeds(n) {
+            let seeds = [1];
+            while (seeds.length < n) {
+                const l = seeds.length * 2;
+                const novo = [];
+                seeds.forEach(s => { novo.push(s); novo.push(l + 1 - s); });
+                seeds = novo;
+            }
+            return seeds;
+        }
         function puxarPromovidos() {
             if(jogadoresPromovidos.length === 0) { showToast("Nenhum jogador classificado! Vá na tabela de grupos e clique em 'Promover' nos jogadores que passaram.", 'error', 6000); return; }
-            let copia = [...jogadoresPromovidos]; shuffle(copia); 
+            // Seed 1 = melhor colocado. Usa a pontuação da fase de grupos; empates são
+            // desfeitos aleatoriamente (sorteados antes de ordenar).
+            const pontosPorJogador = {};
+            document.querySelectorAll('[id^="tbody-grupo-"] tr[data-player]').forEach(tr => {
+                pontosPorJogador[tr.dataset.player] = parseInt(tr.querySelector('.cell-pts')?.textContent, 10) || 0;
+            });
+            let copia = [...jogadoresPromovidos];
+            shuffle(copia);
+            copia.sort((a, b) => (pontosPorJogador[b] || 0) - (pontosPorJogador[a] || 0));
             let neededSize = 2;
             while(neededSize < copia.length) neededSize *= 2;
-            let matchPairs = Array.from({length: neededSize/2}, () => ["TBD", "TBD"]);
-            let byesToAssign = neededSize - copia.length;
-            let step = Math.max(1, Math.floor((neededSize/2) / (byesToAssign || 1)));
-            for(let i=0; i<byesToAssign; i++) {
-                let matchIdx = (i * step) % (neededSize/2);
-                while(matchPairs[matchIdx][1] === "BYE") matchIdx = (matchIdx + 1) % (neededSize/2);
-                matchPairs[matchIdx][1] = "BYE";
-            }
-            let pIdx = 0;
-            for(let i=0; i<neededSize/2; i++) {
-                if(matchPairs[i][0] === "TBD" && pIdx < copia.length) matchPairs[i][0] = copia[pIdx++];
-                if(matchPairs[i][1] === "TBD" && pIdx < copia.length) matchPairs[i][1] = copia[pIdx++];
-            }
-            let finalArray = [];
-            matchPairs.forEach(pair => finalArray.push(pair[0], pair[1]));
+            // Seeds excedentes (sem jogador) viram BYE. Por convenção, ficam nos seeds
+            // mais fracos (números mais altos), então os melhores seeds avançam de graça.
+            let porSeed = new Array(neededSize).fill("BYE");
+            for(let i=0; i<copia.length; i++) porSeed[i] = copia[i];
+            const ordemSeeds = gerarOrdemSeeds(neededSize);
+            let finalArray = ordemSeeds.map(seedNum => porSeed[seedNum - 1]);
             let select = document.getElementById('bracketSize');
             let optionExists = Array.from(select.options).some(opt => parseInt(opt.value) === neededSize);
             if (!optionExists) {
@@ -1370,6 +1381,37 @@
             select.style.display = 'inline-block'; 
             gerarChave(finalArray);
             setTimeout(processByes, 200); 
+        }
+        // Arrastar-e-soltar na chave do mata-mata: troca os NOMES (e seed, se ambos tiverem)
+        // entre dois slots. Não mexe em placar, bans, picks ou estrutura da chave.
+        let bracketDragSource = null;
+        function dragStartBracketPlayer(e) {
+            const bPlayer = e.target.closest('.b-player');
+            if (!bPlayer) return;
+            bracketDragSource = bPlayer;
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        function dropBracketPlayer(e) {
+            e.preventDefault();
+            const targetPlayer = e.currentTarget;
+            if (!bracketDragSource || !targetPlayer || targetPlayer === bracketDragSource) { bracketDragSource = null; return; }
+            const nameA = bracketDragSource.querySelector('.p-name');
+            const nameB = targetPlayer.querySelector('.p-name');
+            if (nameA && nameB) {
+                const tmpName = nameA.textContent;
+                nameA.textContent = nameB.textContent;
+                nameB.textContent = tmpName;
+            }
+            const seedA = bracketDragSource.querySelector('.seed-num');
+            const seedB = targetPlayer.querySelector('.seed-num');
+            if (seedA && seedB) {
+                const tmpSeed = seedA.textContent;
+                seedA.textContent = seedB.textContent;
+                seedB.textContent = tmpSeed;
+            }
+            calcularEloGeral();
+            saveTournament();
+            bracketDragSource = null;
         }
         function gerarSlotHtml(pName, idx, maxSlots, matchId, seedNum = null) {
             let godBtns = '';
@@ -1392,8 +1434,9 @@
             const isPlaceholder = pName.startsWith("Perd.") || pName.startsWith("Venc.");
             const seedHtml = seedNum ? `<span class="seed-num">${seedNum}</span>` : '';
             return `
-            <div class="b-player ${pName === 'BYE' ? 'is-empty' : ''}" data-slot="${idx}">
+            <div class="b-player ${pName === 'BYE' ? 'is-empty' : ''}" data-slot="${idx}" ondrop="dropBracketPlayer(event)" ondragover="allowDropPlayer(event)">
                 <div class="b-player-info">
+                    <span class="drag-handle bracket-drag-handle admin-only" draggable="true" title="Arraste para trocar de posição" ondragstart="dragStartBracketPlayer(event)" style="font-size:0.8rem; margin-right:4px;">⠿</span>
                     ${seedHtml}
                     <span class="p-name ${isPlaceholder ? 'p-placeholder' : ''}" contenteditable="true" oninput="calcularEloGeral()">${pName}</span>
                     <div class="placar-mata-wrapper">
