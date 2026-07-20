@@ -125,6 +125,9 @@
         .format-badge, .id-badge { background: #111; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.55rem; padding: 2px 6px; border-radius: 6px; letter-spacing: 1px; font-weight: bold; }
         .format-badge { border-color: var(--accent-color); color: var(--accent-color); background: rgba(212, 175, 55, 0.1); }
         .id-badge { border-color: #555; color: #bbb; background: #050505; font-family: monospace; }
+        .match-num-badge { position: absolute; right: -13px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border-radius: 50%; background: #1c1c1c; border: 1px solid #444; color: #999; font-size: 0.6rem; font-weight: 700; display: flex; align-items: center; justify-content: center; z-index: 6; font-family: 'Montserrat', sans-serif; }
+        .bracket-round:last-child .match-num-badge { display: none; }
+        .seed-num { color: #666; font-size: 0.65rem; font-weight: 700; min-width: 14px; text-align: right; margin-right: 6px; font-family: 'Montserrat', sans-serif; flex-shrink: 0; }
         .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: center; width: 80%; }
         .viewer-stream-link { 
             --live-color: #ff4d4d; display: flex; align-items: center; justify-content: center; gap: 5px; 
@@ -151,10 +154,10 @@
         /* Sem overflow:hidden para os emblemas vazarem corretamente */
         .b-match { background: var(--panel-surface); border: 1px solid var(--border-color); border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; flex-direction: column; position: relative; z-index: 5; transition: all 0.2s ease; width: 100%; margin: 0; padding-top: 10px;}
         /* CONEXÕES LÓGICAS */
-        .bracket-round:not(:first-child) .match-wrapper::before { content: ''; position: absolute; left: -20px; top: 50%; width: 20px; height: 2px; background-color: #444; z-index: 1; transform: translateY(-50%); }
-        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(odd):not(:only-of-type)::after { content: ''; position: absolute; right: -20px; top: 50%; width: 20px; height: 50%; border-top: 2px solid #444; border-right: 2px solid #444; border-radius: 0 4px 0 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
-        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(even):not(:only-of-type)::after { content: ''; position: absolute; right: -20px; bottom: 50%; width: 20px; height: 50%; border-bottom: 2px solid #444; border-right: 2px solid #444; border-radius: 0 0 4px 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
-        .bracket-round:not(:last-child) .match-wrapper:only-of-type::after { content: ''; position: absolute; right: -20px; top: 50%; width: 20px; height: 2px; background-color: #444; z-index: 1; transform: translateY(-50%); }
+        .bracket-round:not(:first-child) .match-wrapper::before { content: ''; position: absolute; left: -20px; top: 50%; width: 20px; height: 1px; background-color: #3a3a3a; z-index: 1; transform: translateY(-50%); }
+        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(odd):not(:only-of-type)::after { content: ''; position: absolute; right: -20px; top: 50%; width: 20px; height: 50%; border-top: 1px solid #3a3a3a; border-right: 1px solid #3a3a3a; border-radius: 0 4px 0 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
+        .bracket-round:not(:last-child) .match-wrapper:nth-of-type(even):not(:only-of-type)::after { content: ''; position: absolute; right: -20px; bottom: 50%; width: 20px; height: 50%; border-bottom: 1px solid #3a3a3a; border-right: 1px solid #3a3a3a; border-radius: 0 0 4px 0; transition: 0.3s; z-index: 1; box-sizing: border-box; }
+        .bracket-round:not(:last-child) .match-wrapper:only-of-type::after { content: ''; position: absolute; right: -20px; top: 50%; width: 20px; height: 1px; background-color: #3a3a3a; z-index: 1; transform: translateY(-50%); }
         /* BYE INTELIGENTE */
         .b-match.is-bye { background: transparent !important; border: 1px dashed rgba(255,255,255,0.1) !important; box-shadow: none !important; opacity: 0.4; }
         .b-match.is-bye:hover { transform: none; box-shadow: none; border-color: rgba(255,255,255,0.2) !important; }
@@ -175,7 +178,7 @@
         .b-player { padding: 6px 10px; display: flex; flex-direction: column; align-items: stretch; gap: 4px; transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .b-player:last-child { border-bottom: none; }
         .b-player-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .p-name { font-weight: 600; font-size: 0.75rem; letter-spacing: 0.5px; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .p-name { font-weight: 600; font-size: 0.75rem; letter-spacing: 0.5px; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0;}
         .p-placeholder { color: #888; font-style: italic; font-weight: 400; font-size: 0.6rem; }
         .b-player.winner-slot { background: linear-gradient(90deg, rgba(212, 175, 55, 0.1), transparent); border-left: 2px solid var(--accent-color); }
         .b-player.winner-slot .p-name { color: var(--accent-color); }
@@ -1368,7 +1371,7 @@
             gerarChave(finalArray);
             setTimeout(processByes, 200); 
         }
-        function gerarSlotHtml(pName, idx, maxSlots, matchId) {
+        function gerarSlotHtml(pName, idx, maxSlots, matchId, seedNum = null) {
             let godBtns = '';
             for(let i=0; i<maxSlots; i++) {
                 godBtns += `<div class="god-slot-wrapper pick-slot-wrapper">
@@ -1387,9 +1390,11 @@
                 <span class="ban-label" style="font-size:0.35rem;">BANS</span>
             </div>`;
             const isPlaceholder = pName.startsWith("Perd.") || pName.startsWith("Venc.");
+            const seedHtml = seedNum ? `<span class="seed-num">${seedNum}</span>` : '';
             return `
             <div class="b-player ${pName === 'BYE' ? 'is-empty' : ''}" data-slot="${idx}">
                 <div class="b-player-info">
+                    ${seedHtml}
                     <span class="p-name ${isPlaceholder ? 'p-placeholder' : ''}" contenteditable="true" oninput="calcularEloGeral()">${pName}</span>
                     <div class="placar-mata-wrapper">
                         <button class="btn-advance admin-only" title="Avançar Vencedor" onclick="avancarWinner(this, ${idx})">W</button>
@@ -1406,6 +1411,8 @@
             const lContainer = document.getElementById('losersBracketDisplay');
             const fContainer = document.getElementById('grandFinalsDisplay');
             wContainer.innerHTML = ''; lContainer.innerHTML = ''; fContainer.innerHTML = '';
+            let contadorPartidas = 0; // numeração sequencial visual das partidas (como em brackets profissionais)
+            let seedCounter = 0; // numeração visual dos jogadores na 1ª rodada (ordem de entrada na chave)
             let roundsW = Math.log2(size);
             // --- WINNERS BRACKET ---
             for(let i=0; i < roundsW; i++) {
@@ -1416,9 +1423,13 @@
                 roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true" onblur="saveTournament()">${title}</h4>`;
                 for(let j=0; j < matchesNum; j++) {
                     let p1 = "TBD", p2 = "TBD";
+                    let seed1 = null, seed2 = null;
                     if (i === 0 && jogadoresIniciais.length > 0) {
                         p1 = jogadoresIniciais.shift() || "TBD"; p2 = jogadoresIniciais.shift() || "TBD";
+                        if (p1 && p1 !== "TBD" && p1 !== "BYE") seed1 = ++seedCounter;
+                        if (p2 && p2 !== "TBD" && p2 !== "BYE") seed2 = ++seedCounter;
                     }
+                    contadorPartidas++;
                     const mId = `w_${i}_${j}`;
                     const matchDisplayId = `W${i+1}-M${j+1}`;
                     const destText = getLoserDestinationText(i, j, size);
@@ -1435,11 +1446,12 @@
                                 <span class="id-badge">${matchDisplayId}</span>
                             </div>
                             <div class="b-match" data-bracket="W" data-round="${i}" data-match="${j}" data-drop-r="${dropR}" data-drop-m="${crossM}">
+                                <span class="match-num-badge" title="Partida Nº">${contadorPartidas}</span>
                                 <div class="stream-controls" style="top: 6px; right: 6px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                     <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 4px; font-size: 0.5rem; background:rgba(0,0,0,0.5); border-color:#555;" onclick="addStreamLink(this)">🎥 +</button>
                                 </div>
-                                ${gerarSlotHtml(p1, 0, slots, mId)}
-                                ${gerarSlotHtml(p2, 1, slots, mId)}
+                                ${gerarSlotHtml(p1, 0, slots, mId, seed1)}
+                                ${gerarSlotHtml(p2, 1, slots, mId, seed2)}
                                 ${mapsHtml}
                                 <div class="loser-drop-label">⬇ CAI P/ ${destText}</div>
                             </div>
@@ -1457,6 +1469,7 @@
                 let isBo5 = i >= roundsL - 2; let slots = isBo5 ? 5 : 3;
                 roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true" onblur="saveTournament()">${title}</h4>`;
                 for(let j=0; j < matchesNum; j++) {
+                    contadorPartidas++;
                     const mId = `l_${i}_${j}`;
                     const matchDisplayId = `L${i+1}-M${j+1}`;
                     let mapsHtml = `<div class="map-row" style="background:transparent; border-top:1px solid rgba(255,255,255,0.03);">`;
@@ -1469,6 +1482,7 @@
                                 <span class="id-badge">${matchDisplayId}</span>
                             </div>
                             <div class="b-match" data-bracket="L" data-round="${i}" data-match="${j}">
+                                <span class="match-num-badge" title="Partida Nº">${contadorPartidas}</span>
                                 <div class="stream-controls" style="top: 6px; right: 6px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                     <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 4px; font-size: 0.5rem; background:rgba(0,0,0,0.5); border-color:#555;" onclick="addStreamLink(this)">🎥 +</button>
                                 </div>
