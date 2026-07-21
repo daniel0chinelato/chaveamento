@@ -87,6 +87,13 @@
         .trophy-card.trophy-empty { border-color: var(--border-color); opacity: 0.45; }
         .trophy-card.trophy-empty .trophy-icon { filter: none; opacity: 0.5; }
         .trophy-card.trophy-empty .trophy-champion-label { visibility: hidden; }
+        .trophy-champion-photo { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-color); box-shadow: 0 0 25px var(--accent-glow); margin-bottom: 14px; position: relative; }
+        .trophy-edit-btn { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); border: 1px solid var(--border-color); color: var(--text-muted); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 0.8rem; transition: 0.2s; z-index: 2; }
+        .trophy-edit-btn:hover { color: var(--accent-color); border-color: var(--accent-color); }
+        .trophy-add-card { background: transparent; border: 2px dashed var(--border-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: inherit; }
+        .trophy-add-card:hover { border-color: var(--accent-color); }
+        .trophy-add-card:hover .trophy-icon, .trophy-add-card:hover .trophy-tournament-name { color: var(--accent-color); opacity: 1; }
+        .trophy-add-card .trophy-icon { font-size: 2.5rem; opacity: 0.5; margin-bottom: 8px; filter: none; }
         .nav-btn {
             background: transparent; border: 1px solid var(--border-color); color: var(--text-muted);
             padding: 8px 20px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
@@ -578,24 +585,36 @@
         <div class="header-container"><img src="header.png" alt="K.M.P.S" class="header-image" onerror="this.style.display='none'"></div>
         <h1 style="text-align:center; margin-top: 10px;">🏆 Sala de Troféus</h1>
         <p style="text-align:center; color: var(--text-muted); margin-bottom: 40px; letter-spacing: 1px;">O hall da fama do K.M.P.S — celebrando os campeões de cada era.</p>
-        <div class="trophy-grid">
-            <div class="trophy-card trophy-pending" id="trophyCardAtual">
-                <div class="trophy-card-glow"></div>
-                <div class="trophy-icon">🏆</div>
-                <div class="trophy-tournament-name">Tavernas of Demigods &amp; Titans</div>
-                <div class="trophy-champion-label">Campeão</div>
-                <div class="trophy-champion-name" id="trophyChampionName">Torneio em andamento...</div>
+        <div class="trophy-grid" id="trophyGrid"></div>
+    </div>
+    <!-- MODAL: ADICIONAR / EDITAR CAMPEONATO -->
+    <div id="campeonatoModal" class="modal-overlay" onclick="fecharModalCampeonato(event)">
+        <div class="modal-box" onclick="event.stopPropagation()" style="max-width: 420px; position: relative;">
+            <button class="modal-close" onclick="fecharModalCampeonato()" title="Fechar">&times;</button>
+            <h3 style="margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;" id="campeonatoModalTitulo">Adicionar Campeonato</h3>
+            <input type="hidden" id="campeonatoEditId" value="">
+            <div class="login-field">
+                <label>Nome do Campeonato</label>
+                <input type="text" id="campeonatoNome" placeholder="Ex: Briga de Bar">
             </div>
-            <div class="trophy-card trophy-empty">
-                <div class="trophy-icon">🔒</div>
-                <div class="trophy-tournament-name">Próxima Era</div>
-                <div class="trophy-champion-label">Em breve</div>
+            <div class="login-field">
+                <label>Status</label>
+                <select id="campeonatoStatus" onchange="atualizarCamposStatusModal()" style="width:100%; padding:10px; background:#111; border:1px solid var(--border-color); color:var(--text-main); border-radius:6px; font-family:'Montserrat',sans-serif;">
+                    <option value="finalizado">Finalizado</option>
+                    <option value="andamento">Em andamento</option>
+                </select>
             </div>
-            <div class="trophy-card trophy-empty">
-                <div class="trophy-icon">🔒</div>
-                <div class="trophy-tournament-name">Próxima Era</div>
-                <div class="trophy-champion-label">Em breve</div>
+            <div class="login-field" id="campoCampeaoNome">
+                <label>Nome do Campeão</label>
+                <input type="text" id="campeonatoCampeao" placeholder="Ex: NomeDoJogador">
             </div>
+            <div class="login-field" id="campoCampeaoImagem">
+                <label>Foto do Campeão (segurando o troféu)</label>
+                <input type="file" id="campeonatoImagemInput" accept="image/*" onchange="preVisualizarImagemCampeonato(event)" style="width:100%; color: var(--text-muted); font-size: 0.75rem;">
+                <img id="campeonatoImagemPreview" style="max-width:100%; max-height:180px; object-fit:cover; border-radius:8px; margin-top:10px; display:none; border: 1px solid var(--border-color);">
+            </div>
+            <button class="action-btn" onclick="salvarCampeonato()">Salvar Campeonato</button>
+            <button class="action-btn" id="btnExcluirCampeonato" style="background:transparent; border:1px solid #ff4d4d; color:#ff4d4d; margin-top:8px; display:none;" onclick="excluirCampeonatoAtual()">Excluir Campeonato</button>
         </div>
     </div>
     <!-- TAVERNAS OF MORTALS (GRUPOS) -->
@@ -795,6 +814,7 @@
         // =======================
         let mapaAtivoGlobal = "Anatólia";
         let mostrandoDicas = false;
+        let campeonatosArquivados = [];
         function crossfadeLayer(containerId, layerClass, url) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -1239,23 +1259,119 @@
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.navbar .nav-btn:not(.btn-save):not(.btn-reset):not(.btn-copy)').forEach(b => b.classList.remove('active'));
             document.getElementById('page-trophy').classList.add('active');
-            atualizarSalaDeTrofeus();
+            renderizarSalaDeTrofeus();
             fecharMenuLateral();
         }
-        // Detecta automaticamente o campeão olhando o vencedor da Grande Final já resolvida
-        function atualizarSalaDeTrofeus() {
+        // Monta a grade de troféus: o torneio ATUAL do site (detectado automaticamente pela Grande Final)
+        // + os campeonatos arquivados manualmente, sempre com os finalizados aparecendo primeiro.
+        function renderizarSalaDeTrofeus() {
+            const grid = document.getElementById('trophyGrid');
+            if(!grid) return;
+            const isViewer = document.body.classList.contains('is-viewer');
             const finais = document.getElementById('grandFinalsDisplay');
             const campeaoEl = finais ? finais.querySelector('.winner-slot .p-name') : null;
-            const nome = campeaoEl ? campeaoEl.textContent.trim() : '';
-            const card = document.getElementById('trophyCardAtual'), nomeEl = document.getElementById('trophyChampionName');
-            if(!card || !nomeEl) return;
-            if(nome && nome !== 'TBD' && nome !== '') {
-                nomeEl.textContent = '👑 ' + nome;
-                card.classList.remove('trophy-pending');
+            const nomeAtual = campeaoEl ? campeaoEl.textContent.trim() : '';
+            const statusAtual = (nomeAtual && nomeAtual !== 'TBD' && nomeAtual !== '') ? 'finalizado' : 'andamento';
+            const cardAtual = { id: '__atual__', nome: 'Tavernas of Demigods & Titans', status: statusAtual, campeao: nomeAtual, imagem: '', live: true };
+            const todos = [cardAtual, ...campeonatosArquivados];
+            const ordem = { finalizado: 0, andamento: 1 };
+            todos.sort((a, b) => (ordem[a.status] ?? 2) - (ordem[b.status] ?? 2));
+            grid.innerHTML = todos.map(c => gerarCardTrofeuHtml(c, isViewer)).join('') + (isViewer ? '' : gerarCardAdicionarHtml());
+        }
+        function gerarCardTrofeuHtml(c, isViewer) {
+            const finalizado = c.status === 'finalizado' && c.campeao;
+            const editBtn = (!c.live && !isViewer) ? `<button class="trophy-edit-btn admin-only" onclick="event.stopPropagation(); abrirModalCampeonato('${c.id}')" title="Editar">✎</button>` : '';
+            const imagemHtml = c.imagem ? `<img src="${c.imagem}" class="trophy-champion-photo">` : `<div class="trophy-icon">🏆</div>`;
+            return `<div class="trophy-card ${finalizado ? '' : 'trophy-pending'}">
+                ${editBtn}
+                <div class="trophy-card-glow"></div>
+                ${imagemHtml}
+                <div class="trophy-tournament-name">${c.nome}</div>
+                <div class="trophy-champion-label">${finalizado ? 'Campeão' : 'Em andamento'}</div>
+                <div class="trophy-champion-name">${finalizado ? '👑 ' + c.campeao : 'Torneio em andamento...'}</div>
+            </div>`;
+        }
+        function gerarCardAdicionarHtml() {
+            return `<button class="trophy-card trophy-add-card admin-only" onclick="abrirModalCampeonato()">
+                <div class="trophy-icon">+</div>
+                <div class="trophy-tournament-name" style="color:var(--text-muted); opacity:0.7;">Adicionar Campeonato</div>
+            </button>`;
+        }
+        function abrirModalCampeonato(id = null) {
+            document.getElementById('campeonatoEditId').value = id || '';
+            const preview = document.getElementById('campeonatoImagemPreview');
+            preview.src = ''; preview.style.display = 'none'; preview.removeAttribute('data-base64');
+            document.getElementById('campeonatoImagemInput').value = '';
+            if(id) {
+                const c = campeonatosArquivados.find(x => x.id === id);
+                if(!c) return;
+                document.getElementById('campeonatoModalTitulo').textContent = 'Editar Campeonato';
+                document.getElementById('campeonatoNome').value = c.nome;
+                document.getElementById('campeonatoStatus').value = c.status;
+                document.getElementById('campeonatoCampeao').value = c.campeao || '';
+                if(c.imagem) { preview.src = c.imagem; preview.style.display = 'block'; }
+                document.getElementById('btnExcluirCampeonato').style.display = 'block';
             } else {
-                nomeEl.textContent = 'Torneio em andamento...';
-                card.classList.add('trophy-pending');
+                document.getElementById('campeonatoModalTitulo').textContent = 'Adicionar Campeonato';
+                document.getElementById('campeonatoNome').value = '';
+                document.getElementById('campeonatoStatus').value = 'finalizado';
+                document.getElementById('campeonatoCampeao').value = '';
+                document.getElementById('btnExcluirCampeonato').style.display = 'none';
             }
+            atualizarCamposStatusModal();
+            document.getElementById('campeonatoModal').style.display = 'flex';
+        }
+        function fecharModalCampeonato(e) { if(!e || e.target.id === 'campeonatoModal') document.getElementById('campeonatoModal').style.display = 'none'; }
+        function atualizarCamposStatusModal() {
+            const finalizado = document.getElementById('campeonatoStatus').value === 'finalizado';
+            document.getElementById('campoCampeaoNome').style.display = finalizado ? 'block' : 'none';
+            document.getElementById('campoCampeaoImagem').style.display = finalizado ? 'block' : 'none';
+        }
+        // Redimensiona a foto no navegador antes de salvar, para não sobrecarregar o banco de dados
+        function preVisualizarImagemCampeonato(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const maxW = 500;
+                    const scale = Math.min(1, maxW / img.width);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width * scale; canvas.height = img.height * scale;
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                    const preview = document.getElementById('campeonatoImagemPreview');
+                    preview.src = dataUrl; preview.style.display = 'block'; preview.setAttribute('data-base64', dataUrl);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        function salvarCampeonato() {
+            const nome = document.getElementById('campeonatoNome').value.trim();
+            if(!nome) { showToast('Digite o nome do campeonato', 'error'); return; }
+            const id = document.getElementById('campeonatoEditId').value || ('camp_' + Date.now());
+            const status = document.getElementById('campeonatoStatus').value;
+            const campeao = document.getElementById('campeonatoCampeao').value.trim();
+            const preview = document.getElementById('campeonatoImagemPreview');
+            const existente = campeonatosArquivados.find(x => x.id === id);
+            const imagem = preview.getAttribute('data-base64') || (existente ? existente.imagem : '') || '';
+            if(existente) Object.assign(existente, { nome, status, campeao, imagem });
+            else campeonatosArquivados.push({ id, nome, status, campeao, imagem });
+            renderizarSalaDeTrofeus();
+            fecharModalCampeonato();
+            saveTournament();
+            showToast('Campeonato salvo!', 'success');
+        }
+        function excluirCampeonatoAtual() {
+            const id = document.getElementById('campeonatoEditId').value;
+            if(!id) return;
+            if(!confirm('Tem certeza que deseja excluir este campeonato? Essa ação não pode ser desfeita.')) return;
+            campeonatosArquivados = campeonatosArquivados.filter(x => x.id !== id);
+            renderizarSalaDeTrofeus();
+            fecharModalCampeonato();
+            saveTournament();
         }
         function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
         function gerarTorneio() {
@@ -2007,6 +2123,7 @@
                     winnersDisplay: document.getElementById('winnersBracketDisplay')?.innerHTML || '',
                     losersDisplay: document.getElementById('losersBracketDisplay')?.innerHTML || '',
                     finalsDisplay: document.getElementById('grandFinalsDisplay')?.innerHTML || '',
+                    campeonatosArquivados: campeonatosArquivados || [],
                 };
                 db.ref('tavernas_data').set(data)
                   .then(() => { if(btnSave) btnSave.style.display = 'none'; })
@@ -2067,6 +2184,7 @@
                 if(data.finalsDisplay) document.getElementById('grandFinalsDisplay').innerHTML = data.finalsDisplay;
                 atualizarFocoChave();
                 jogadoresPromovidos = data.promotedList || [];
+                campeonatosArquivados = data.campeonatosArquivados || [];
                 if(data.bracketSize) {
                     let select = document.getElementById('bracketSize');
                     let optionExists = Array.from(select.options).some(opt => parseInt(opt.value) === parseInt(data.bracketSize));
