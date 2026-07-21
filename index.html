@@ -1156,6 +1156,7 @@
                 btn.innerText = "Promover"; jogadoresPromovidos = jogadoresPromovidos.filter(j => j !== nomeJogador);
             }
             calcularEloGeral();
+            saveTournament();
         }
         function renomeJogadorGrupo(cell, groupIdx) {
             const row = cell.closest('tr');
@@ -1600,6 +1601,7 @@
             `;
             attachHoverEvents();
             renderStreamLinks();
+            saveTournament();
             setTimeout(processByes, 100);
         }
         // --- SISTEMA INTELIGENTE DE RASTRO ---
@@ -1929,7 +1931,7 @@
                     select.value = data.bracketSize;
                     select.style.display = 'inline-block';
                 }
-                attachHoverEvents(); calcularEloGeral(); renderizarFiltrosDeMapas(); initDragToScroll(); renderStreamLinks(); garantirBotoesRecalcGrupo(); removerPaineisDuplicadosDeGrupo(); saveTournament();
+                attachHoverEvents(); calcularEloGeral(); renderizarFiltrosDeMapas(); initDragToScroll(); renderStreamLinks(); garantirBotoesRecalcGrupo(); removerPaineisDuplicadosDeGrupo(); processByes(); saveTournament();
                 hideInitialLoadOverlay();
             }).catch(e => {
                 if(!document.body.classList.contains('is-viewer')) gerarChave();
