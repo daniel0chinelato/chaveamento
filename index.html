@@ -167,7 +167,8 @@
         /* BYE INTELIGENTE */
         .b-match.is-bye { background: transparent !important; border: 1px dashed rgba(255,255,255,0.1) !important; box-shadow: none !important; opacity: 0.4; }
         .b-match.is-bye:hover { transform: none; box-shadow: none; border-color: rgba(255,255,255,0.2) !important; }
-        .b-match.is-bye .stream-controls, .b-match.is-bye .draft-section, .b-match.is-bye .loser-drop-label, .b-match.is-bye .map-row, .b-match.is-bye .score-input, .b-match.is-bye .btn-advance, .b-match.is-bye .match-badges { display: none !important; }
+        .b-match.is-bye .stream-controls, .b-match.is-bye .draft-section, .b-match.is-bye .loser-drop-label, .b-match.is-bye .map-row, .b-match.is-bye .score-input, .b-match.is-bye .btn-advance { display: none !important; }
+        .match-wrapper.is-bye .match-badges { display: none !important; }
         .b-match.is-bye .b-player { border-bottom: none; padding: 4px 8px;}
         .b-player.is-empty .p-name { color: #555; text-decoration: line-through; }
         .b-match.is-bye .winner-slot { background: transparent; border-left-color: #555; }
@@ -1360,6 +1361,8 @@
         }
         function processByes() {
             let changed = false;
+            // Corrige retroativamente partidas já processadas antes desta correção existir
+            document.querySelectorAll('.b-match.is-bye').forEach(m => m.closest('.match-wrapper')?.classList.add('is-bye'));
             document.querySelectorAll('.b-match:not(.bye-processed)').forEach(match => {
                 let players = match.querySelectorAll('.p-name');
                 if(players.length < 2) return;
@@ -1369,6 +1372,7 @@
                     (p1 === "BYE" && p2 === "BYE")) {
                     match.classList.add('bye-processed');
                     match.classList.add('is-bye');
+                    match.closest('.match-wrapper')?.classList.add('is-bye');
                     let winnerIdx = 0;
                     if (p1 === "BYE" && p2 !== "BYE") winnerIdx = 1;
                     if (p2 === "BYE" && p1 !== "BYE") winnerIdx = 0;
