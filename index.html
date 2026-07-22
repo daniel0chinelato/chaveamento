@@ -365,15 +365,24 @@
         @keyframes goldPulseGlow { 0%, 100% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.5)); } 50% { filter: drop-shadow(0 0 22px rgba(255,215,0,0.85)); } }
         .podium-item.gold .avatar-wrapper { animation: goldPulseGlow 2.4s ease-in-out infinite; }
         #mapaDestaqueTitulo { transition: opacity 0.3s ease; }
-        /* ===== PAINEL DE DICAS COM ÍCONES (HTML/CSS, sem precisar de imagem por mapa) ===== */
-        .hint-legend { max-width: 480px; width: 90vw; max-height: 62vh; overflow-y: auto; background: rgba(8,8,10,0.88); backdrop-filter: blur(10px); border: 1px solid var(--accent-color); border-radius: 16px; padding: 26px 26px 20px; box-shadow: 0 25px 60px rgba(0,0,0,0.7); animation: cardRiseIn 0.4s ease backwards; }
-        .hint-legend-title { font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-color); text-align: center; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid rgba(212,175,55,0.25); }
-        .hint-legend-item { display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
-        .hint-legend-item:last-child { border-bottom: none; }
-        .hint-legend-icon { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
-        .hint-legend-texto strong { display: block; color: var(--accent-color); font-size: 0.8rem; letter-spacing: 0.5px; margin-bottom: 2px; }
-        .hint-legend-texto span { color: #ccc; font-size: 0.75rem; line-height: 1.4; }
-        .hint-legend-empty { text-align: center; color: var(--text-muted); font-size: 0.8rem; font-style: italic; padding: 10px 0; }
+        /* ===== PINS INTERATIVOS DE DICA NO MAPA (HTML/CSS puro, arrastáveis pelo admin) ===== */
+        #mapPinsLayer { position: absolute; inset: 0; z-index: 55; }
+        .map-pin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; z-index: 10; transition: filter 0.2s ease; }
+        .map-pin:hover .map-pin-icon { transform: scale(1.12); box-shadow: 0 6px 16px rgba(0,0,0,0.7), 0 0 16px rgba(212,175,55,0.6); }
+        .map-pin-drop { width: 42px; height: 54px; position: relative; }
+        .map-pin-icon { width: 42px; height: 42px; border-radius: 50%; background: #111; border: 2px solid var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 0 10px rgba(212,175,55,0.35); position: relative; z-index: 2; overflow: hidden; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        .map-pin-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .map-pin-drop::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 16px; height: 16px; background: #111; border-right: 2px solid var(--accent-color); border-bottom: 2px solid var(--accent-color); z-index: 1; }
+        .map-pin-badge { position: absolute; top: -6px; right: -6px; background: #fff9e0; color: #111; font-weight: 800; font-size: 0.65rem; min-width: 18px; height: 18px; padding: 0 3px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #333; z-index: 3; }
+        /* Modo de edição: pin "respirando" indicando que pode ser arrastado */
+        @keyframes pinEditPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(212,175,55,0.6); } 50% { box-shadow: 0 0 0 6px rgba(212,175,55,0); } }
+        .map-pin.editable { cursor: grab; }
+        .map-pin.editable .map-pin-icon { animation: pinEditPulse 1.6s ease-in-out infinite; }
+        .map-pin.editable:active { cursor: grabbing; }
+        .map-pin.dragging { z-index: 20; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.6)); }
+        .hint-toolbar { position: absolute; top: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 60; }
+        .pin-modal-box { max-width: 380px; }
+        .pin-modal-box .map-pin-icon { position: static; }
         #mainMapUI { position: relative; z-index: 3; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; transition: opacity 0.4s ease, pointer-events 0.4s; }
         /* Layout Superior */
         .map-stats-top { display: flex; justify-content: space-between; align-items: flex-start; padding: 28px 40px; width: 100%; box-sizing: border-box; flex: 1; position: relative;}
@@ -702,8 +711,47 @@
         </div>
         <!-- OVERLAY DE DICAS (Sem interface, tela cheia) -->
         <div id="hintContainer">
-            <div id="hintLegend" class="hint-legend"></div>
+            <div id="mapPinsLayer"></div>
+            <div class="hint-toolbar admin-only">
+                <button class="nav-btn" style="padding:6px 14px; font-size:0.65rem;" onclick="alternarModoEdicaoPins()" id="btnModoEdicaoPins">✎ Editar Dicas</button>
+                <button class="nav-btn" style="padding:6px 14px; font-size:0.65rem; display:none;" onclick="adicionarNovoPin()" id="btnAdicionarPin">📍 Adicionar Pin</button>
+            </div>
             <button class="btn-fechar-dica" onclick="toggleDicas()">Voltar às Estatísticas</button>
+        </div>
+        <!-- POPUP: INFO / EDIÇÃO DE UM PIN DO MAPA -->
+        <div id="pinModal" class="modal-overlay" onclick="fecharModalPin(event)">
+            <div class="modal-box pin-modal-box" onclick="event.stopPropagation()" style="position: relative;">
+                <button class="modal-close" onclick="fecharModalPin()" title="Fechar">&times;</button>
+                <div id="pinModalView">
+                    <div id="pinViewIcone" class="map-pin-icon" style="width:56px; height:56px; font-size:1.6rem; margin:0 auto 14px;"></div>
+                    <h3 id="pinViewTitulo" style="text-align:center; color:var(--accent-color); font-family:'Cinzel', serif;"></h3>
+                    <p id="pinViewTexto" style="text-align:center; color:#ccc; font-size:0.85rem; margin-top:8px;"></p>
+                    <button class="nav-btn admin-only" style="display:block; margin:16px auto 0; padding:6px 16px; font-size:0.65rem;" onclick="entrarEdicaoDoPinAberto()">✎ Editar este pin</button>
+                </div>
+                <div id="pinModalEdit" style="display:none;">
+                    <h3 style="text-align:center; color:var(--accent-color); font-family:'Cinzel', serif; margin-bottom:16px;">Editar Pin</h3>
+                    <div class="login-field">
+                        <label>Ícone (emoji ou URL de imagem)</label>
+                        <input type="text" id="pinEditIcone" placeholder="🛡️ ou https://...">
+                    </div>
+                    <div class="login-field">
+                        <label>Título</label>
+                        <input type="text" id="pinEditTitulo" placeholder="Ex: Buff de Força">
+                    </div>
+                    <div class="login-field">
+                        <label>Descrição</label>
+                        <textarea id="pinEditTexto" rows="3" style="width:100%; background-color: var(--panel-surface); color: var(--text-main); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 8px; box-sizing: border-box; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; resize:vertical;" placeholder="Explique a dica..."></textarea>
+                    </div>
+                    <div class="login-field">
+                        <label>Número no pin (opcional, ex: 2 minas)</label>
+                        <input type="text" id="pinEditQtd" placeholder="Deixe em branco se não precisar">
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="action-btn" style="flex:1;" onclick="salvarEdicaoPin()">Salvar</button>
+                        <button class="nav-btn btn-reset" style="flex:0 0 auto; padding: 10px 16px;" onclick="excluirPinAberto()">Excluir</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!-- SALA DE TROFÉUS -->
@@ -1008,35 +1056,141 @@
             crossfadeLayer('immersiveMapBg', 'bg-layer-main', url);
             crossfadeLayer('immersiveMapBgBlur', 'bg-layer-blur', url);
         }
-        // ===== DICAS DE MAPA EM HTML (ícones + texto) =====
-        // Edite/adicione mapas aqui — não precisa de nenhuma imagem customizada.
-        // Cada item: { icon: 'emoji ou texto curto', titulo: 'nome curto', texto: 'a dica em si' }
-        const mapaDicasIcones = {
+        // ===== PINS INTERATIVOS DE DICA NO MAPA =====
+        // Estrutura: mapaPinsData["Nome do Mapa"] = [ {id, x, y, icon, titulo, texto, qtd}, ... ]
+        // x/y são porcentagem (0-100) da tela, pra funcionar em qualquer resolução.
+        // Isso é carregado/salvo junto com o resto do torneio (loadTournament/saveTournament)
+        // e preservado mesmo se o torneio for resetado (são conhecimento do jogo, não do evento).
+        let mapaPinsData = {
             "Anatólia": [
-                { icon: "🛡️", titulo: "Buff de Força", texto: "Fica na fenda central do mapa — contestem cedo, define o controle do meio." },
-                { icon: "🐍", titulo: "Camp da Serpente", texto: "Perto da rota da selva; bom pra snowball no early game." },
-                { icon: "🔥", titulo: "Rotação sugerida", texto: "Duo prioriza o buff de attack speed antes do primeiro reset." }
-            ],
-            "Coração de Tenochtitlán": [
-                { icon: "⚔️", titulo: "Objetivo central", texto: "O altar do meio dá vantagem de visão — vale disputar no minuto 2-3." },
-                { icon: "🏹", titulo: "Ângulos de jungle", texto: "Muitos arbustos nas laterais, cuidado com ganks de flanco." }
+                { id: 'p1', x: 38, y: 46, icon: '🛡️', titulo: 'Buff de Força', texto: 'Fica na fenda central do mapa — contestem cedo, define o controle do meio.' },
+                { id: 'p2', x: 60, y: 34, icon: '🐍', titulo: 'Camp da Serpente', texto: 'Perto da rota da selva; bom pra snowball no early game.' },
+                { id: 'p3', x: 72, y: 60, icon: '🔥', titulo: 'Rotação sugerida', texto: 'Duo prioriza o buff de attack speed antes do primeiro reset.', qtd: '2' }
             ]
-            // Exemplo: "Nome do Mapa": [ { icon: "💀", titulo: "...", texto: "..." } ]
         };
-        function renderizarLegendaDicas(mapa) {
-            const container = document.getElementById('hintLegend');
-            if (!container) return;
-            const itens = mapaDicasIcones[mapa];
-            if (!itens || itens.length === 0) {
-                container.innerHTML = `<div class="hint-legend-title">${escapeHtml(mapa)}</div><div class="hint-legend-empty">Ainda não temos dicas cadastradas pra esse mapa.</div>`;
-                return;
-            }
-            container.innerHTML = `<div class="hint-legend-title">${escapeHtml(mapa)}</div>` + itens.map(it => `
-                <div class="hint-legend-item">
-                    <div class="hint-legend-icon">${it.icon}</div>
-                    <div class="hint-legend-texto"><strong>${escapeHtml(it.titulo)}</strong><span>${escapeHtml(it.texto)}</span></div>
-                </div>`).join('');
+        let modoEdicaoPinsAtivo = false;
+        let pinAbertoId = null; // qual pin está no popup no momento
+        function renderizarPinsDoMapa(mapa) {
+            const layer = document.getElementById('mapPinsLayer');
+            if (!layer) return;
+            layer.innerHTML = '';
+            const pins = mapaPinsData[mapa] || [];
+            pins.forEach(p => {
+                const el = document.createElement('div');
+                el.className = 'map-pin' + (modoEdicaoPinsAtivo ? ' editable' : '');
+                el.style.left = p.x + '%';
+                el.style.top = p.y + '%';
+                el.dataset.id = p.id;
+                const iconInner = (p.icon || '').startsWith('http') ? `<img src="${p.icon}">` : (p.icon || '📍');
+                el.innerHTML = `<div class="map-pin-drop"><div class="map-pin-icon">${iconInner}</div>${p.qtd ? `<div class="map-pin-badge">${escapeHtml(String(p.qtd))}</div>` : ''}</div>`;
+                el.addEventListener('mousedown', (e) => iniciarInteracaoPin(e, el, p.id));
+                layer.appendChild(el);
+            });
         }
+        // Distingue clique (abre popup) de arrasto (reposiciona), usando um limiar de movimento.
+        let pinInteracao = null;
+        function iniciarInteracaoPin(e, el, pinId) {
+            e.preventDefault(); e.stopPropagation();
+            pinInteracao = { el, pinId, startX: e.clientX, startY: e.clientY, moveu: false };
+            document.addEventListener('mousemove', moverInteracaoPin);
+            document.addEventListener('mouseup', soltarInteracaoPin);
+        }
+        function moverInteracaoPin(e) {
+            if (!pinInteracao) return;
+            const dist = Math.hypot(e.clientX - pinInteracao.startX, e.clientY - pinInteracao.startY);
+            if (!modoEdicaoPinsAtivo || document.body.classList.contains('is-viewer')) return; // viewer/fora do modo edição: nunca arrasta
+            if (dist > 5) {
+                pinInteracao.moveu = true;
+                pinInteracao.el.classList.add('dragging');
+                const layer = document.getElementById('mapPinsLayer');
+                const rect = layer.getBoundingClientRect();
+                let x = ((e.clientX - rect.left) / rect.width) * 100;
+                let y = ((e.clientY - rect.top) / rect.height) * 100;
+                x = Math.max(1, Math.min(99, x)); y = Math.max(1, Math.min(99, y));
+                pinInteracao.el.style.left = x + '%'; pinInteracao.el.style.top = y + '%';
+                pinInteracao._x = x; pinInteracao._y = y;
+            }
+        }
+        function soltarInteracaoPin(e) {
+            document.removeEventListener('mousemove', moverInteracaoPin);
+            document.removeEventListener('mouseup', soltarInteracaoPin);
+            if (!pinInteracao) return;
+            const { pinId, moveu, _x, _y, el } = pinInteracao;
+            el.classList.remove('dragging');
+            if (moveu && _x !== undefined) {
+                const pin = (mapaPinsData[mapaAtivoGlobal] || []).find(p => p.id === pinId);
+                if (pin) { pin.x = Math.round(_x * 10) / 10; pin.y = Math.round(_y * 10) / 10; salvarPinsDoMapa(); }
+            } else {
+                // Foi um clique, não um arrasto: modo edição abre o form de edição, senão o popup de info.
+                if (modoEdicaoPinsAtivo && !document.body.classList.contains('is-viewer')) abrirEdicaoPin(pinId);
+                else abrirInfoPin(pinId);
+            }
+            pinInteracao = null;
+        }
+        function alternarModoEdicaoPins() {
+            if (document.body.classList.contains('is-viewer')) return;
+            modoEdicaoPinsAtivo = !modoEdicaoPinsAtivo;
+            document.getElementById('btnModoEdicaoPins').textContent = modoEdicaoPinsAtivo ? '✓ Concluir Edição' : '✎ Editar Dicas';
+            document.getElementById('btnAdicionarPin').style.display = modoEdicaoPinsAtivo ? 'inline-block' : 'none';
+            renderizarPinsDoMapa(mapaAtivoGlobal);
+        }
+        function adicionarNovoPin() {
+            if (document.body.classList.contains('is-viewer')) return;
+            if (!mapaPinsData[mapaAtivoGlobal]) mapaPinsData[mapaAtivoGlobal] = [];
+            const novoId = 'pin_' + Date.now();
+            mapaPinsData[mapaAtivoGlobal].push({ id: novoId, x: 50, y: 50, icon: '📍', titulo: 'Novo Ponto', texto: '' });
+            renderizarPinsDoMapa(mapaAtivoGlobal);
+            abrirEdicaoPin(novoId);
+        }
+        function abrirInfoPin(pinId) {
+            const pin = (mapaPinsData[mapaAtivoGlobal] || []).find(p => p.id === pinId);
+            if (!pin) return;
+            pinAbertoId = pinId;
+            document.getElementById('pinModalView').style.display = 'block';
+            document.getElementById('pinModalEdit').style.display = 'none';
+            const iconEl = document.getElementById('pinViewIcone');
+            iconEl.innerHTML = (pin.icon || '').startsWith('http') ? `<img src="${pin.icon}">` : (pin.icon || '📍');
+            document.getElementById('pinViewTitulo').textContent = pin.titulo || '(sem título)';
+            document.getElementById('pinViewTexto').textContent = pin.texto || '';
+            document.getElementById('pinModal').style.display = 'flex';
+        }
+        function entrarEdicaoDoPinAberto() { if (pinAbertoId) abrirEdicaoPin(pinAbertoId); }
+        function abrirEdicaoPin(pinId) {
+            const pin = (mapaPinsData[mapaAtivoGlobal] || []).find(p => p.id === pinId);
+            if (!pin) return;
+            pinAbertoId = pinId;
+            document.getElementById('pinModalView').style.display = 'none';
+            document.getElementById('pinModalEdit').style.display = 'block';
+            document.getElementById('pinEditIcone').value = pin.icon || '';
+            document.getElementById('pinEditTitulo').value = pin.titulo || '';
+            document.getElementById('pinEditTexto').value = pin.texto || '';
+            document.getElementById('pinEditQtd').value = pin.qtd || '';
+            document.getElementById('pinModal').style.display = 'flex';
+        }
+        function salvarEdicaoPin() {
+            const pin = (mapaPinsData[mapaAtivoGlobal] || []).find(p => p.id === pinAbertoId);
+            if (!pin) return;
+            pin.icon = document.getElementById('pinEditIcone').value.trim() || '📍';
+            pin.titulo = document.getElementById('pinEditTitulo').value.trim();
+            pin.texto = document.getElementById('pinEditTexto').value.trim();
+            pin.qtd = document.getElementById('pinEditQtd').value.trim();
+            renderizarPinsDoMapa(mapaAtivoGlobal);
+            salvarPinsDoMapa();
+            fecharModalPin();
+        }
+        function excluirPinAberto() {
+            if (!pinAbertoId) return;
+            mapaPinsData[mapaAtivoGlobal] = (mapaPinsData[mapaAtivoGlobal] || []).filter(p => p.id !== pinAbertoId);
+            renderizarPinsDoMapa(mapaAtivoGlobal);
+            salvarPinsDoMapa();
+            fecharModalPin();
+        }
+        function fecharModalPin(e) {
+            if (e && e.target.id !== 'pinModal') return;
+            document.getElementById('pinModal').style.display = 'none';
+            pinAbertoId = null;
+        }
+        function salvarPinsDoMapa() { saveTournament(); }
         function toggleDicas() {
             const uiContent = document.getElementById('mainMapUI');
             const hintContainer = document.getElementById('hintContainer');
@@ -1045,15 +1199,20 @@
                 uiContent.style.opacity = '0';
                 uiContent.style.pointerEvents = 'none';
                 hintContainer.classList.add('active');
-                // O fundo vira a imagem da dica sem blur (se existir); a legenda de ícones
-                // aparece por cima e funciona mesmo sem nenhuma imagem custom.
-                setMapBackground(getMapHintPath(mapaAtivoGlobal));
-                renderizarLegendaDicas(mapaAtivoGlobal);
+                // Reaproveita a MESMA arte do mapa (sem precisar de imagem extra de dica),
+                // só que sem o blur/escurecimento das bordas, pra ver os pins com clareza.
+                setMapBackground(mapaImagens[mapaAtivoGlobal]);
+                renderizarPinsDoMapa(mapaAtivoGlobal);
                 document.querySelector('.immersive-overlay').style.opacity = '0';
             } else {
                 uiContent.style.opacity = '1';
                 uiContent.style.pointerEvents = 'auto';
                 hintContainer.classList.remove('active');
+                modoEdicaoPinsAtivo = false;
+                const btnModo = document.getElementById('btnModoEdicaoPins');
+                if (btnModo) btnModo.textContent = '✎ Editar Dicas';
+                const btnAdd = document.getElementById('btnAdicionarPin');
+                if (btnAdd) btnAdd.style.display = 'none';
                 // Retorna a imagem do mapa original com a máscara
                 setMapBackground(mapaImagens[mapaAtivoGlobal]);
                 document.querySelector('.immersive-overlay').style.opacity = '1';
@@ -2587,6 +2746,7 @@
                     losersDisplay: document.getElementById('losersBracketDisplay')?.innerHTML || '',
                     finalsDisplay: document.getElementById('grandFinalsDisplay')?.innerHTML || '',
                     campeonatosArquivados: campeonatosArquivados || [],
+                    mapaPins: mapaPinsData || {},
                 };
                 db.ref('tavernas_data').set(data)
                   .then(() => { if(btnSave) btnSave.style.display = 'none'; })
@@ -2648,7 +2808,8 @@
             if(data.finalsDisplay) document.getElementById('grandFinalsDisplay').innerHTML = data.finalsDisplay;
             atualizarFocoChave();
             jogadoresPromovidos = data.promotedList || [];
-            campeonatosArquivados = data.campeonatosArquivados || [];
+                        campeonatosArquivados = data.campeonatosArquivados || [];
+            if (data.mapaPins && Object.keys(data.mapaPins).length > 0) mapaPinsData = data.mapaPins;
             if(data.bracketSize) {
                 let select = document.getElementById('bracketSize');
                 let optionExists = Array.from(select.options).some(opt => parseInt(opt.value) === parseInt(data.bracketSize));
@@ -2703,7 +2864,14 @@
         }
         function resetTournament() {
             if(confirm("Tem certeza que deseja apagar TODOS os dados da Nuvem? Isso não pode ser desfeito.")) {
-                db.ref('tavernas_data').remove().then(() => { location.reload(); });
+                // As dicas de mapa (pins) não são dados do torneio — preserva antes de apagar.
+                db.ref('tavernas_data/mapaPins').once('value').then(snap => {
+                    const pinsAtuais = snap.val();
+                    db.ref('tavernas_data').remove().then(() => {
+                        if (pinsAtuais) db.ref('tavernas_data/mapaPins').set(pinsAtuais).finally(() => location.reload());
+                        else location.reload();
+                    });
+                });
             }
         }
         // ===== PRÉ-CARREGAMENTO DAS IMAGENS DOS MAPAS =====
