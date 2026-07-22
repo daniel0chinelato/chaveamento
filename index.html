@@ -750,7 +750,21 @@
             "Vaus do Nilo": "vaus do nilo.jpg"
         };
         const listaMapas = Object.keys(mapaImagens).sort();
-        function getGodIconPath(nome) { if(!nome) return ''; let safeName = nome.toLowerCase().replace('é', 'e').replace('í', 'i').replace('á', 'a'); return safeName + '_icon.png'; }
+        // ===== SEGURANÇA: escapa texto antes de inserir via innerHTML =====
+        // Nomes de jogadores, campeonatos etc. vêm de inputs do admin e são
+        // renderizados para TODOS os visitantes (link público). Sem isso, um nome
+        // como "<img src=x onerror=...>" viraria código executável na tela de
+        // qualquer pessoa que abrisse o site — não só na do admin.
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+        function getGodIconPath(nome) { if(!nome) return ''; let safeName = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); return safeName + '_icon.png'; }
         // Lógica Inteligente para Imagens de Dicas JPG
         function getMapHintPath(nomeDoMapa) {
             const hintsEspeciais = {
@@ -955,7 +969,7 @@
                         ? playersArr.slice(0,3).map((p, idx) => `
                             <div class="mvp-row">
                                 <span class="mvp-rank-chip">${idx+1}</span>
-                                <span class="mvp-row-name">${p.name}</span>
+                                <span class="mvp-row-name">${escapeHtml(p.name)}</span>
                                 <span class="mvp-row-wins">${p.wins}V</span>
                             </div>`).join('') 
                         : `<div class="mvp-empty">Nenhum registro ainda</div>`;
@@ -1191,8 +1205,15 @@
             let streams = []; try { streams = JSON.parse(card.getAttribute('data-streams') || "[]"); } catch(e) {}
             const input = prompt(`Adicionar link de transmissão (Twitch, YouTube).\nPara apagar tudo, digite "limpar".`);
             if(input === null) return; 
-            if(input.trim().toLowerCase() === 'limpar') streams = [];
-            else if(input.trim() !== "") streams.push(input.trim());
+            if(input.trim().toLowerCase() === 'limpar') { streams = []; }
+            else if(input.trim() !== "") {
+                let url = input.trim();
+                if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
+                // So aceita http(s): qualquer outro esquema (ex: javascript:) é bloqueado,
+                // pois esse link é aberto por qualquer visitante ao clicar em "AO VIVO".
+                if(!/^https?:\/\//i.test(url)) { showToast('Link inválido. Use uma URL http(s) válida.', 'error'); return; }
+                streams.push(url);
+            }
             card.setAttribute('data-streams', JSON.stringify(streams));
             renderStreamLinks(); saveTournament(); 
         }
@@ -1206,7 +1227,7 @@
                     try {
                         const links = JSON.parse(streamData);
                         links.forEach((streamUrl, idx) => {
-                            if(streamUrl && streamUrl.trim() !== "") {
+                            if(streamUrl && streamUrl.trim() !== "" && /^https?:\/\//i.test(streamUrl.trim())) {
                                 let iconHtml = 'AO VIVO', color = '#ff3b3b'; 
                                 if(streamUrl.toLowerCase().includes('twitch.tv')) {
                                     iconHtml = `<svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg> AO VIVO`;
@@ -1286,9 +1307,9 @@
                 ${editBtn}
                 <div class="trophy-card-glow"></div>
                 ${imagemHtml}
-                <div class="trophy-tournament-name">${c.nome}</div>
+                <div class="trophy-tournament-name">${escapeHtml(c.nome)}</div>
                 <div class="trophy-champion-label">${finalizado ? 'Campeão' : 'Em andamento'}</div>
-                <div class="trophy-champion-name">${finalizado ? '👑 ' + c.campeao : 'Torneio em andamento...'}</div>
+                <div class="trophy-champion-name">${finalizado ? '👑 ' + escapeHtml(c.campeao) : 'Torneio em andamento...'}</div>
             </div>`;
         }
         function gerarCardAdicionarHtml() {
@@ -1396,10 +1417,10 @@
             grupos.forEach((grupo, idx) => {
                 let html = `<div class="panel" style="padding:20px;"><div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom: 15px; position:relative;"><h3 style="margin:0; font-size:1.1rem;">Grupo ${String.fromCharCode(65 + idx)}</h3><button class="btn-recalc-grupo admin-only" style="position:absolute; right:0;" onclick="recalcularGrupoUnico(${idx})" title="Recalcular confrontos deste grupo">⟳</button></div><table style="margin-top:0;"><thead><tr><th style="width:20px;"></th><th>Status</th><th style="text-align:left">Jogador</th><th>V</th><th>D</th><th>Pts</th></tr></thead><tbody id="tbody-grupo-${idx}" ondrop="dropPlayer(event)" ondragover="allowDropPlayer(event)">`;
                 grupo.forEach(p => {
-                    html += `<tr class="${p.seed ? 'seed-row' : ''}" data-player="${p.nome}" draggable="true" ondragstart="dragPlayer(event)">
+                    html += `<tr class="${p.seed ? 'seed-row' : ''}" data-player="${escapeHtml(p.nome)}" draggable="true" ondragstart="dragPlayer(event)">
                         <td class="drag-handle" title="Arraste para mover">☰</td>
                         <td><button class="btn-promote admin-only" onclick="togglePromote(this)">Promover</button></td>
-                        <td style="text-align:left; font-weight:600;" class="cell-nome-jogador" contenteditable="true" onblur="renomeJogadorGrupo(this, ${idx})" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.blur();}">${p.nome}</td>
+                        <td style="text-align:left; font-weight:600;" class="cell-nome-jogador" contenteditable="true" onblur="renomeJogadorGrupo(this, ${idx})" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.blur();}">${escapeHtml(p.nome)}</td>
                         <td class="cell-v" contenteditable="true" oninput="calcPtsManual(this, ${idx})">0</td>
                         <td class="cell-d" contenteditable="true">0</td>
                         <td class="cell-pts" style="font-weight:bold; color:var(--accent-color)">0</td>
@@ -1527,12 +1548,12 @@
                         let picksHtml1 = `<div class="picks-group">${godsHtml1}</div>`;
                         let picksHtml2 = `<div class="picks-group">${godsHtml2}</div>`;
                         matchesHtml += `
-                        <div class="match-card" data-group="${idx}" data-p1="${p1Name}" data-p2="${p2Name}" data-streams='${streamsStr}'>
+                        <div class="match-card" data-group="${idx}" data-p1="${escapeHtml(p1Name)}" data-p2="${escapeHtml(p2Name)}" data-streams='${streamsStr}'>
                             <div class="stream-controls"><button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.6rem; border-style:dashed;" onclick="addStreamLink(this)">🎥 +</button></div>
                             <div class="match-card-body">
-                                <div class="match-player" data-slot="p1"><div class="mp-name" style="margin-bottom:5px;">${p1Name}</div><div class="draft-section" style="justify-content:center;">${banHtml1}${picksHtml1}</div></div>
+                                <div class="match-player" data-slot="p1"><div class="mp-name" style="margin-bottom:5px;">${escapeHtml(p1Name)}</div><div class="draft-section" style="justify-content:center;">${banHtml1}${picksHtml1}</div></div>
                                 <div class="match-score"><input type="number" class="score-p1 score-input" value="0"><span>X</span><input type="number" class="score-p2 score-input" value="0"></div>
-                                <div class="match-player" data-slot="p2"><div class="mp-name" style="margin-bottom:5px;">${p2Name}</div><div class="draft-section" style="justify-content:center;">${banHtml2}${picksHtml2}</div></div>
+                                <div class="match-player" data-slot="p2"><div class="mp-name" style="margin-bottom:5px;">${escapeHtml(p2Name)}</div><div class="draft-section" style="justify-content:center;">${banHtml2}${picksHtml2}</div></div>
                             </div>
                             ${mapsHtml}
                         </div>`;
@@ -1742,7 +1763,7 @@
                 <div class="b-player-info">
                     <span class="drag-handle bracket-drag-handle admin-only" draggable="true" title="Arraste para trocar de posição" ondragstart="dragStartBracketPlayer(event)" style="font-size:0.8rem; margin-right:4px;">⠿</span>
                     ${seedHtml}
-                    <span class="p-name ${isPlaceholder ? 'p-placeholder' : ''}" contenteditable="true" oninput="calcularEloGeral()">${pName}</span>
+                    <span class="p-name ${isPlaceholder ? 'p-placeholder' : ''}" contenteditable="true" oninput="calcularEloGeral()">${escapeHtml(pName)}</span>
                     <div class="placar-mata-wrapper">
                         <button class="btn-advance admin-only" title="Avançar Vencedor" onclick="avancarWinner(this, ${idx})">W</button>
                         <button class="btn-advance btn-loser admin-only" title="Enviar p/ Repescagem" onclick="avancarLoser(this, ${idx})">L</button>
@@ -2065,7 +2086,7 @@
                             <tr style="transition: 0.3s; background-color: var(--panel-surface);">
                                 <td style="font-weight:bold; font-size:1.1rem; color:${posColor}; text-align: center; border-radius: 6px 0 0 6px; padding: 8px 5px;">${index + 1}º</td>
                                 <td style="text-align:left; font-weight:700; font-size:0.9rem; line-height: 1.2; padding: 8px 5px;">
-                                    ${p.nome}<br>${statusBadge}
+                                    ${escapeHtml(p.nome)}<br>${statusBadge}
                                 </td>
                                 <td style="font-weight:bold; font-family:'Cinzel', serif; color:var(--accent-color); font-size:1.2rem; text-align: center; border-radius: 0 6px 6px 0; padding: 8px 5px;">${p.elo}</td>
                             </tr>`;
