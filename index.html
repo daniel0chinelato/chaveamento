@@ -77,25 +77,40 @@
         .sidebar-trophy-link { font-size: 1.3rem; }
         .sidebar-footer { margin-top: auto; padding: 18px 24px 6px; text-align: center; font-size: 0.62rem; color: #444; letter-spacing: 1px; border-top: 1px solid var(--border-color); }
         /* SALA DE TROFÉUS */
-        .trophy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; max-width: 1000px; margin: 0 auto; padding: 0 20px 60px; }
-        .trophy-card { position: relative; background: linear-gradient(180deg, #14120a 0%, #0a0a0c 100%); border: 1px solid var(--accent-color); border-radius: 16px; padding: 40px 24px; text-align: center; overflow: hidden; transition: transform 0.3s ease; }
-        .trophy-card:hover { transform: translateY(-6px); }
-        .trophy-card-glow { position: absolute; top: -40%; left: 50%; transform: translateX(-50%); width: 200px; height: 200px; background: radial-gradient(circle, rgba(212,175,55,0.35) 0%, transparent 70%); pointer-events: none; }
-        .trophy-icon { font-size: 3.2rem; margin-bottom: 14px; filter: drop-shadow(0 0 18px var(--accent-glow)); }
-        .trophy-tournament-name { font-family: 'Cinzel', serif; font-size: 1.05rem; letter-spacing: 1px; color: var(--text-main); margin-bottom: 18px; position: relative; }
-        .trophy-champion-label { font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; position: relative; }
-        .trophy-champion-name { font-family: 'Cinzel', serif; font-size: 1.25rem; color: var(--accent-color); font-weight: 700; position: relative; }
+        .trophy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; max-width: 1000px; margin: 0 auto; padding: 0 20px 60px; position: relative; z-index: 1; }
+        @keyframes cardRiseIn { from { opacity: 0; transform: translateY(28px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .trophy-card { position: relative; background: linear-gradient(180deg, #14120a 0%, #0a0a0c 100%); border: 1px solid var(--accent-color); border-radius: 16px; padding: 40px 24px; text-align: center; overflow: hidden; transition: transform 0.15s ease, box-shadow 0.3s ease; animation: cardRiseIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: calc(var(--card-i, 0) * 0.09s); }
+        .trophy-card:not(.trophy-empty):not(.trophy-add-card) { box-shadow: 0 0 0 1px rgba(212,175,55,0.15), 0 15px 40px rgba(0,0,0,0.5); }
+        @keyframes rayRotate { from { transform: translateX(-50%) rotate(0deg); } to { transform: translateX(-50%) rotate(360deg); } }
+        .trophy-card-rays { position: absolute; top: -10%; left: 50%; width: 340px; height: 340px; transform: translateX(-50%); background: conic-gradient(from 0deg, transparent 0deg, rgba(212,175,55,0.16) 8deg, transparent 20deg, transparent 160deg, rgba(212,175,55,0.12) 172deg, transparent 190deg, transparent 340deg, rgba(212,175,55,0.14) 352deg, transparent 360deg); animation: rayRotate 14s linear infinite; pointer-events: none; z-index: 0; }
+        .trophy-card.trophy-empty .trophy-card-rays, .trophy-card.trophy-pending .trophy-card-rays, .trophy-add-card .trophy-card-rays { display: none; }
+        @keyframes glowPulse { 0%, 100% { opacity: 0.55; transform: translateX(-50%) scale(1); } 50% { opacity: 1; transform: translateX(-50%) scale(1.12); } }
+        .trophy-card-glow { position: absolute; top: -40%; left: 50%; transform: translateX(-50%); width: 200px; height: 200px; background: radial-gradient(circle, rgba(212,175,55,0.35) 0%, transparent 70%); pointer-events: none; animation: glowPulse 2.6s ease-in-out infinite; z-index: 0; }
+        .trophy-icon { font-size: 3.2rem; margin-bottom: 14px; filter: drop-shadow(0 0 18px var(--accent-glow)); position: relative; z-index: 1; }
+        .trophy-tournament-name { font-family: 'Cinzel', serif; font-size: 1.05rem; letter-spacing: 1px; color: var(--text-main); margin-bottom: 18px; position: relative; z-index: 1; }
+        .trophy-champion-label { font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; position: relative; z-index: 1; }
+        .trophy-champion-name { font-family: 'Cinzel', serif; font-size: 1.25rem; color: var(--accent-color); font-weight: 700; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .trophy-champion-name .laurel { font-size: 1rem; opacity: 0.8; filter: drop-shadow(0 0 6px var(--accent-glow)); }
         .trophy-card.trophy-pending .trophy-champion-name { color: var(--text-muted); font-size: 0.95rem; font-family: 'Montserrat', sans-serif; font-weight: 400; font-style: italic; }
         .trophy-card.trophy-empty { border-color: var(--border-color); opacity: 0.45; }
         .trophy-card.trophy-empty .trophy-icon { filter: none; opacity: 0.5; }
         .trophy-card.trophy-empty .trophy-champion-label { visibility: hidden; }
-        .trophy-champion-photo { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-color); box-shadow: 0 0 25px var(--accent-glow); margin-bottom: 14px; position: relative; }
+        .trophy-champion-photo { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-color); box-shadow: 0 0 25px var(--accent-glow); margin-bottom: 14px; position: relative; z-index: 1; }
         .trophy-edit-btn { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); border: 1px solid var(--border-color); color: var(--text-muted); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 0.8rem; transition: 0.2s; z-index: 2; }
         .trophy-edit-btn:hover { color: var(--accent-color); border-color: var(--accent-color); }
         .trophy-add-card { background: transparent; border: 2px dashed var(--border-color); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: inherit; }
         .trophy-add-card:hover { border-color: var(--accent-color); }
         .trophy-add-card:hover .trophy-icon, .trophy-add-card:hover .trophy-tournament-name { color: var(--accent-color); opacity: 1; }
         .trophy-add-card .trophy-icon { font-size: 2.5rem; opacity: 0.5; margin-bottom: 8px; filter: none; }
+        /* ===== CABEÇALHO ÉPICO DA SALA DE TROFÉUS ===== */
+        .trophy-hero-title { text-align: center; margin-top: 10px; font-size: 2.4rem; letter-spacing: 3px; position: relative; z-index: 1; }
+        .trophy-hero-flourish { text-align: center; color: var(--accent-color); opacity: 0.6; font-size: 0.9rem; letter-spacing: 8px; margin-top: -6px; }
+        @keyframes dividerSweep { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        .trophy-divider { max-width: 420px; height: 2px; margin: 18px auto 40px; background: linear-gradient(90deg, transparent, var(--accent-color) 20%, #fff9e0 50%, var(--accent-color) 80%, transparent); background-size: 200% auto; animation: dividerSweep 3.5s linear infinite; box-shadow: 0 0 12px var(--accent-glow); }
+        /* ===== BRASAS FLUTUANTES (só na sala de troféus) ===== */
+        #trophyEmbers { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+        @keyframes emberRise { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: 0.8; } 90% { opacity: 0.5; } 100% { transform: translateY(-620px) translateX(var(--drift, 20px)); opacity: 0; } }
+        .ember { position: absolute; bottom: -20px; width: 4px; height: 4px; border-radius: 50%; background: radial-gradient(circle, #ffe9b0, var(--accent-color)); box-shadow: 0 0 8px 2px rgba(212,175,55,0.6); animation: emberRise linear infinite; }
         .nav-btn {
             background: transparent; border: 1px solid var(--border-color); color: var(--text-muted);
             padding: 8px 20px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
@@ -665,10 +680,13 @@
         </div>
     </div>
     <!-- SALA DE TROFÉUS -->
-    <div id="page-trophy" class="container page">
+    <div id="page-trophy" class="container page" style="position: relative;">
+        <div id="trophyEmbers"></div>
         <div class="header-container"><img src="header.png" alt="K.M.P.S" class="header-image" onerror="this.style.display='none'"></div>
-        <h1 style="text-align:center; margin-top: 10px;">🏆 Sala de Troféus</h1>
-        <p style="text-align:center; color: var(--text-muted); margin-bottom: 40px; letter-spacing: 1px;">O hall da fama do K.M.P.S — celebrando os campeões de cada era.</p>
+        <h1 class="trophy-hero-title">🏆 <span class="champion-shimmer-text">Sala de Troféus</span> 🏆</h1>
+        <div class="trophy-hero-flourish">⚜ ⚜ ⚜</div>
+        <p style="text-align:center; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 1px; position:relative; z-index:1;">O hall da fama do K.M.P.S — celebrando os campeões de cada era.</p>
+        <div class="trophy-divider"></div>
         <div class="trophy-grid" id="trophyGrid"></div>
     </div>
     <!-- MODAL: ADICIONAR / EDITAR CAMPEONATO -->
@@ -1541,23 +1559,41 @@
             const todos = [cardAtual, ...campeonatosArquivados];
             const ordem = { finalizado: 0, andamento: 1 };
             todos.sort((a, b) => (ordem[a.status] ?? 2) - (ordem[b.status] ?? 2));
-            grid.innerHTML = todos.map(c => gerarCardTrofeuHtml(c, isViewer)).join('') + (isViewer ? '' : gerarCardAdicionarHtml());
+            grid.innerHTML = todos.map((c, i) => gerarCardTrofeuHtml(c, isViewer, i)).join('') + (isViewer ? '' : gerarCardAdicionarHtml(todos.length));
+            gerarBrasasFlutuantes();
         }
-        function gerarCardTrofeuHtml(c, isViewer) {
+        // Gera brasas flutuantes decorativas no fundo da Sala de Troféus (som e visual "épicos").
+        function gerarBrasasFlutuantes() {
+            const layer = document.getElementById('trophyEmbers');
+            if (!layer) return;
+            layer.innerHTML = '';
+            for (let i = 0; i < 22; i++) {
+                const e = document.createElement('div');
+                e.className = 'ember';
+                e.style.left = Math.random() * 100 + '%';
+                e.style.setProperty('--drift', (Math.random() * 60 - 30) + 'px');
+                e.style.animationDuration = (6 + Math.random() * 6) + 's';
+                e.style.animationDelay = (Math.random() * 8) + 's';
+                e.style.width = e.style.height = (2 + Math.random() * 3) + 'px';
+                layer.appendChild(e);
+            }
+        }
+        function gerarCardTrofeuHtml(c, isViewer, i = 0) {
             const finalizado = c.status === 'finalizado' && c.campeao;
             const editBtn = (!c.live && !isViewer) ? `<button class="trophy-edit-btn admin-only" onclick="event.stopPropagation(); abrirModalCampeonato('${c.id}')" title="Editar">✎</button>` : '';
             const imagemHtml = c.imagem ? `<img src="${c.imagem}" class="trophy-champion-photo">` : `<div class="trophy-icon">🏆</div>`;
-            return `<div class="trophy-card ${finalizado ? '' : 'trophy-pending'}">
+            return `<div class="trophy-card ${finalizado ? '' : 'trophy-pending'}" style="--card-i:${i};">
                 ${editBtn}
+                <div class="trophy-card-rays"></div>
                 <div class="trophy-card-glow"></div>
                 ${imagemHtml}
                 <div class="trophy-tournament-name">${escapeHtml(c.nome)}</div>
                 <div class="trophy-champion-label">${finalizado ? 'Campeão' : 'Em andamento'}</div>
-                <div class="trophy-champion-name">${finalizado ? `<span class="crown-float">👑</span> <span class="champion-shimmer-text">${escapeHtml(c.campeao)}</span>` : 'Torneio em andamento...'}</div>
+                <div class="trophy-champion-name">${finalizado ? `<span class="laurel">🌿</span><span class="crown-float">👑</span> <span class="champion-shimmer-text">${escapeHtml(c.campeao)}</span> <span class="laurel">🌿</span>` : 'Torneio em andamento...'}</div>
             </div>`;
         }
-        function gerarCardAdicionarHtml() {
-            return `<button class="trophy-card trophy-add-card admin-only" onclick="abrirModalCampeonato()">
+        function gerarCardAdicionarHtml(i = 0) {
+            return `<button class="trophy-card trophy-add-card admin-only" style="--card-i:${i};" onclick="abrirModalCampeonato()">
                 <div class="trophy-icon">+</div>
                 <div class="trophy-tournament-name" style="color:var(--text-muted); opacity:0.7;">Adicionar Campeonato</div>
             </button>`;
