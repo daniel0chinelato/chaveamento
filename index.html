@@ -385,7 +385,7 @@
         .pin-modal-box { max-width: 380px; }
         .pin-modal-box .map-pin-icon { position: static; }
         /* ===== TEXTOS GERAIS DO MAPA (lista com ícone, tipo a referência) ===== */
-        .map-textos-gerais { position: absolute; top: 30px; left: 30px; max-width: 360px; z-index: 56; display: flex; flex-direction: column; gap: 18px; pointer-events: none; }
+        .map-textos-gerais { position: absolute; top: 60px; left: 30%; max-width: 320px; z-index: 56; display: flex; flex-direction: column; gap: 18px; pointer-events: none; }
         .texto-geral-item { display: flex; gap: 12px; align-items: flex-start; pointer-events: auto; }
         .texto-geral-icon { width: 38px; height: 38px; border-radius: 50%; background: rgba(0,0,0,0.75); border: 1px solid var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 1.05rem; flex-shrink: 0; overflow: hidden; }
         .texto-geral-icon img { width: 100%; height: 100%; object-fit: cover; }
@@ -1102,9 +1102,9 @@
                 <div class="texto-geral-item" data-id="${it.id}">
                     <div class="texto-geral-icon" ${editando ? `onclick="editarIconeTextoGeral('${it.id}')" style="cursor:pointer;"` : ''}>${(it.icon || '').startsWith('http') ? `<img src="${it.icon}">` : (it.icon || '📌')}</div>
                     <div class="texto-geral-texto" contenteditable="${editando}" onblur="salvarTextoGeralEditado('${it.id}', this)">${editando ? escapeHtml(it.texto) : formatarTextoComNegrito(it.texto)}</div>
-                    ${editando ? `<button class="texto-geral-del" onclick="excluirTextoGeral('${it.id}')" title="Excluir">×</button>` : ''}
+                    ${editando ? `<button class="texto-geral-del admin-only" onclick="excluirTextoGeral('${it.id}')" title="Excluir">×</button>` : ''}
                 </div>`).join('');
-            if (editando) html += `<button class="nav-btn" style="padding:6px 14px; font-size:0.65rem; align-self:flex-start; pointer-events:auto;" onclick="adicionarTextoGeral()">+ Adicionar Texto</button>`;
+            if (editando) html += `<button class="nav-btn admin-only" style="padding:6px 14px; font-size:0.65rem; align-self:flex-start; pointer-events:auto;" onclick="adicionarTextoGeral()">+ Adicionar Texto</button>`;
             container.innerHTML = html;
         }
         function editarIconeTextoGeral(id) {
@@ -1118,17 +1118,20 @@
             salvarPinsDoMapa();
         }
         function salvarTextoGeralEditado(id, el) {
+            if (document.body.classList.contains('is-viewer')) return;
             const item = (mapaTextosGerais[mapaAtivoGlobal] || []).find(t => t.id === id);
             if (!item) return;
             item.texto = el.textContent.trim();
             salvarPinsDoMapa();
         }
         function excluirTextoGeral(id) {
+            if (document.body.classList.contains('is-viewer')) return;
             mapaTextosGerais[mapaAtivoGlobal] = (mapaTextosGerais[mapaAtivoGlobal] || []).filter(t => t.id !== id);
             renderizarTextosGerais(mapaAtivoGlobal);
             salvarPinsDoMapa();
         }
         function adicionarTextoGeral() {
+            if (document.body.classList.contains('is-viewer')) return;
             if (!mapaTextosGerais[mapaAtivoGlobal]) mapaTextosGerais[mapaAtivoGlobal] = [];
             mapaTextosGerais[mapaAtivoGlobal].push({ id: 'txt_' + Date.now(), icon: '📌', texto: 'Novo texto — use **palavra** para deixar em negrito.' });
             renderizarTextosGerais(mapaAtivoGlobal);
@@ -1233,6 +1236,7 @@
             document.getElementById('pinModal').style.display = 'flex';
         }
         function salvarEdicaoPin() {
+            if (document.body.classList.contains('is-viewer')) return;
             const pin = (mapaPinsData[mapaAtivoGlobal] || []).find(p => p.id === pinAbertoId);
             if (!pin) return;
             pin.icon = document.getElementById('pinEditIcone').value.trim() || '📍';
@@ -1244,6 +1248,7 @@
             fecharModalPin();
         }
         function excluirPinAberto() {
+            if (document.body.classList.contains('is-viewer')) return;
             if (!pinAbertoId) return;
             mapaPinsData[mapaAtivoGlobal] = (mapaPinsData[mapaAtivoGlobal] || []).filter(p => p.id !== pinAbertoId);
             renderizarPinsDoMapa(mapaAtivoGlobal);
