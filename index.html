@@ -365,6 +365,15 @@
         @keyframes goldPulseGlow { 0%, 100% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.5)); } 50% { filter: drop-shadow(0 0 22px rgba(255,215,0,0.85)); } }
         .podium-item.gold .avatar-wrapper { animation: goldPulseGlow 2.4s ease-in-out infinite; }
         #mapaDestaqueTitulo { transition: opacity 0.3s ease; }
+        /* ===== PAINEL DE DICAS COM ÍCONES (HTML/CSS, sem precisar de imagem por mapa) ===== */
+        .hint-legend { max-width: 480px; width: 90vw; max-height: 62vh; overflow-y: auto; background: rgba(8,8,10,0.88); backdrop-filter: blur(10px); border: 1px solid var(--accent-color); border-radius: 16px; padding: 26px 26px 20px; box-shadow: 0 25px 60px rgba(0,0,0,0.7); animation: cardRiseIn 0.4s ease backwards; }
+        .hint-legend-title { font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-color); text-align: center; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid rgba(212,175,55,0.25); }
+        .hint-legend-item { display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .hint-legend-item:last-child { border-bottom: none; }
+        .hint-legend-icon { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .hint-legend-texto strong { display: block; color: var(--accent-color); font-size: 0.8rem; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .hint-legend-texto span { color: #ccc; font-size: 0.75rem; line-height: 1.4; }
+        .hint-legend-empty { text-align: center; color: var(--text-muted); font-size: 0.8rem; font-style: italic; padding: 10px 0; }
         #mainMapUI { position: relative; z-index: 3; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; transition: opacity 0.4s ease, pointer-events 0.4s; }
         /* Layout Superior */
         .map-stats-top { display: flex; justify-content: space-between; align-items: flex-start; padding: 28px 40px; width: 100%; box-sizing: border-box; flex: 1; position: relative;}
@@ -693,6 +702,7 @@
         </div>
         <!-- OVERLAY DE DICAS (Sem interface, tela cheia) -->
         <div id="hintContainer">
+            <div id="hintLegend" class="hint-legend"></div>
             <button class="btn-fechar-dica" onclick="toggleDicas()">Voltar às Estatísticas</button>
         </div>
     </div>
@@ -998,6 +1008,35 @@
             crossfadeLayer('immersiveMapBg', 'bg-layer-main', url);
             crossfadeLayer('immersiveMapBgBlur', 'bg-layer-blur', url);
         }
+        // ===== DICAS DE MAPA EM HTML (ícones + texto) =====
+        // Edite/adicione mapas aqui — não precisa de nenhuma imagem customizada.
+        // Cada item: { icon: 'emoji ou texto curto', titulo: 'nome curto', texto: 'a dica em si' }
+        const mapaDicasIcones = {
+            "Anatólia": [
+                { icon: "🛡️", titulo: "Buff de Força", texto: "Fica na fenda central do mapa — contestem cedo, define o controle do meio." },
+                { icon: "🐍", titulo: "Camp da Serpente", texto: "Perto da rota da selva; bom pra snowball no early game." },
+                { icon: "🔥", titulo: "Rotação sugerida", texto: "Duo prioriza o buff de attack speed antes do primeiro reset." }
+            ],
+            "Coração de Tenochtitlán": [
+                { icon: "⚔️", titulo: "Objetivo central", texto: "O altar do meio dá vantagem de visão — vale disputar no minuto 2-3." },
+                { icon: "🏹", titulo: "Ângulos de jungle", texto: "Muitos arbustos nas laterais, cuidado com ganks de flanco." }
+            ]
+            // Exemplo: "Nome do Mapa": [ { icon: "💀", titulo: "...", texto: "..." } ]
+        };
+        function renderizarLegendaDicas(mapa) {
+            const container = document.getElementById('hintLegend');
+            if (!container) return;
+            const itens = mapaDicasIcones[mapa];
+            if (!itens || itens.length === 0) {
+                container.innerHTML = `<div class="hint-legend-title">${escapeHtml(mapa)}</div><div class="hint-legend-empty">Ainda não temos dicas cadastradas pra esse mapa.</div>`;
+                return;
+            }
+            container.innerHTML = `<div class="hint-legend-title">${escapeHtml(mapa)}</div>` + itens.map(it => `
+                <div class="hint-legend-item">
+                    <div class="hint-legend-icon">${it.icon}</div>
+                    <div class="hint-legend-texto"><strong>${escapeHtml(it.titulo)}</strong><span>${escapeHtml(it.texto)}</span></div>
+                </div>`).join('');
+        }
         function toggleDicas() {
             const uiContent = document.getElementById('mainMapUI');
             const hintContainer = document.getElementById('hintContainer');
@@ -1006,8 +1045,10 @@
                 uiContent.style.opacity = '0';
                 uiContent.style.pointerEvents = 'none';
                 hintContainer.classList.add('active');
-                // O fundo vira a imagem da dica sem blur
+                // O fundo vira a imagem da dica sem blur (se existir); a legenda de ícones
+                // aparece por cima e funciona mesmo sem nenhuma imagem custom.
                 setMapBackground(getMapHintPath(mapaAtivoGlobal));
+                renderizarLegendaDicas(mapaAtivoGlobal);
                 document.querySelector('.immersive-overlay').style.opacity = '0';
             } else {
                 uiContent.style.opacity = '1';
@@ -2688,7 +2729,7 @@
             const layer = document.getElementById('mapDustLayer');
             if (!layer) return;
             layer.innerHTML = '';
-            for (let i = 0; i < 26; i++) {
+            for (let i = 0; i < 60; i++) {
                 const d = document.createElement('div');
                 d.className = 'dust-mote';
                 const tam = 1.5 + Math.random() * 3;
