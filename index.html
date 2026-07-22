@@ -340,7 +340,7 @@
            ======================================= */
         #page-maps { padding: 0 !important; max-width: 100% !important; height: calc(100vh - 65px); position: relative; overflow: hidden; background: #000; }
         .immersive-bg-blur { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; filter: blur(70px) saturate(1.6) brightness(0.5); transform: scale(1.15); transition: filter 0.5s ease-in-out; z-index: 0; }
-        .immersive-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.5s ease-in-out; z-index: 1; }
+        .immersive-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: filter 0.5s ease-in-out, transform 0.3s ease-out; z-index: 1; }
         /* Camadas de crossfade: background-image NAO pode ser animado nativamente pelo CSS,
            entao usamos duas camadas empilhadas e cruzamos a opacidade entre elas (isso sim anima). */
         .bg-layer-blur, .bg-layer-main { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.6s ease-in-out; }
@@ -348,7 +348,23 @@
         .bg-layer-main { background-size: contain; background-repeat: no-repeat; background-position: center; }
         .bg-layer-blur.active, .bg-layer-main.active { opacity: 1; }
         .immersive-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(5,5,8,0.95) 0%, rgba(5,5,8,0.6) 40%, rgba(5,5,8,0.3) 60%, rgba(5,5,8,0.8) 100%), linear-gradient(0deg, rgba(5,5,8,0.95) 0%, transparent 30%); z-index: 2; transition: opacity 0.6s; }
-        .map-vignette { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; box-shadow: inset 0 0 160px 20px rgba(0,0,0,0.7); }
+        .map-vignette { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; box-shadow: inset 0 0 160px 20px rgba(0,0,0,0.7); animation: vignetteBreathe 6s ease-in-out infinite; }
+        @keyframes vignetteBreathe { 0%, 100% { box-shadow: inset 0 0 160px 20px rgba(0,0,0,0.7); } 50% { box-shadow: inset 0 0 190px 30px rgba(0,0,0,0.8); } }
+        /* Poeira/luz flutuante sobre o mapa imersivo (atmosfera épica) */
+        #mapDustLayer { position: absolute; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
+        @keyframes dustDrift { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: 0.7; } 90% { opacity: 0.4; } 100% { transform: translate(var(--dx, 120px), var(--dy, -80px)); opacity: 0; } }
+        .dust-mote { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(255,240,200,0.9), rgba(212,175,55,0.1)); animation: dustDrift linear infinite; }
+        /* Entrada em cascata do pódio: bronze, prata e ouro sobem em sequência, ouro com destaque final */
+        @keyframes podiumRiseUp { from { opacity: 0; transform: translateY(35px) scale(0.85); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .podium-item { animation: podiumRiseUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+        .podium-item.bronze { animation-delay: 0.05s; }
+        .podium-item.silver { animation-delay: 0.22s; }
+        .podium-item.gold { animation-delay: 0.42s; }
+        @keyframes goldRayRotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+        .podium-item.gold .avatar-wrapper::before { content: ''; position: absolute; top: 50%; left: 50%; width: 130px; height: 130px; transform: translate(-50%, -50%); background: conic-gradient(from 0deg, transparent 0deg, rgba(255,215,0,0.35) 10deg, transparent 24deg, transparent 160deg, rgba(255,215,0,0.25) 174deg, transparent 190deg, transparent 340deg, rgba(255,215,0,0.3) 354deg, transparent 360deg); animation: goldRayRotate 10s linear infinite; z-index: -1; }
+        @keyframes goldPulseGlow { 0%, 100% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.5)); } 50% { filter: drop-shadow(0 0 22px rgba(255,215,0,0.85)); } }
+        .podium-item.gold .avatar-wrapper { animation: goldPulseGlow 2.4s ease-in-out infinite; }
+        #mapaDestaqueTitulo { transition: opacity 0.3s ease; }
         #mainMapUI { position: relative; z-index: 3; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; transition: opacity 0.4s ease, pointer-events 0.4s; }
         /* Layout Superior */
         .map-stats-top { display: flex; justify-content: space-between; align-items: flex-start; padding: 28px 40px; width: 100%; box-sizing: border-box; flex: 1; position: relative;}
@@ -647,11 +663,12 @@
             <div class="immersive-overlay"></div>
         </div>
         <div class="map-vignette"></div>
+        <div id="mapDustLayer"></div>
         <div id="mainMapUI" class="immersive-content">
             <!-- Lado Superior (Esquerda e Direita) -->
             <div class="map-stats-top">
                 <div class="map-info-left">
-                    <h1 id="mapaDestaqueTitulo" style="font-size: 2.1rem; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); font-family: 'Cinzel', serif; color: var(--accent-color); letter-spacing: 2px; line-height:1.1;">Anatólia</h1>
+                    <h1 id="mapaDestaqueTitulo" class="champion-shimmer-text" style="font-size: 2.1rem; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); font-family: 'Cinzel', serif; letter-spacing: 2px; line-height:1.1;">Anatólia</h1>
                     <div style="font-size: 0.75rem; color: #fff; text-transform: uppercase; font-weight: bold; letter-spacing: 1.5px; text-shadow: 1px 1px 4px #000; margin-top: 6px;">Total de Partidas no Mapa: <span id="mapTotalJogos" style="color: var(--accent-color); font-size: 1.05rem; margin-left: 5px;">0</span></div>
                     <button class="btn-hint" onclick="toggleDicas()">💡 Ver Dicas do Mapa</button>
                 </div>
@@ -2666,7 +2683,38 @@
         document.getElementById('trophyGrid')?.addEventListener('mouseleave', (e) => {
             document.querySelectorAll('.trophy-card').forEach(c => c.style.transform = '');
         }, true);
-        window.onload = () => { renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); };
+        // Poeira/luz flutuante decorativa sobre o mapa imersivo (efeito atmosférico).
+        function gerarPoeiraFlutuante() {
+            const layer = document.getElementById('mapDustLayer');
+            if (!layer) return;
+            layer.innerHTML = '';
+            for (let i = 0; i < 26; i++) {
+                const d = document.createElement('div');
+                d.className = 'dust-mote';
+                const tam = 1.5 + Math.random() * 3;
+                d.style.width = d.style.height = tam + 'px';
+                d.style.left = Math.random() * 100 + '%';
+                d.style.top = Math.random() * 100 + '%';
+                d.style.setProperty('--dx', (Math.random() * 200 - 100) + 'px');
+                d.style.setProperty('--dy', (Math.random() * 160 - 100) + 'px');
+                d.style.animationDuration = (8 + Math.random() * 10) + 's';
+                d.style.animationDelay = (Math.random() * 10) + 's';
+                layer.appendChild(d);
+            }
+        }
+        // Parallax sutil: o fundo do mapa acompanha levemente o cursor, dando profundidade.
+        (function initParallaxMapa() {
+            const pageMaps = document.getElementById('page-maps');
+            const bg = document.getElementById('immersiveMapBg');
+            if (!pageMaps || !bg) return;
+            pageMaps.addEventListener('mousemove', (e) => {
+                const x = (e.clientX / window.innerWidth - 0.5) * 14;
+                const y = (e.clientY / window.innerHeight - 0.5) * 14;
+                bg.style.transform = `translate(${x}px, ${y}px) scale(1.03)`;
+            });
+            pageMaps.addEventListener('mouseleave', () => { bg.style.transform = ''; });
+        })();
+        window.onload = () => { renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); gerarPoeiraFlutuante(); };
     </script>
 </body>
 </html>
