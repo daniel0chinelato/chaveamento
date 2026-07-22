@@ -366,10 +366,11 @@
         .podium-item.gold .avatar-wrapper { animation: goldPulseGlow 2.4s ease-in-out infinite; }
         #mapaDestaqueTitulo { transition: opacity 0.3s ease; }
         /* ===== PINS INTERATIVOS DE DICA NO MAPA (HTML/CSS puro, arrastáveis pelo admin) ===== */
-        #mapPinsLayer { position: absolute; inset: 0; z-index: 55; }
-        .map-pin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; z-index: 10; transition: filter 0.2s ease; }
+        #mapPinsLayer { position: absolute; inset: 0; z-index: 55; pointer-events: none; }
+        .map-pin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; z-index: 10; transition: filter 0.2s ease; pointer-events: auto; }
         .map-pin:hover .map-pin-icon { transform: scale(1.12); box-shadow: 0 6px 16px rgba(0,0,0,0.7), 0 0 16px rgba(212,175,55,0.6); }
-        .map-pin-drop { width: 42px; height: 54px; position: relative; }
+        @keyframes pinFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+        .map-pin-drop { width: 42px; height: 54px; position: relative; animation: pinFloat 3s ease-in-out infinite; }
         .map-pin-icon { width: 42px; height: 42px; border-radius: 50%; background: #111; border: 2px solid var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 0 10px rgba(212,175,55,0.35); position: relative; z-index: 2; overflow: hidden; transition: transform 0.15s ease, box-shadow 0.15s ease; }
         .map-pin-icon img { width: 100%; height: 100%; object-fit: cover; }
         .map-pin-drop::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 16px; height: 16px; background: #111; border-right: 2px solid var(--accent-color); border-bottom: 2px solid var(--accent-color); z-index: 1; }
@@ -383,6 +384,15 @@
         .hint-toolbar { position: absolute; top: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 60; }
         .pin-modal-box { max-width: 380px; }
         .pin-modal-box .map-pin-icon { position: static; }
+        /* ===== TEXTOS GERAIS DO MAPA (lista com ícone, tipo a referência) ===== */
+        .map-textos-gerais { position: absolute; top: 30px; left: 30px; max-width: 360px; z-index: 56; display: flex; flex-direction: column; gap: 18px; pointer-events: none; }
+        .texto-geral-item { display: flex; gap: 12px; align-items: flex-start; pointer-events: auto; }
+        .texto-geral-icon { width: 38px; height: 38px; border-radius: 50%; background: rgba(0,0,0,0.75); border: 1px solid var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 1.05rem; flex-shrink: 0; overflow: hidden; }
+        .texto-geral-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .texto-geral-texto { color: #fff; font-size: 0.85rem; line-height: 1.45; text-shadow: 1px 1px 5px rgba(0,0,0,0.95); padding-top: 6px; }
+        .texto-geral-texto strong { color: var(--accent-color); }
+        .texto-geral-texto[contenteditable="true"] { outline: 1px dashed rgba(212,175,55,0.5); border-radius: 6px; padding: 6px 8px; background: rgba(0,0,0,0.4); cursor: text; }
+        .texto-geral-del { background: rgba(0,0,0,0.7); border: 1px solid var(--danger-color); color: var(--danger-color); width: 22px; height: 22px; border-radius: 50%; cursor: pointer; flex-shrink: 0; font-size: 0.85rem; line-height: 1; margin-top: 6px; }
         #mainMapUI { position: relative; z-index: 3; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; transition: opacity 0.4s ease, pointer-events 0.4s; }
         /* Layout Superior */
         .map-stats-top { display: flex; justify-content: space-between; align-items: flex-start; padding: 28px 40px; width: 100%; box-sizing: border-box; flex: 1; position: relative;}
@@ -711,6 +721,7 @@
         </div>
         <!-- OVERLAY DE DICAS (Sem interface, tela cheia) -->
         <div id="hintContainer">
+            <div id="mapTextosGeraisLayer" class="map-textos-gerais"></div>
             <div id="mapPinsLayer"></div>
             <div class="hint-toolbar admin-only">
                 <button class="nav-btn" style="padding:6px 14px; font-size:0.65rem;" onclick="alternarModoEdicaoPins()" id="btnModoEdicaoPins">✎ Editar Dicas</button>
@@ -1070,6 +1081,59 @@
         };
         let modoEdicaoPinsAtivo = false;
         let pinAbertoId = null; // qual pin está no popup no momento
+        // Textos gerais do mapa (lista com ícone + palavra em destaque + descrição, estilo referência)
+        let mapaTextosGerais = {
+            "Anatólia": [
+                { id: 'tg1', icon: '🐟', texto: 'Grande quantidade de **arenque**, sendo viável coletar comida em mar.' },
+                { id: 'tg2', icon: '🍖', texto: 'Alta quantidade de **caça** no centro do mapa.' },
+                { id: 'tg3', icon: '⛏️', texto: 'Começa com **2x minas de ouro** iniciais no mapa. Terceira mina afastada.' }
+            ]
+        };
+        function formatarTextoComNegrito(texto) {
+            return escapeHtml(texto || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        }
+        function renderizarTextosGerais(mapa) {
+            const container = document.getElementById('mapTextosGeraisLayer');
+            if (!container) return;
+            const isViewer = document.body.classList.contains('is-viewer');
+            const itens = mapaTextosGerais[mapa] || [];
+            const editando = modoEdicaoPinsAtivo && !isViewer;
+            let html = itens.map(it => `
+                <div class="texto-geral-item" data-id="${it.id}">
+                    <div class="texto-geral-icon" ${editando ? `onclick="editarIconeTextoGeral('${it.id}')" style="cursor:pointer;"` : ''}>${(it.icon || '').startsWith('http') ? `<img src="${it.icon}">` : (it.icon || '📌')}</div>
+                    <div class="texto-geral-texto" contenteditable="${editando}" onblur="salvarTextoGeralEditado('${it.id}', this)">${editando ? escapeHtml(it.texto) : formatarTextoComNegrito(it.texto)}</div>
+                    ${editando ? `<button class="texto-geral-del" onclick="excluirTextoGeral('${it.id}')" title="Excluir">×</button>` : ''}
+                </div>`).join('');
+            if (editando) html += `<button class="nav-btn" style="padding:6px 14px; font-size:0.65rem; align-self:flex-start; pointer-events:auto;" onclick="adicionarTextoGeral()">+ Adicionar Texto</button>`;
+            container.innerHTML = html;
+        }
+        function editarIconeTextoGeral(id) {
+            if (document.body.classList.contains('is-viewer')) return;
+            const item = (mapaTextosGerais[mapaAtivoGlobal] || []).find(t => t.id === id);
+            if (!item) return;
+            const novo = prompt('Ícone (emoji ou URL de imagem):', item.icon || '');
+            if (novo === null) return;
+            item.icon = novo.trim() || '📌';
+            renderizarTextosGerais(mapaAtivoGlobal);
+            salvarPinsDoMapa();
+        }
+        function salvarTextoGeralEditado(id, el) {
+            const item = (mapaTextosGerais[mapaAtivoGlobal] || []).find(t => t.id === id);
+            if (!item) return;
+            item.texto = el.textContent.trim();
+            salvarPinsDoMapa();
+        }
+        function excluirTextoGeral(id) {
+            mapaTextosGerais[mapaAtivoGlobal] = (mapaTextosGerais[mapaAtivoGlobal] || []).filter(t => t.id !== id);
+            renderizarTextosGerais(mapaAtivoGlobal);
+            salvarPinsDoMapa();
+        }
+        function adicionarTextoGeral() {
+            if (!mapaTextosGerais[mapaAtivoGlobal]) mapaTextosGerais[mapaAtivoGlobal] = [];
+            mapaTextosGerais[mapaAtivoGlobal].push({ id: 'txt_' + Date.now(), icon: '📌', texto: 'Novo texto — use **palavra** para deixar em negrito.' });
+            renderizarTextosGerais(mapaAtivoGlobal);
+            salvarPinsDoMapa();
+        }
         function renderizarPinsDoMapa(mapa) {
             const layer = document.getElementById('mapPinsLayer');
             if (!layer) return;
@@ -1082,7 +1146,7 @@
                 el.style.top = p.y + '%';
                 el.dataset.id = p.id;
                 const iconInner = (p.icon || '').startsWith('http') ? `<img src="${p.icon}">` : (p.icon || '📍');
-                el.innerHTML = `<div class="map-pin-drop"><div class="map-pin-icon">${iconInner}</div>${p.qtd ? `<div class="map-pin-badge">${escapeHtml(String(p.qtd))}</div>` : ''}</div>`;
+                el.innerHTML = `<div class="map-pin-drop" style="animation-delay:${(p.id.length % 5) * 0.4 + Math.random() * 0.6}s;"><div class="map-pin-icon">${iconInner}</div>${p.qtd ? `<div class="map-pin-badge">${escapeHtml(String(p.qtd))}</div>` : ''}</div>`;
                 el.addEventListener('mousedown', (e) => iniciarInteracaoPin(e, el, p.id));
                 layer.appendChild(el);
             });
@@ -1133,6 +1197,7 @@
             document.getElementById('btnModoEdicaoPins').textContent = modoEdicaoPinsAtivo ? '✓ Concluir Edição' : '✎ Editar Dicas';
             document.getElementById('btnAdicionarPin').style.display = modoEdicaoPinsAtivo ? 'inline-block' : 'none';
             renderizarPinsDoMapa(mapaAtivoGlobal);
+            renderizarTextosGerais(mapaAtivoGlobal);
         }
         function adicionarNovoPin() {
             if (document.body.classList.contains('is-viewer')) return;
@@ -1203,6 +1268,7 @@
                 // só que sem o blur/escurecimento das bordas, pra ver os pins com clareza.
                 setMapBackground(mapaImagens[mapaAtivoGlobal]);
                 renderizarPinsDoMapa(mapaAtivoGlobal);
+                renderizarTextosGerais(mapaAtivoGlobal);
                 document.querySelector('.immersive-overlay').style.opacity = '0';
             } else {
                 uiContent.style.opacity = '1';
@@ -2747,6 +2813,7 @@
                     finalsDisplay: document.getElementById('grandFinalsDisplay')?.innerHTML || '',
                     campeonatosArquivados: campeonatosArquivados || [],
                     mapaPins: mapaPinsData || {},
+                    mapaTextosGerais: mapaTextosGerais || {},
                 };
                 db.ref('tavernas_data').set(data)
                   .then(() => { if(btnSave) btnSave.style.display = 'none'; })
@@ -2810,6 +2877,7 @@
             jogadoresPromovidos = data.promotedList || [];
                         campeonatosArquivados = data.campeonatosArquivados || [];
             if (data.mapaPins && Object.keys(data.mapaPins).length > 0) mapaPinsData = data.mapaPins;
+            if (data.mapaTextosGerais && Object.keys(data.mapaTextosGerais).length > 0) mapaTextosGerais = data.mapaTextosGerais;
             if(data.bracketSize) {
                 let select = document.getElementById('bracketSize');
                 let optionExists = Array.from(select.options).some(opt => parseInt(opt.value) === parseInt(data.bracketSize));
@@ -2864,12 +2932,18 @@
         }
         function resetTournament() {
             if(confirm("Tem certeza que deseja apagar TODOS os dados da Nuvem? Isso não pode ser desfeito.")) {
-                // As dicas de mapa (pins) não são dados do torneio — preserva antes de apagar.
-                db.ref('tavernas_data/mapaPins').once('value').then(snap => {
-                    const pinsAtuais = snap.val();
+                // As dicas de mapa (pins e textos) não são dados do torneio — preserva antes de apagar.
+                Promise.all([
+                    db.ref('tavernas_data/mapaPins').once('value'),
+                    db.ref('tavernas_data/mapaTextosGerais').once('value')
+                ]).then(([snapPins, snapTextos]) => {
+                    const pinsAtuais = snapPins.val();
+                    const textosAtuais = snapTextos.val();
                     db.ref('tavernas_data').remove().then(() => {
-                        if (pinsAtuais) db.ref('tavernas_data/mapaPins').set(pinsAtuais).finally(() => location.reload());
-                        else location.reload();
+                        const restaurar = [];
+                        if (pinsAtuais) restaurar.push(db.ref('tavernas_data/mapaPins').set(pinsAtuais));
+                        if (textosAtuais) restaurar.push(db.ref('tavernas_data/mapaTextosGerais').set(textosAtuais));
+                        Promise.all(restaurar).finally(() => location.reload());
                     });
                 });
             }
