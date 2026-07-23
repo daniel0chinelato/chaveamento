@@ -367,7 +367,11 @@
         #mapaDestaqueTitulo { transition: opacity 0.3s ease; }
         /* ===== PINS INTERATIVOS DE DICA NO MAPA (HTML/CSS puro, arrastáveis pelo admin) ===== */
         #mapPinsLayer { position: absolute; inset: 0; z-index: 55; pointer-events: none; }
-        .map-pin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; z-index: 10; transition: filter 0.2s ease; pointer-events: auto; }
+        .map-pin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; z-index: 10; transition: filter 0.2s ease; pointer-events: none; }
+        /* Os pins só ficam clicáveis quando o modo "Dicas do Mapa" está realmente
+           aberto — sem isso, eles continuavam recebendo cliques por cima do pódio
+           mesmo invisíveis, depois da primeira vez que a camada era renderizada. */
+        #hintContainer.active .map-pin { pointer-events: auto; }
         .map-pin:hover .map-pin-icon { transform: scale(1.12); box-shadow: 0 6px 16px rgba(0,0,0,0.7), 0 0 16px rgba(212,175,55,0.6); }
         @keyframes pinFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
         .map-pin-drop { width: 42px; height: 54px; position: relative; animation: pinFloat 3s ease-in-out infinite; }
@@ -408,7 +412,7 @@
         #mainMapUI { position: relative; z-index: 3; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; transition: opacity 0.4s ease, pointer-events 0.4s; }
         /* Layout Superior */
         .map-stats-top { display: flex; justify-content: space-between; align-items: flex-start; padding: 28px 40px; width: 100%; box-sizing: border-box; flex: 1; position: relative;}
-        .map-info-left { flex: 1; max-width: 340px; display: flex; flex-direction: column; gap: 12px;}
+        .map-info-left { flex: 1; max-width: 340px; display: flex; flex-direction: column; gap: 12px; padding-left: 15%; box-sizing: border-box; }
         /* O Pódio agora foi movido para a direita, empurrado um pouco para a esquerda (sobre o mapa) */
         .map-podium-right { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 340px; margin-right: 30%; margin-top: 8%;}
         /* BOTAO DE DICAS E TRANSIÇÃO */
@@ -519,6 +523,7 @@
             .setup-grid { grid-template-columns: 1fr !important; }
             .map-stats-top { flex-direction: column; padding: 20px; gap: 20px; }
             .map-podium-right { width: 100%; margin-right: 0; }
+            .map-info-left { padding-left: 0; max-width: 100%; }
             .groups-grid { grid-template-columns: 1fr; }
         }
     </style>
