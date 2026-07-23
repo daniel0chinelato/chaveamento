@@ -412,7 +412,7 @@
         #mainMapUI { position: relative; z-index: 3; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; transition: opacity 0.4s ease, pointer-events 0.4s; }
         /* Layout Superior */
         .map-stats-top { display: flex; justify-content: space-between; align-items: flex-start; padding: 28px 40px; width: 100%; box-sizing: border-box; flex: 1; position: relative;}
-        .map-info-left { flex: 1; max-width: 340px; display: flex; flex-direction: column; gap: 12px; margin-left: 15%; }
+        .map-info-left { flex: 1; max-width: 340px; display: flex; flex-direction: column; gap: 12px; margin-left: clamp(0px, 15%, 130px); position: relative; z-index: 6; }
         /* O Pódio agora foi movido para a direita, empurrado um pouco para a esquerda (sobre o mapa) */
         .map-podium-right { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 340px; margin-right: 30%; margin-top: 8%;}
         /* BOTAO DE DICAS E TRANSIÇÃO */
