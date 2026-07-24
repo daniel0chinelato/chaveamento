@@ -141,6 +141,11 @@
         .h2h-row .h2h-opponent { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .h2h-row .h2h-score { font-family: 'Cinzel', serif; font-weight: bold; color: var(--accent-color); }
         .h2h-empty { text-align: center; color: var(--text-muted); font-style: italic; font-size: 0.85rem; padding: 20px 0; }
+        /* ===== INTEGRAÇÃO CHALLONGE (modo espelho, somente leitura de placar) ===== */
+        .chall-match .btn-advance { display: none !important; }
+        .chall-match .score-input:disabled { pointer-events: none; opacity: 0.9; background: rgba(212,175,55,0.08) !important; -webkit-text-fill-color: var(--accent-color); cursor: default; }
+        .chall-sync-badge { position: absolute; top: 6px; left: 6px; font-size: 0.55rem; font-weight: 700; letter-spacing: 0.5px; color: var(--text-muted); background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 10px; z-index: 5; pointer-events: none; }
+        .match-card.chall-match .chall-sync-badge { top: 6px; left: 6px; }
         .loader { display: none; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid #fff; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .container { max-width: 1600px; margin: 0 auto; padding: 0 20px 60px 20px; }
@@ -588,6 +593,16 @@
                 <div>
                     <div class="sidebar-tournament-name">Sala de Troféus</div>
                     <div class="sidebar-tournament-status">Campeões de todas as eras</div>
+                </div>
+            </button>
+        </div>
+        <div class="sidebar-section-title admin-only">Integração</div>
+        <div class="sidebar-tournament-list admin-only">
+            <button class="sidebar-tournament-item" id="btnSincronizarChallonge" onclick="sincronizarComChallonge()">
+                🔗
+                <div>
+                    <div class="sidebar-tournament-name">Sincronizar com Challonge</div>
+                    <div class="sidebar-tournament-status">Importa grupos + chave (somente leitura)</div>
                 </div>
             </button>
         </div>
@@ -3081,6 +3096,312 @@
             });
             pageMaps.addEventListener('mouseleave', () => { bg.style.transform = ''; });
         })();
+        // =======================================================================
+        // INTEGRAÇÃO CHALLONGE — modo espelho (somente leitura de placar/estrutura)
+        // Grupos e chave (vencedores/repescagem/final) passam a vir do Challonge.
+        // Gods, bans, mapas e links de stream continuam 100% controlados aqui no site.
+        // =======================================================================
+        const CHALLONGE_PROXY_URL = 'https://kmps-tournament.tsmpain159.workers.dev/';
+        const CHALLONGE_TOURNAMENT_ID = 'tavernas';
+
+        async function fetchChallongeJSON(path) {
+            const url = `${CHALLONGE_PROXY_URL}?tournament=${encodeURIComponent(CHALLONGE_TOURNAMENT_ID)}&path=${path}`;
+            const resp = await fetch(url);
+            if (!resp.ok) throw new Error(`Falha ao buscar ${path} (HTTP ${resp.status})`);
+            return await resp.json();
+        }
+
+        function construirMapasDeParticipantes(participantsRaw) {
+            const byId = {}, byGroupPlayerId = {};
+            participantsRaw.forEach(p => {
+                const part = p.participant;
+                byId[part.id] = part.name;
+                (part.group_player_ids || []).forEach(gid => { byGroupPlayerId[gid] = part.name; });
+            });
+            return { byId, byGroupPlayerId };
+        }
+        function nomeJogadorPlayoff(id, maps) { return id ? (maps.byId[id] || 'TBD') : 'TBD'; }
+        function nomeJogadorGrupo(id, maps) { return id ? (maps.byGroupPlayerId[id] || 'TBD') : 'TBD'; }
+
+        function contarVitoriasPorGame(scoresCsv) {
+            if (!scoresCsv) return [0, 0];
+            let v1 = 0, v2 = 0;
+            scoresCsv.split(',').forEach(par => {
+                const partes = par.split('-').map(n => parseInt(n) || 0);
+                const a = partes[0] || 0, b = partes[1] || 0;
+                if (a === 0 && b === 0) return;
+                if (a > b) v1++; else if (b > a) v2++;
+            });
+            return [v1, v2];
+        }
+
+        // Separa as partidas em grupos (fase de round-robin) e playoff (vencedores/repescagem/final)
+        function classificarPartidasChallonge(matchesRaw) {
+            const todas = matchesRaw.map(m => m.match);
+            const grupos = {};
+            const playoff = todas.filter(m => {
+                if (m.group_id !== null && m.group_id !== undefined) {
+                    (grupos[m.group_id] = grupos[m.group_id] || []).push(m);
+                    return false;
+                }
+                return true;
+            });
+            const byId = {}; playoff.forEach(m => byId[m.id] = m);
+            const gfIds = new Set();
+            playoff.forEach(m => {
+                if (m.round > 0) {
+                    const r1 = m.player1_prereq_match_id ? byId[m.player1_prereq_match_id]?.round : null;
+                    const r2 = m.player2_prereq_match_id ? byId[m.player2_prereq_match_id]?.round : null;
+                    if ((r1 != null && r1 < 0) || (r2 != null && r2 < 0)) gfIds.add(m.id);
+                }
+            });
+            let mudou = true;
+            while (mudou) {
+                mudou = false;
+                playoff.forEach(m => {
+                    if (gfIds.has(m.id) || m.round <= 0) return;
+                    const p1Gf = m.player1_prereq_match_id && gfIds.has(m.player1_prereq_match_id);
+                    const p2Gf = m.player2_prereq_match_id && gfIds.has(m.player2_prereq_match_id);
+                    if (p1Gf || p2Gf) { gfIds.add(m.id); mudou = true; }
+                });
+            }
+            const winners = {}, losers = {}, finais = [];
+            playoff.forEach(m => {
+                if (gfIds.has(m.id)) { finais.push(m); return; }
+                if (m.round > 0) (winners[m.round] = winners[m.round] || []).push(m);
+                else if (m.round < 0) (losers[Math.abs(m.round)] = losers[Math.abs(m.round)] || []).push(m);
+            });
+            const ordenar = arr => arr.sort((a, b) => (a.suggested_play_order || 0) - (b.suggested_play_order || 0));
+            Object.values(winners).forEach(ordenar); Object.values(losers).forEach(ordenar); ordenar(finais);
+            return { grupos, winners, losers, finais };
+        }
+
+        // ---- Extração dos dados locais (gods/bans/streams) antes de regenerar, pra poder migrar ----
+        function extrairDadosLocaisPorPar() {
+            const mapa = {};
+            const chavePar = (a, b) => [a, b].sort().join('|');
+            document.querySelectorAll('.match-card').forEach(card => {
+                const p1 = (card.dataset.p1 || '').trim(), p2 = (card.dataset.p2 || '').trim();
+                if (!p1 || !p2) return;
+                mapa[chavePar(p1, p2)] = extrairPicksBansStreams(card, p1, p2);
+            });
+            document.querySelectorAll('.b-match:not(.is-bye)').forEach(match => {
+                const players = match.querySelectorAll('.b-player');
+                if (players.length !== 2) return;
+                const p1 = players[0].querySelector('.p-name')?.innerText.trim() || '';
+                const p2 = players[1].querySelector('.p-name')?.innerText.trim() || '';
+                if (!p1 || !p2 || p1.startsWith('Perd.') || p1.startsWith('Venc.') || p2.startsWith('Perd.') || p2.startsWith('Venc.')) return;
+                mapa[chavePar(p1, p2)] = extrairPicksBansStreams(match, p1, p2);
+            });
+            return mapa;
+        }
+        function extrairPicksBansStreams(container, p1, p2) {
+            const picksP1 = [], picksP2 = [], bansP1 = [], bansP2 = [];
+            const p1Container = container.querySelector('.match-player[data-slot="p1"], .b-player[data-slot="0"]');
+            const p2Container = container.querySelector('.match-player[data-slot="p2"], .b-player[data-slot="1"]');
+            [[p1Container, picksP1, bansP1], [p2Container, picksP2, bansP2]].forEach(([cont, picksArr, bansArr]) => {
+                if (!cont) return;
+                cont.querySelectorAll('.god-select-btn:not(.ban-slot)').forEach(el => picksArr.push(el.getAttribute('data-god') || ''));
+                cont.querySelectorAll('.god-select-btn.ban-slot').forEach(el => bansArr.push(el.getAttribute('data-god') || ''));
+            });
+            let streams = [];
+            try { streams = JSON.parse(container.getAttribute('data-streams') || '[]'); } catch (e) {}
+            return { picksP1, picksP2, bansP1, bansP2, streams };
+        }
+        // Reaplica os dados extraídos num card/match novo, casando por nome (ignora quem é p1/p2, pois a chave já é o par ordenado)
+        function aplicarDadosMigrados(mapaAntigo, novoContainer, p1Name, p2Name) {
+            const chavePar = (a, b) => [a, b].sort().join('|');
+            const dados = mapaAntigo[chavePar(p1Name, p2Name)];
+            if (!dados) return false;
+            const p1Container = novoContainer.querySelector('.match-player[data-slot="p1"], .b-player[data-slot="0"]');
+            const p2Container = novoContainer.querySelector('.match-player[data-slot="p2"], .b-player[data-slot="1"]');
+            const aplicarLado = (cont, picks, bans) => {
+                if (!cont) return;
+                let i = 0;
+                cont.querySelectorAll('.god-select-btn:not(.ban-slot)').forEach(el => {
+                    const godName = picks[i]; i++;
+                    if (godName) { el.setAttribute('data-god', godName); el.style.backgroundImage = `url('${getGodIconPath(godName)}')`; el.style.borderStyle = 'solid'; }
+                });
+                let j = 0;
+                cont.querySelectorAll('.god-select-btn.ban-slot').forEach(el => {
+                    const godName = bans[j]; j++;
+                    if (godName) { el.setAttribute('data-god', godName); el.style.backgroundImage = `url('${getGodIconPath(godName)}')`; el.style.borderStyle = 'solid'; }
+                });
+            };
+            aplicarLado(p1Container, dados.picksP1, dados.bansP1);
+            aplicarLado(p2Container, dados.picksP2, dados.bansP2);
+            if (dados.streams && dados.streams.length) novoContainer.setAttribute('data-streams', JSON.stringify(dados.streams));
+            return true;
+        }
+
+        // ---- Renderização: fase de grupos ----
+        function calcularStandingsGrupo(matches, maps) {
+            const stats = {};
+            matches.forEach(m => {
+                const p1 = nomeJogadorGrupo(m.player1_id, maps), p2 = nomeJogadorGrupo(m.player2_id, maps);
+                [p1, p2].forEach(n => { if (!stats[n]) stats[n] = { v: 0, d: 0 }; });
+                if (m.state === 'complete' && m.winner_id) {
+                    const vencedorNome = nomeJogadorGrupo(m.winner_id, maps);
+                    const perdedorNome = vencedorNome === p1 ? p2 : p1;
+                    if (stats[vencedorNome]) stats[vencedorNome].v++;
+                    if (stats[perdedorNome]) stats[perdedorNome].d++;
+                }
+            });
+            return stats;
+        }
+        function gerarCardConfrontoChallonge(matchId, p1Name, p2Name, groupIdx, s1, s2) {
+            const banHtml = (lado) => `<div class="ban-group"><div class="god-slot-wrapper"><div class="god-select-btn ban-slot ban-${lado} ${matchId}-ban-${lado}" data-god="" onclick="abrirModalDeuses(this)" title="Banir Deus"></div></div><span class="ban-label">BAN</span></div>`;
+            let godsHtml1 = '', godsHtml2 = '', mapsHtml = `<div class="map-row">`;
+            for (let g = 0; g < 3; g++) {
+                godsHtml1 += `<div class="god-slot-wrapper pick-slot-wrapper"><div class="god-select-btn game${g}-slot ${matchId}-slot" data-god="" onclick="abrirModalDeuses(this)"></div><button class="win-toggle admin-only" title="Marcar Vitória" data-match="${matchId}" data-game="${g}" data-player="1" onclick="toggleVitoria(this)">V</button></div>`;
+                godsHtml2 += `<div class="god-slot-wrapper pick-slot-wrapper"><div class="god-select-btn game${g}-slot ${matchId}-slot" data-god="" onclick="abrirModalDeuses(this)"></div><button class="win-toggle admin-only" title="Marcar Vitória" data-match="${matchId}" data-game="${g}" data-player="2" onclick="toggleVitoria(this)">V</button></div>`;
+                mapsHtml += `<select class="map-select game${g}-map" data-match="${matchId}" data-game="${g}" onchange="atualizarMapas(this)"><option value="">Mapa ${g + 1}</option>${listaMapas.map(m => `<option value="${m}">${m}</option>`).join('')}</select>`;
+            }
+            mapsHtml += `</div>`;
+            return `<div class="match-card chall-match" data-group="${groupIdx}" data-p1="${escapeHtml(p1Name)}" data-p2="${escapeHtml(p2Name)}" data-streams='[]'>
+                <div class="chall-sync-badge" title="Sincronizado do Challonge">🔗 Challonge</div>
+                <div class="stream-controls"><button class="nav-btn admin-only add-stream-btn" style="padding: 2px 6px; font-size: 0.6rem; border-style:dashed;" onclick="addStreamLink(this)">🎥 +</button><button class="nav-btn btn-share-result" style="padding: 2px 6px; font-size: 0.6rem;" title="Compartilhar resultado" onclick="compartilharResultado(this)">📸</button></div>
+                <div class="match-card-body">
+                    <div class="match-player" data-slot="p1"><div class="mp-name" style="margin-bottom:5px;">${escapeHtml(p1Name)}</div><div class="draft-section" style="justify-content:center;">${banHtml('p1')}<div class="picks-group">${godsHtml1}</div></div></div>
+                    <div class="match-score"><input type="number" class="score-p1 score-input" value="${s1}" disabled><span>X</span><input type="number" class="score-p2 score-input" value="${s2}" disabled></div>
+                    <div class="match-player" data-slot="p2"><div class="mp-name" style="margin-bottom:5px;">${escapeHtml(p2Name)}</div><div class="draft-section" style="justify-content:center;">${banHtml('p2')}<div class="picks-group">${godsHtml2}</div></div></div>
+                </div>
+                ${mapsHtml}
+            </div>`;
+        }
+        function renderizarGruposChallonge(gruposPorId, maps, mapaAntigo) {
+            const container = document.getElementById('groupsDisplay'); container.innerHTML = '';
+            document.getElementById('groupsSection').style.display = 'block';
+            const matchesContainer = document.getElementById('matchesGroupsContainer'); matchesContainer.innerHTML = '';
+            const idsOrdenados = Object.keys(gruposPorId).map(Number).sort((a, b) => a - b);
+            let casados = 0, total = 0;
+            idsOrdenados.forEach((groupId, idx) => {
+                const matches = gruposPorId[groupId];
+                const stats = calcularStandingsGrupo(matches, maps);
+                const nomesOrdenados = Object.keys(stats).sort((a, b) => stats[b].v - stats[a].v || stats[a].d - stats[b].d);
+                let html = `<div class="panel" style="padding:20px;"><h3 style="text-align:center; margin-bottom:15px; font-size:1.1rem;">Grupo ${String.fromCharCode(65 + idx)}</h3><table style="margin-top:0;"><thead><tr><th style="text-align:left">Jogador</th><th>V</th><th>D</th></tr></thead><tbody id="tbody-grupo-${idx}">`;
+                nomesOrdenados.forEach(nome => {
+                    html += `<tr data-player="${escapeHtml(nome)}"><td style="text-align:left; font-weight:600;">${escapeHtml(nome)}</td><td class="cell-v">${stats[nome].v}</td><td class="cell-d">${stats[nome].d}</td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+                container.innerHTML += html;
+                let matchesHtml = '';
+                matches.slice().sort((a, b) => (a.suggested_play_order || 0) - (b.suggested_play_order || 0)).forEach(m => {
+                    const p1Name = nomeJogadorGrupo(m.player1_id, maps), p2Name = nomeJogadorGrupo(m.player2_id, maps);
+                    const [s1, s2] = contarVitoriasPorGame(m.scores_csv);
+                    matchesHtml += gerarCardConfrontoChallonge(`ch_${m.id}`, p1Name, p2Name, idx, s1, s2);
+                    total++;
+                });
+                matchesContainer.innerHTML += `<div class="panel" id="group-matches-panel-${idx}" style="margin-bottom: 30px;"><h3 style="margin-bottom:25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">Confrontos - Grupo ${String.fromCharCode(65 + idx)}</h3><div class="match-list">${matchesHtml}</div></div>`;
+            });
+            document.querySelectorAll('#matchesGroupsContainer .match-card').forEach(card => {
+                const p1 = card.dataset.p1, p2 = card.dataset.p2;
+                if (aplicarDadosMigrados(mapaAntigo, card, p1, p2)) casados++;
+            });
+            return { casados, total };
+        }
+
+        // ---- Renderização: chave (vencedores / repescagem / final) ----
+        function gerarCardBracketChallonge(match, bracketLetra, roundIdx, matchIdx, maps, labelOverride = null) {
+            const p1Name = nomeJogadorPlayoff(match.player1_id, maps);
+            const p2Name = nomeJogadorPlayoff(match.player2_id, maps);
+            const matchId = `ch_${match.id}`;
+            const slotsHtml = gerarSlotHtml(p1Name, 0, 3, matchId) + gerarSlotHtml(p2Name, 1, 3, matchId);
+            const rotulo = labelOverride || match.identifier || '';
+            const html = `<div class="match-wrapper">
+                <div class="match-badges"><span class="id-badge">${escapeHtml(rotulo)}</span></div>
+                <div class="b-match chall-match" data-bracket="${bracketLetra}" data-round="${roundIdx}" data-match="${matchIdx}">
+                    <div class="chall-sync-badge" title="Sincronizado do Challonge">🔗</div>
+                    ${slotsHtml}
+                </div>
+            </div>`;
+            return { html, matchId, p1Name, p2Name, winnerId: match.winner_id, p1Id: match.player1_id, p2Id: match.player2_id };
+        }
+        function renderizarRodadasBracket(porRodada, bracketLetra, containerEl, maps, mapaAntigo, estado) {
+            const rodadasOrdenadas = Object.keys(porRodada).map(Number).sort((a, b) => a - b);
+            let html = '';
+            const infosPorMatch = [];
+            rodadasOrdenadas.forEach((roundNum, roundIdx) => {
+                html += `<div class="bracket-round">`;
+                porRodada[roundNum].forEach((m, matchIdx) => {
+                    const info = gerarCardBracketChallonge(m, bracketLetra, roundIdx, matchIdx, maps);
+                    html += info.html; infosPorMatch.push({ info, match: m });
+                });
+                html += `</div>`;
+            });
+            containerEl.innerHTML = html;
+            // Aplica placares/vencedor/migração por matchId
+            containerEl.querySelectorAll('.b-match').forEach((matchEl, i) => {
+                const { info, match } = infosPorMatch[i] || {}; if (!info) return;
+                const [s1, s2] = contarVitoriasPorGame(match.scores_csv);
+                const players = matchEl.querySelectorAll('.b-player');
+                const i1 = players[0]?.querySelector('.score-input'), i2 = players[1]?.querySelector('.score-input');
+                if (i1) { i1.value = s1; i1.disabled = true; }
+                if (i2) { i2.value = s2; i2.disabled = true; }
+                if (info.winnerId && info.winnerId === info.p1Id) players[0]?.classList.add('winner-slot');
+                if (info.winnerId && info.winnerId === info.p2Id) players[1]?.classList.add('winner-slot');
+                if (aplicarDadosMigrados(mapaAntigo, matchEl, info.p1Name, info.p2Name)) estado.casados++;
+                estado.total++;
+            });
+        }
+        function renderizarChaveChallonge(winners, losers, finais, maps, mapaAntigo) {
+            const estado = { casados: 0, total: 0 };
+            renderizarRodadasBracket(winners, 'W', document.getElementById('winnersBracketDisplay'), maps, mapaAntigo, estado);
+            renderizarRodadasBracket(losers, 'L', document.getElementById('losersBracketDisplay'), maps, mapaAntigo, estado);
+            // Grand Finals — sempre mostra a 1ª partida; a 2ª (reset) só se já tiver jogadores definidos
+            const finaisContainer = document.getElementById('grandFinalsDisplay');
+            const finaisParaExibir = finais.filter((m, idx) => idx !== 1 || m.player1_id || m.player2_id);
+            let html = '';
+            const infosFinais = [];
+            finaisParaExibir.forEach((m, idx) => {
+                const rotulo = idx === 0 ? 'Grande Final' : 'Grande Final - Reset';
+                const info = gerarCardBracketChallonge(m, 'F', 0, idx, maps, rotulo);
+                html += info.html; infosFinais.push({ info, match: m });
+            });
+            finaisContainer.innerHTML = html;
+            finaisContainer.querySelectorAll('.b-match').forEach((matchEl, i) => {
+                const { info, match } = infosFinais[i] || {}; if (!info) return;
+                const [s1, s2] = contarVitoriasPorGame(match.scores_csv);
+                const players = matchEl.querySelectorAll('.b-player');
+                const i1 = players[0]?.querySelector('.score-input'), i2 = players[1]?.querySelector('.score-input');
+                if (i1) { i1.value = s1; i1.disabled = true; }
+                if (i2) { i2.value = s2; i2.disabled = true; }
+                if (info.winnerId && info.winnerId === info.p1Id) players[0]?.classList.add('winner-slot');
+                if (info.winnerId && info.winnerId === info.p2Id) players[1]?.classList.add('winner-slot');
+                if (aplicarDadosMigrados(mapaAntigo, matchEl, info.p1Name, info.p2Name)) estado.casados++;
+                estado.total++;
+            });
+            return estado;
+        }
+
+        // ---- Orquestração ----
+        async function sincronizarComChallonge() {
+            if (document.body.classList.contains('is-viewer')) return;
+            const btn = document.getElementById('btnSincronizarChallonge');
+            if (btn) btn.style.opacity = '0.5';
+            showToast('Buscando dados do Challonge...', 'info', 3000);
+            try {
+                const [matchesRaw, participantsRaw] = await Promise.all([
+                    fetchChallongeJSON('matches.json'),
+                    fetchChallongeJSON('participants.json'),
+                ]);
+                const maps = construirMapasDeParticipantes(participantsRaw);
+                const { grupos, winners, losers, finais } = classificarPartidasChallonge(matchesRaw);
+                const mapaAntigo = extrairDadosLocaisPorPar();
+                const resultadoGrupos = renderizarGruposChallonge(grupos, maps, mapaAntigo);
+                const resultadoChave = renderizarChaveChallonge(winners, losers, finais, maps, mapaAntigo);
+                attachHoverEvents(); calcularEloGeral(); renderizarFiltrosDeMapas(); initDragToScroll(); renderStreamLinks(); atualizarFocoChave();
+                saveTournament();
+                const totalCasados = resultadoGrupos.casados + resultadoChave.casados;
+                const totalPartidas = resultadoGrupos.total + resultadoChave.total;
+                fecharMenuLateral();
+                showToast(`Sincronizado! ${totalPartidas} partidas importadas, ${totalCasados} com gods/bans recuperados do site antigo.`, 'success', 8000);
+            } catch (e) {
+                showToast('Erro ao sincronizar com o Challonge: ' + e.message, 'error', 8000);
+            } finally {
+                if (btn) btn.style.opacity = '1';
+            }
+        }
         window.onload = () => { renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); gerarPoeiraFlutuante(); };
     </script>
 </body>
