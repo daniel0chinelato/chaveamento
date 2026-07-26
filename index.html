@@ -125,6 +125,10 @@
             padding: 8px 20px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
             transition: all 0.3s ease; font-weight: 600; font-size: 0.7rem; border-radius: 6px; font-family: 'Montserrat', sans-serif;
         }
+        /* Menu minimalista: as abas do torneio (e as ações de admin ligadas a elas) só
+           aparecem depois que o usuário entra em "Torneio Atual". */
+        .navbar .tourney-tab { display: none; }
+        body.in-tournament-view .navbar .tourney-tab { display: inline-block; }
         .nav-btn.active { background-color: var(--accent-color); color: #000; border-color: var(--accent-color); box-shadow: 0 0 15px var(--accent-glow); }
         .nav-btn:hover:not(.active) { color: var(--text-main); border-color: var(--text-main); }
         .btn-save { border-color: #2a7a48; color: #4ade80; display: flex; align-items: center; gap: 8px;}
@@ -595,13 +599,13 @@
         <span class="live-badge-nav viewer-only" id="liveBadgeNav" title="Esta página atualiza sozinha em tempo real"><span class="live-dot"></span>AO VIVO</span>
         <button class="nav-btn active" id="navBtnHome" onclick="switchTab('page-home', this)">Início</button>
         <button class="nav-btn" id="navBtnMain" onclick="switchTab('page-main', this)">Torneio Atual</button>
-        <button class="nav-btn" onclick="switchTab('page-matches', this)">Tavernas of Mortals</button>
-        <button class="nav-btn" onclick="switchTab('page-bracket', this)">Demigods & Titans</button>
-        <button class="nav-btn" onclick="switchTab('page-maps', this); atualizarPainelMapas('Anatólia'); initHorizontalDrag();">Estatísticas de Mapas</button>
-        <div style="width: 1px; height: 30px; background: var(--border-color); margin: 0 10px;"></div>
-        <button class="nav-btn btn-save admin-only" onclick="saveTournament()">Salvar na Nuvem <span class="loader" id="saveLoader"></span></button>
-        <button class="nav-btn btn-reset admin-only" onclick="resetTournament()">Resetar</button>
-        <button class="btn-copy admin-only" onclick="copiarLinkPublico(this)" title="Copiar link para os espectadores">Link Público</button>
+        <button class="nav-btn tourney-tab" onclick="switchTab('page-matches', this)">Tavernas of Mortals</button>
+        <button class="nav-btn tourney-tab" onclick="switchTab('page-bracket', this)">Demigods & Titans</button>
+        <button class="nav-btn tourney-tab" onclick="switchTab('page-maps', this); atualizarPainelMapas('Anatólia'); initHorizontalDrag();">Estatísticas de Mapas</button>
+        <div class="tourney-tab" style="width: 1px; height: 30px; background: var(--border-color); margin: 0 10px;"></div>
+        <button class="nav-btn btn-save admin-only tourney-tab" onclick="saveTournament()">Salvar na Nuvem <span class="loader" id="saveLoader"></span></button>
+        <button class="nav-btn btn-reset admin-only tourney-tab" onclick="resetTournament()">Resetar</button>
+        <button class="btn-copy admin-only tourney-tab" onclick="copiarLinkPublico(this)" title="Copiar link para os espectadores">Link Público</button>
         <button class="nav-btn btn-login viewer-only" onclick="abrirLoginAdmin()">Login Admin</button>
         <button class="btn-copy admin-only" onclick="sairAdmin()" title="Sair do modo admin">Sair</button>
     </div>
@@ -726,10 +730,10 @@
                 </div>
             </div>
 
-            <!-- TORNEIOS PELO MUNDO -->
+            <!-- MEUS SITES -->
             <div class="panel home-panel-global">
-                <h3 class="home-panel-title" style="border-bottom: 1px solid var(--border-color);">Torneios pelo Mundo</h3>
-                <div id="torneiosMundoList" class="home-card-list"></div>
+                <h3 class="home-panel-title" style="border-bottom: 1px solid var(--border-color);">Meus Sites</h3>
+                <div id="meusSitesList" class="home-card-list"></div>
             </div>
 
             <!-- INSTAGRAM -->
@@ -1991,10 +1995,12 @@
             if (content.style.display === 'none') { content.style.display = 'block'; btn.innerText = 'Recolher'; btn.classList.add('active'); } 
             else { content.style.display = 'none'; btn.innerText = 'Mostrar'; btn.classList.remove('active'); }
         }
+        const PAGINAS_DO_TORNEIO = ['page-main', 'page-matches', 'page-bracket', 'page-maps'];
         function switchTab(pageId, btn) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.navbar .nav-btn:not(.btn-save):not(.btn-reset):not(.btn-copy)').forEach(b => b.classList.remove('active'));
             document.getElementById(pageId).classList.add('active'); btn.classList.add('active');
+            document.body.classList.toggle('in-tournament-view', PAGINAS_DO_TORNEIO.includes(pageId));
             if (pageId === 'page-bracket') setTimeout(rolarAteConfrontoAtual, 150);
         }
         // Rola a chave horizontalmente até o primeiro confronto "em foco" (pronto pra decidir).
@@ -3594,26 +3600,26 @@
                 </div>`;
             }).join('');
         }
-        // Torneios reais de Age of Mythology: Retold pela cena competitiva mundial.
-        // Fonte: Liquipedia / ageofempires.com. Atualize esta lista conforme novos eventos surgirem.
-        const torneiosMundo = [
-            { nome: 'Gameathlon: Athens AoM', meta: '11–13 Set 2026 · Atenas, Grécia · LAN', url: 'https://liquipedia.net/ageofempires/Gameathlon:_Athens' },
-            { nome: "T90's Titans League — Season 6", meta: 'A partir de Fev 2027 · Online', url: 'https://liquipedia.net/ageofempires/Age_of_Mythology/Tournaments' },
-            { nome: 'Road to Royal Blood', meta: '16 Jan 2027 · Online', url: 'https://liquipedia.net/ageofempires/Age_of_Mythology/Tournaments' },
-            { nome: 'Sudden Dessaster 3', meta: '5 Out 2026 · Online', url: 'https://liquipedia.net/ageofempires/Age_of_Mythology/Tournaments' },
-            { nome: 'Clash of Immortals', meta: 'Hospedado pela EGCTV · Prêmio $10.000', url: 'https://liquipedia.net/ageofempires/Age_of_Mythology/Tournaments' },
+        // Outros sites criados por você — edite/adicione aqui.
+        const meusSites = [
+            { nome: 'Compêndio de Cartas', meta: 'album-carta.vercel.app', url: 'https://album-carta.vercel.app/' },
+            { nome: 'Draft Overlay', meta: 'overlay-drafts.vercel.app', url: 'https://overlay-drafts.vercel.app/' },
+            { nome: 'Aprendendo Age', meta: 'aprendendoage.com', url: 'https://aprendendoage.com/' },
         ];
-        function renderizarTorneiosMundo() {
-            const lista = document.getElementById('torneiosMundoList');
+        function renderizarMeusSites() {
+            const lista = document.getElementById('meusSitesList');
             if (!lista) return;
-            lista.innerHTML = torneiosMundo.map(t => `
-                <a class="home-img-card" href="${t.url}" target="_blank" rel="noopener noreferrer">
-                    <div class="home-img-banner"><span class="banner-glyph">🌍</span></div>
+            lista.innerHTML = meusSites.map(t => {
+                const dominio = new URL(t.url).hostname;
+                const favicon = `https://www.google.com/s2/favicons?sz=128&domain=${dominio}`;
+                return `<a class="home-img-card" href="${t.url}" target="_blank" rel="noopener noreferrer">
+                    <div class="home-img-banner"><img src="${favicon}" onerror="this.parentElement.innerHTML='<span class=\\'banner-glyph\\'>🔗</span>'"></div>
                     <div class="home-img-card-body">
                         <div class="home-img-card-title">${escapeHtml(t.nome)}</div>
                         <div class="home-img-card-meta">${escapeHtml(t.meta)}</div>
                     </div>
-                </a>`).join('') + `<a href="https://liquipedia.net/ageofempires/Age_of_Mythology/Tournaments" target="_blank" rel="noopener noreferrer" style="text-align:center; font-size:0.7rem; color:var(--text-muted); text-decoration:none; padding:6px;">Ver calendário completo no Liquipedia ↗</a>`;
+                </a>`;
+            }).join('');
         }
         // Troque pelo @ real do perfil (sem o @) quando tiver a informação.
         const INSTAGRAM_HANDLE = 'mdre.mandarecurso';
@@ -3624,7 +3630,7 @@
             if (label) label.textContent = '@' + INSTAGRAM_HANDLE;
             if (link) link.href = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
         }
-        window.onload = () => { renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); gerarPoeiraFlutuante(); carregarNovidadesAoM(); renderizarTorneiosMundo(); configurarInstagramCard(); };
+        window.onload = () => { renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); gerarPoeiraFlutuante(); carregarNovidadesAoM(); renderizarMeusSites(); configurarInstagramCard(); };
     </script>
 </body>
 </html>
