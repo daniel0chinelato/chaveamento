@@ -2344,13 +2344,20 @@
             if (idxAtual === -1) idxAtual = roundsWinners.length - 1;
             roundsWinners.forEach((round, i) => {
                 if (round.classList.contains('round-skipped')) return;
-                round.classList.toggle('round-idle', i > idxAtual);
+                const temConteudoReal = Array.from(round.querySelectorAll('.p-name')).some(n => {
+                    const t = n.textContent.trim();
+                    return t && t !== 'TBD' && t !== 'BYE';
+                });
+                round.classList.toggle('round-idle', i > idxAtual && !temConteudoReal);
             });
             const lContainer = document.getElementById('losersBracketDisplay');
             if (lContainer) {
                 const temUso = Array.from(lContainer.querySelectorAll('.b-match')).some(m =>
                     m.querySelector('.winner-slot') ||
-                    (!m.classList.contains('is-bye') && Array.from(m.querySelectorAll('.p-name')).some(n => n.textContent.trim() !== 'TBD'))
+                    (!m.classList.contains('is-bye') && Array.from(m.querySelectorAll('.p-name')).some(n => {
+                        const t = n.textContent.trim();
+                        return t !== 'TBD' && !t.startsWith('Perd.') && !t.startsWith('Venc.');
+                    }))
                 );
                 lContainer.classList.toggle('container-idle', !temUso);
             }
@@ -2360,7 +2367,7 @@
             document.querySelectorAll('#winnersBracketDisplay .b-match:not(.is-bye), #losersBracketDisplay .b-match:not(.is-bye)').forEach(m => {
                 if (m.querySelector('.winner-slot')) return;
                 const nomes = Array.from(m.querySelectorAll('.p-name')).map(n => n.textContent.trim());
-                if (nomes.length === 2 && nomes.every(n => n && n !== 'TBD' && n !== 'BYE')) m.classList.add('match-live-focus');
+                if (nomes.length === 2 && nomes.every(n => n && n !== 'TBD' && n !== 'BYE' && !n.startsWith('Perd.') && !n.startsWith('Venc.'))) m.classList.add('match-live-focus');
             });
             atualizarProgressoChave();
         }
@@ -2520,12 +2527,16 @@
             let contadorPartidas = 0; // numeração sequencial visual das partidas (como em brackets profissionais)
             let seedCounter = 0; // numeração visual dos jogadores na 1ª rodada (ordem de entrada na chave)
             let roundsW = Math.log2(size);
+            let wr1ByeStatus = []; // marca quais partidas da Rodada 1 dos Vencedores já nascem como BYE
+            let wrMatchNumero = []; // wrMatchNumero[round][match] = número global da partida (mesmo do match-num-badge)
             // --- WINNERS BRACKET ---
             for(let i=0; i < roundsW; i++) {
                 let matchesNum = size / Math.pow(2, i+1);
                 let roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
                 let title = i === roundsW - 1 ? "Final (Vencedores)" : (i === roundsW - 2 ? "Semifinal (Vencedores)" : "Round " + (i+1));
-                let isBo5 = i >= roundsW - 2; let slots = isBo5 ? 5 : 3;
+                let isFinal = i === roundsW - 1;
+                let isBo5 = i === roundsW - 2;
+                let slots = isFinal ? 7 : (isBo5 ? 5 : 3);
                 roundDiv.innerHTML = `<h4 class="round-title" contenteditable="true" onblur="saveTournament()">${title}</h4>`;
                 for(let j=0; j < matchesNum; j++) {
                     let p1 = "TBD", p2 = "TBD";
@@ -2534,8 +2545,11 @@
                         p1 = jogadoresIniciais.shift() || "TBD"; p2 = jogadoresIniciais.shift() || "TBD";
                         if (p1 && p1 !== "TBD" && p1 !== "BYE") seed1 = ++seedCounter;
                         if (p2 && p2 !== "TBD" && p2 !== "BYE") seed2 = ++seedCounter;
+                        wr1ByeStatus[j] = (p1 === "BYE" || p2 === "BYE");
                     }
                     contadorPartidas++;
+                    wrMatchNumero[i] = wrMatchNumero[i] || [];
+                    wrMatchNumero[i][j] = contadorPartidas;
                     const mId = `w_${i}_${j}`;
                     const matchDisplayId = `W${i+1}-M${j+1}`;
                     const destText = getLoserDestinationText(i, j, size);
@@ -2548,7 +2562,7 @@
                     roundDiv.innerHTML += `
                         <div class="match-wrapper">
                             <div class="match-badges">
-                                ${isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>'}
+                                ${isFinal ? '<span class="format-badge" style="background:#FFD700; color:#000;">MD7</span>' : (isBo5 ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>')}
                                 <span class="id-badge">${matchDisplayId}</span>
                             </div>
                             <div class="b-match" data-bracket="W" data-round="${i}" data-match="${j}" data-drop-r="${dropR}" data-drop-m="${crossM}">
@@ -2578,6 +2592,19 @@
                     contadorPartidas++;
                     const mId = `l_${i}_${j}`;
                     const matchDisplayId = `L${i+1}-M${j+1}`;
+                    // Em vez de "TBD" cru, mostra de onde vem o jogador (igual ao Challonge:
+                    // "Perd. Partida X" quando a vaga vem do perdedor de uma partida específica).
+                    let pL1 = "TBD", pL2 = "TBD";
+                    if (i === 0) {
+                        pL1 = wr1ByeStatus[2*j] ? "BYE" : `Perd. Partida ${wrMatchNumero[0][2*j]}`;
+                        pL2 = wr1ByeStatus[2*j+1] ? "BYE" : `Perd. Partida ${wrMatchNumero[0][2*j+1]}`;
+                    } else if (i % 2 === 1) {
+                        const wi = (i + 1) / 2;
+                        const mInR = size / Math.pow(2, wi + 1);
+                        const jOrig = mInR - 1 - j;
+                        const numero = (wrMatchNumero[wi] && wrMatchNumero[wi][jOrig]) ? wrMatchNumero[wi][jOrig] : null;
+                        pL1 = numero ? `Perd. Partida ${numero}` : "TBD";
+                    }
                     let mapsHtml = `<div class="map-row" style="background:transparent; border-top:1px solid rgba(255,255,255,0.03);">`;
                     for(let g=0; g<slots; g++) mapsHtml += `<select class="map-select" data-match="${mId}" data-game="${g}" onchange="atualizarMapas(this)"><option value="">Mapa ${g+1}</option>${listaMapas.map(m => `<option value="${m}">${m}</option>`).join('')}</select>`;
                     mapsHtml += `</div>`;
@@ -2592,8 +2619,8 @@
                                 <div class="stream-controls" style="top: 6px; right: 6px; left: auto; transform: none; width: auto; justify-content: flex-end;">
                                     <button class="nav-btn admin-only add-stream-btn" style="padding: 2px 4px; font-size: 0.5rem; background:rgba(0,0,0,0.5); border-color:#555;" onclick="addStreamLink(this)">🎥 +</button><button class="nav-btn btn-share-result" style="padding: 2px 4px; font-size: 0.5rem; background:rgba(0,0,0,0.5); border-color:#555;" title="Compartilhar resultado" onclick="compartilharResultado(this)">📸</button>
                                 </div>
-                                ${gerarSlotHtml("TBD", 0, slots, mId)}
-                                ${gerarSlotHtml("TBD", 1, slots, mId)}
+                                ${gerarSlotHtml(pL1, 0, slots, mId)}
+                                ${gerarSlotHtml(pL2, 1, slots, mId)}
                                 ${mapsHtml}
                             </div>
                         </div>`;
@@ -3302,29 +3329,46 @@
         }
 
         // ---- Renderização: chave (vencedores / repescagem / final) ----
-        function gerarCardBracketChallonge(match, bracketLetra, roundIdx, matchIdx, maps, labelOverride = null) {
-            const p1Name = nomeJogadorPlayoff(match.player1_id, maps);
-            const p2Name = nomeJogadorPlayoff(match.player2_id, maps);
+        function normalizarPlaceholderChallonge(texto) {
+            if (!texto) return 'TBD';
+            if (/^Perdedor/i.test(texto)) return texto.replace(/^Perdedor d[ae]\s*/i, 'Perd. Partida ');
+            if (/^Vencedor/i.test(texto)) return texto.replace(/^Vencedor d[ae]\s*/i, 'Venc. Partida ');
+            return texto;
+        }
+        function gerarCardBracketChallonge(match, bracketLetra, roundIdx, matchIdx, maps, totalRounds = 1, labelOverride = null) {
+            const p1Name = match.player1_id ? nomeJogadorPlayoff(match.player1_id, maps) : normalizarPlaceholderChallonge(match.player1_placeholder_text);
+            const p2Name = match.player2_id ? nomeJogadorPlayoff(match.player2_id, maps) : normalizarPlaceholderChallonge(match.player2_placeholder_text);
             const matchId = `ch_${match.id}`;
-            const slotsHtml = gerarSlotHtml(p1Name, 0, 3, matchId) + gerarSlotHtml(p2Name, 1, 3, matchId);
+            const isFinal = (bracketLetra === 'W' && roundIdx === totalRounds - 1) || bracketLetra === 'F';
+            const isSemi = bracketLetra === 'W' && roundIdx === totalRounds - 2;
+            const slots = isFinal ? 7 : (isSemi ? 5 : 3);
+            const badge = isFinal
+                ? '<span class="format-badge" style="background:#FFD700; color:#000;">MD7</span>'
+                : (isSemi ? '<span class="format-badge">MD5</span>' : '<span class="format-badge">MD3</span>');
+            const slotsHtml = gerarSlotHtml(p1Name, 0, slots, matchId) + gerarSlotHtml(p2Name, 1, slots, matchId);
+            let mapsHtml = `<div class="map-row" style="background:transparent; border-top:1px solid rgba(255,255,255,0.03);">`;
+            for (let g = 0; g < slots; g++) mapsHtml += `<select class="map-select" data-match="${matchId}" data-game="${g}" onchange="atualizarMapas(this)"><option value="">Mapa ${g + 1}</option>${listaMapas.map(m => `<option value="${m}">${m}</option>`).join('')}</select>`;
+            mapsHtml += `</div>`;
             const rotulo = labelOverride || match.identifier || '';
             const html = `<div class="match-wrapper">
-                <div class="match-badges"><span class="id-badge">${escapeHtml(rotulo)}</span></div>
+                <div class="match-badges">${badge}<span class="id-badge">${escapeHtml(rotulo)}</span></div>
                 <div class="b-match chall-match" data-bracket="${bracketLetra}" data-round="${roundIdx}" data-match="${matchIdx}">
                     <div class="chall-sync-badge" title="Sincronizado do Challonge">🔗</div>
                     ${slotsHtml}
+                    ${mapsHtml}
                 </div>
             </div>`;
             return { html, matchId, p1Name, p2Name, winnerId: match.winner_id, p1Id: match.player1_id, p2Id: match.player2_id };
         }
         function renderizarRodadasBracket(porRodada, bracketLetra, containerEl, maps, mapaAntigo, estado) {
             const rodadasOrdenadas = Object.keys(porRodada).map(Number).sort((a, b) => a - b);
+            const totalRounds = rodadasOrdenadas.length;
             let html = '';
             const infosPorMatch = [];
             rodadasOrdenadas.forEach((roundNum, roundIdx) => {
                 html += `<div class="bracket-round">`;
                 porRodada[roundNum].forEach((m, matchIdx) => {
-                    const info = gerarCardBracketChallonge(m, bracketLetra, roundIdx, matchIdx, maps);
+                    const info = gerarCardBracketChallonge(m, bracketLetra, roundIdx, matchIdx, maps, totalRounds);
                     html += info.html; infosPorMatch.push({ info, match: m });
                 });
                 html += `</div>`;
@@ -3355,7 +3399,7 @@
             const infosFinais = [];
             finaisParaExibir.forEach((m, idx) => {
                 const rotulo = idx === 0 ? 'Grande Final' : 'Grande Final - Reset';
-                const info = gerarCardBracketChallonge(m, 'F', 0, idx, maps, rotulo);
+                const info = gerarCardBracketChallonge(m, 'F', 0, idx, maps, 1, rotulo);
                 html += info.html; infosFinais.push({ info, match: m });
             });
             finaisContainer.innerHTML = html;
