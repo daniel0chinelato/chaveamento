@@ -84,9 +84,9 @@
         @media (max-width: 800px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
         /* ===== TORNEIOS KMPS (cards grandes com imagem) ===== */
         .kmps-tournaments-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-        .kmps-tournament-card { position: relative; aspect-ratio: 16/11; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; text-decoration: none; color: var(--text-main); background: #0a0a0a; transition: 0.25s; }
+        .kmps-tournament-card { position: relative; aspect-ratio: 16/11; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; text-decoration: none; color: var(--text-main); background: radial-gradient(ellipse at center, #16110a 0%, #0a0a0a 75%); transition: 0.25s; }
         .kmps-tournament-card:hover { border-color: var(--accent-color); transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.5); }
-        .kmps-tournament-card img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+        .kmps-tournament-card img { width: 100%; height: 100%; object-fit: contain; object-position: center; position: absolute; inset: 0; padding: 10px; box-sizing: border-box; }
         .kmps-tournament-card .kt-label { position: relative; z-index: 1; font-family: 'Cinzel', serif; font-size: 1.1rem; text-align: center; padding: 20px; }
         .kmps-tournament-card.em-breve { color: var(--text-muted); font-style: italic; }
         @media (max-width: 800px) { .kmps-tournaments-grid { grid-template-columns: 1fr; } }
@@ -106,7 +106,7 @@
             backdrop-filter: blur(16px) saturate(1.2);
             -webkit-backdrop-filter: blur(16px) saturate(1.2);
             border: 1.5px solid rgba(255, 255, 255, 0.55);
-            clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+            border-radius: 6px;
             display: flex; justify-content: center; align-items: center; padding: 9px 26px; gap: 14px; position: fixed; top: 28px; left: 50%; transform: translateX(-50%); z-index: 1000; flex-wrap: wrap; box-shadow: 0 4px 24px rgba(0,0,0,0.55); min-height: 56px; width: max-content; max-width: calc(100% - 140px);
         }
         .navbar-logo-edge { display: none; }
@@ -663,7 +663,10 @@
         </button>
         <span class="live-badge-nav viewer-only" id="liveBadgeNav" title="Esta página atualiza sozinha em tempo real"><span class="live-dot"></span>AO VIVO</span>
         <button class="nav-btn active" id="navBtnHome" onclick="switchTab('page-home', this)">Início</button>
-        <button class="nav-btn" id="navBtnMain" onclick="switchTab('page-main', this)">Torneio Atual</button>
+        <button class="nav-btn" id="navBtnMain" onclick="switchTab('page-main', this)">Torneios</button>
+        <button class="nav-btn" id="navBtnNews" onclick="irParaSecaoHome('secaoAtualizacoes', this)">Atualizações</button>
+        <button class="nav-btn" id="navBtnProdutos" onclick="irParaSecaoHome('secaoProdutos', this)">Nossos Produtos</button>
+        <button class="nav-btn" id="navBtnCanais" onclick="irParaSecaoHome('secaoCanais', this)">Canais</button>
         <button class="nav-btn tourney-tab" id="navBtnMatches" onclick="switchTab('page-matches', this)">Tavernas of Mortals</button>
         <button class="nav-btn tourney-tab" id="navBtnBracket" onclick="switchTab('page-bracket', this)">Demigods & Titans</button>
         <button class="nav-btn tourney-tab" id="navBtnMaps" onclick="switchTab('page-maps', this)">Estatísticas de Mapas</button>
@@ -789,23 +792,25 @@
         <div class="home-logo-badge"><img src="KMPS_v2.png" alt="KMPS" onerror="this.parentElement.innerHTML='&lt;span&gt;KMPS&lt;/span&gt;'"></div>
 
         <!-- CANAIS EM DESTAQUE -->
-        <div class="home-channels-section">
+        <div class="home-channels-section" id="secaoCanais">
             <h3 class="home-panel-title home-panel-title-center" style="text-align:center; padding-bottom:0; margin-bottom: 26px;">Canais em Destaque</h3>
             <div class="channels-grid" id="canaisDestaqueList"></div>
         </div>
 
         <!-- NOTÍCIA EM DESTAQUE -->
-        <div class="featured-news" id="featuredNewsContainer" style="display:none;">
-            <img class="featured-news-img" id="featuredNewsImg" src="" alt="">
-            <div>
-                <h3 class="featured-news-title" id="featuredNewsTitle">Latest News</h3>
-                <p class="featured-news-text" id="featuredNewsText"></p>
-                <a class="featured-news-link" id="featuredNewsLink" href="#" target="_blank" rel="noopener noreferrer">Ver mais +</a>
+        <div id="secaoAtualizacoes">
+            <div class="featured-news" id="featuredNewsContainer" style="display:none;">
+                <img class="featured-news-img" id="featuredNewsImg" src="" alt="">
+                <div>
+                    <h3 class="featured-news-title" id="featuredNewsTitle">Latest News</h3>
+                    <p class="featured-news-text" id="featuredNewsText"></p>
+                    <a class="featured-news-link" id="featuredNewsLink" href="#" target="_blank" rel="noopener noreferrer">Ver mais +</a>
+                </div>
             </div>
         </div>
 
         <!-- NOSSOS PRODUTOS -->
-        <div style="margin-top: 60px;">
+        <div style="margin-top: 60px;" id="secaoProdutos">
             <h3 class="home-panel-title home-panel-title-center" style="text-align:center; padding-bottom:0; margin-bottom: 26px;">Nossos Produtos</h3>
             <div class="products-grid" id="produtosList"></div>
             <div style="text-align:center; margin-top:20px;"><a href="#" id="produtosVerMaisLink" target="_blank" rel="noopener noreferrer" style="color:#ff5555; font-size:0.75rem; letter-spacing:1.5px; text-transform:uppercase; font-weight:700; text-decoration:none;">Ver mais +</a></div>
@@ -818,7 +823,7 @@
         </div>
 
         <div class="home-bottom-art">
-            <img src="pain_YT.png" alt="" onerror="this.style.display='none'">
+            <img src="footer.png" alt="" onerror="this.style.display='none'">
         </div>
 
         <!-- ACESSE NOSSOS SITES -->
@@ -2097,6 +2102,18 @@
             if (cfg.after) cfg.after();
         }
         function switchTab(pageId) { irParaPagina(pageId); }
+        function irParaSecaoHome(sectionId, btn) {
+            irParaPagina('page-home');
+            document.querySelectorAll('.navbar .nav-btn:not(.btn-save):not(.btn-reset):not(.btn-copy)').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            setTimeout(() => {
+                const el = document.getElementById(sectionId);
+                if (el) {
+                    const y = el.getBoundingClientRect().top + window.pageYOffset - 110;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+            }, 60);
+        }
         window.addEventListener('popstate', (e) => {
             const pageId = (e.state && e.state.page) || (location.hash ? location.hash.slice(1) : 'page-home');
             irParaPagina(pageId, false);
@@ -3673,17 +3690,18 @@
             const nomeAtual = campeaoEl ? campeaoEl.textContent.trim() : '';
             const atualFinalizado = !!(nomeAtual && nomeAtual !== 'TBD' && nomeAtual !== '');
             const todos = [
-                { nome: 'Tavernas of Demigods & Titans', status: atualFinalizado ? 'finalizado' : 'andamento', campeao: nomeAtual, atual: true, imagem: '' },
-                ...campeonatosArquivados.map(c => ({ nome: c.nome, status: c.status === 'finalizado' ? 'finalizado' : (c.status === 'em_breve' ? 'em_breve' : 'andamento'), campeao: c.campeao, atual: false, imagem: c.imagem || '' })),
+                { nome: 'Tavernas of Demigods & Titans', status: atualFinalizado ? 'finalizado' : 'andamento', campeao: nomeAtual, atual: true, imagem: 'tavernas-kmps.png' },
+                ...campeonatosArquivados.map(c => ({ nome: c.nome, status: c.status === 'finalizado' ? 'finalizado' : (c.status === 'em_breve' ? 'em_breve' : 'andamento'), campeao: c.campeao, atual: false, imagem: c.imagem || (/briga\s*de\s*bar/i.test(c.nome || '') ? 'briga-de-bar-kmps.png' : '') })),
             ];
             // Ordem sempre: Finalizado -> Em Andamento -> Em Breve
             const ordem = { finalizado: 0, andamento: 1, em_breve: 2 };
             todos.sort((a, b) => ordem[a.status] - ordem[b.status]);
             const cards = todos.slice(0, 3).map(t => {
                 const acao = t.atual ? `document.querySelector('.nav-btn[onclick*=\\"page-bracket\\"]').click()` : `abrirSalaDeTrofeus()`;
-                const banner = t.imagem ? `<img src="${t.imagem}">` : '';
+                const banner = t.imagem ? `<img src="${t.imagem}" alt="${escapeHtml(t.nome)}">` : '';
+                const label = t.imagem ? '' : `<span class="kt-label">${escapeHtml(t.nome)}</span>`;
                 const classeStatus = t.status === 'em_breve' ? ' em-breve' : '';
-                return `<div class="kmps-tournament-card${classeStatus}" style="cursor:pointer;" onclick="${acao}">${banner}<span class="kt-label">${escapeHtml(t.nome)}</span></div>`;
+                return `<div class="kmps-tournament-card${classeStatus}" style="cursor:pointer;" title="${escapeHtml(t.nome)}" onclick="${acao}">${banner}${label}</div>`;
             });
             while (cards.length < 3) cards.push(`<div class="kmps-tournament-card em-breve"><span class="kt-label">Em Breve</span></div>`);
             lista.innerHTML = cards.join('');
