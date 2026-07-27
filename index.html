@@ -46,7 +46,7 @@
         .header-container { width: 100%; margin: 20px 0 40px 0; display: flex; justify-content: center; align-items: center; }
         .header-image { width: 100%; height: auto; max-height: 350px; object-fit: cover; border-radius: 12px; filter: drop-shadow(0 8px 25px var(--accent-glow)); }
         /* ===== HERO DA PÁGINA INÍCIO (largura total, sai do container) ===== */
-        .home-hero { position: relative; width: 100vw; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; height: 380px; overflow: hidden; margin-bottom: 40px; margin-top: 0; z-index: 1; }
+        .home-hero { position: relative; width: 100vw; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; height: 560px; overflow: hidden; margin-bottom: 40px; margin-top: 0; z-index: 1; }
         .home-hero-img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.65) saturate(1.15); animation: heroImgZoom 24s ease-in-out infinite alternate; }
         @keyframes heroImgZoom { from { transform: scale(1); } to { transform: scale(1.08); } }
         .home-hero-fade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(3,3,4,0.1) 0%, rgba(3,3,4,0.35) 45%, var(--bg-color) 100%), radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.5) 100%); }
@@ -96,17 +96,20 @@
         .home-sites-footer-links { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; }
         .home-sites-footer-links a { color: var(--accent-color); font-size: 0.75rem; letter-spacing: 1px; text-decoration: none; }
         .home-sites-footer-links a:hover { text-decoration: underline; }
-        .home-bottom-art { position: relative; width: 100vw; left: 50%; margin-left: -50vw; margin-top: 60px; height: 420px; overflow: hidden; }
+        .home-bottom-art { position: relative; width: 100vw; left: 50%; margin-left: -50vw; margin-top: -70px; height: 600px; overflow: hidden; z-index: 1; }
         .home-bottom-art img { width: 100%; height: 100%; object-fit: cover; }
+        .home-bottom-art::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, var(--bg-color) 0%, transparent 18%); }
         .home-bottom-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0%, var(--bg-color) 100%); }
-        @media (max-width: 700px) { .home-hero { height: 260px; } .home-hero-title { font-size: 1.8rem; letter-spacing: 4px; } }
+        @media (max-width: 700px) { .home-hero { height: 380px; } .home-hero-title { font-size: 1.8rem; letter-spacing: 4px; } }
         .navbar {
-            background-color: rgba(10, 10, 13, 0.75); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color);
-            display: flex; justify-content: center; align-items: center; padding: 9px 15px; gap: 14px; position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; box-shadow: 0 4px 18px rgba(0,0,0,0.45);
+            background-color: rgba(0, 0, 0, 0.92); border: 1px solid rgba(255, 255, 255, 0.1);
+            clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+            display: flex; justify-content: center; align-items: center; padding: 9px 15px; gap: 14px; position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; box-shadow: 0 4px 18px rgba(0,0,0,0.45); min-height: 64px;
         }
+        .navbar-logo-edge { position: absolute; left: 0; top: 0; height: 100%; width: auto; z-index: 2; pointer-events: none; }
         .navbar .nav-btn, .navbar .btn-copy { padding: 6px 16px; font-size: 0.62rem; }
         /* MENU LATERAL K.M.P.S */
-        .hamburger-btn { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); background: transparent; border: 1px solid var(--border-color); border-radius: 8px; width: 42px; height: 42px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: 0.25s; z-index: 5; }
+        .hamburger-btn { position: absolute; left: 90px; top: 50%; transform: translateY(-50%); background: transparent; border: 1px solid var(--border-color); border-radius: 8px; width: 42px; height: 42px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: 0.25s; z-index: 5; }
         .hamburger-btn:hover { border-color: var(--accent-color); box-shadow: 0 0 12px var(--accent-glow); }
         .hamburger-btn span { display: block; width: 20px; height: 2px; background: var(--accent-color); border-radius: 2px; transition: 0.25s; }
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(2px); z-index: 4000; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }
@@ -650,6 +653,7 @@
     </div>
     <div id="toastContainer"></div>
     <div class="navbar">
+        <img src="KMPS_v2.png" alt="KMPS" class="navbar-logo-edge" onerror="this.style.display='none'">
         <button class="hamburger-btn" onclick="abrirMenuLateral()" title="Menu K.M.P.S">
             <span></span><span></span><span></span>
         </button>
@@ -773,17 +777,12 @@
     <!-- INÍCIO -->
     <div id="page-home" class="container page active">
         <div class="home-hero">
-            <img src="header.png" alt="Era das Tavernas" class="home-hero-img" onerror="this.style.display='none'">
+            <img src="header.png" alt="K.M.P.S" class="home-hero-img" onerror="this.style.display='none'">
             <div class="home-hero-fade"></div>
-            <div class="home-hero-content">
-                <h1 class="champion-shimmer-text home-hero-title">ERA DAS TAVERNAS</h1>
-                <div class="trophy-hero-flourish">⚜ ⚜ ⚜</div>
-                <p class="home-hero-sub">Onde as lendas de Age of Mythology: Retold são forjadas — acompanhe torneios, resultados e a cena competitiva do K.M.P.S.</p>
-            </div>
         </div>
 
         <div class="kmps-watermark-wrap"><span class="kmps-watermark-text">KMPS</span></div>
-        <div class="home-logo-badge"><span>KMPS</span></div>
+        <div class="home-logo-badge"><img src="KMPS_v2.png" alt="KMPS" onerror="this.parentElement.innerHTML='&lt;span&gt;KMPS&lt;/span&gt;'"></div>
 
         <!-- CANAIS EM DESTAQUE -->
         <div class="home-channels-section">
@@ -809,23 +808,13 @@
         </div>
 
         <!-- TORNEIOS KMPS -->
-        <div style="margin-top: 60px;">
+        <div style="margin-top: 60px; position: relative; z-index: 2;">
             <h3 class="home-panel-title" style="padding-bottom:0; margin-bottom: 26px;">Torneios KMPS</h3>
             <div class="kmps-tournaments-grid" id="kmpsTorneiosList"></div>
         </div>
 
-        <div class="home-bottom-art">
-            <img src="header.png" alt="" style="filter: brightness(0.55) saturate(1.2) hue-rotate(-10deg);" onerror="this.style.display='none'">
-        </div>
-
-        <!-- ACESSE NOSSOS SITES -->
-        <div class="home-sites-footer">
-            <div class="home-sites-footer-title">Acesse nossos sites</div>
-            <div class="home-sites-footer-links" id="meusSitesList"></div>
-        </div>
-
         <!-- RANKING ELO (conta em todos os torneios) -->
-        <div class="panel" style="margin-top: 50px;">
+        <div class="panel" style="margin-top: 50px; position: relative; z-index: 2;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
                 <h3 style="margin:0; font-size: 1.2rem; color: var(--accent-color); font-family: 'Cinzel', serif; letter-spacing: 2px; font-weight: 600;">🏆 Ranking ELO Geral</h3>
             </div>
@@ -835,6 +824,16 @@
                     <tbody id="eloTableBody"><tr><td colspan="3" style="text-align:center; color:var(--text-muted); font-style: italic; font-size: 0.8rem; padding: 15px;">Aguardando o início do torneio...</td></tr></tbody>
                 </table>
             </div>
+        </div>
+
+        <div class="home-bottom-art">
+            <img src="footer.png" alt="" onerror="this.style.display='none'">
+        </div>
+
+        <!-- ACESSE NOSSOS SITES -->
+        <div class="home-sites-footer">
+            <div class="home-sites-footer-title">Acesse nossos sites</div>
+            <div class="home-sites-footer-links" id="meusSitesList"></div>
         </div>
         <div class="footer">DESENVOLVIDO POR K.M.P.S</div>
     </div>
@@ -3668,15 +3667,19 @@
             const finais = document.getElementById('grandFinalsDisplay');
             const campeaoEl = finais ? finais.querySelector('.winner-slot .p-name') : null;
             const nomeAtual = campeaoEl ? campeaoEl.textContent.trim() : '';
-            const statusAtivo = !(nomeAtual && nomeAtual !== 'TBD' && nomeAtual !== '');
+            const atualFinalizado = !!(nomeAtual && nomeAtual !== 'TBD' && nomeAtual !== '');
             const todos = [
-                { nome: 'Tavernas of Demigods & Titans', ativo: statusAtivo, campeao: nomeAtual, atual: true, imagem: '' },
-                ...campeonatosArquivados.map(c => ({ nome: c.nome, ativo: c.status !== 'finalizado', campeao: c.campeao, atual: false, imagem: c.imagem || '' })),
+                { nome: 'Tavernas of Demigods & Titans', status: atualFinalizado ? 'finalizado' : 'andamento', campeao: nomeAtual, atual: true, imagem: '' },
+                ...campeonatosArquivados.map(c => ({ nome: c.nome, status: c.status === 'finalizado' ? 'finalizado' : (c.status === 'em_breve' ? 'em_breve' : 'andamento'), campeao: c.campeao, atual: false, imagem: c.imagem || '' })),
             ];
+            // Ordem sempre: Finalizado -> Em Andamento -> Em Breve
+            const ordem = { finalizado: 0, andamento: 1, em_breve: 2 };
+            todos.sort((a, b) => ordem[a.status] - ordem[b.status]);
             const cards = todos.slice(0, 3).map(t => {
                 const acao = t.atual ? `document.querySelector('.nav-btn[onclick*=\\"page-bracket\\"]').click()` : `abrirSalaDeTrofeus()`;
                 const banner = t.imagem ? `<img src="${t.imagem}">` : '';
-                return `<div class="kmps-tournament-card" style="cursor:pointer;" onclick="${acao}">${banner}<span class="kt-label">${escapeHtml(t.nome)}</span></div>`;
+                const classeStatus = t.status === 'em_breve' ? ' em-breve' : '';
+                return `<div class="kmps-tournament-card${classeStatus}" style="cursor:pointer;" onclick="${acao}">${banner}<span class="kt-label">${escapeHtml(t.nome)}</span></div>`;
             });
             while (cards.length < 3) cards.push(`<div class="kmps-tournament-card em-breve"><span class="kt-label">Em Breve</span></div>`);
             lista.innerHTML = cards.join('');
