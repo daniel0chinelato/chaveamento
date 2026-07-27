@@ -46,7 +46,7 @@
         .header-container { width: 100%; margin: 20px 0 40px 0; display: flex; justify-content: center; align-items: center; }
         .header-image { width: 100%; height: auto; max-height: 350px; object-fit: cover; border-radius: 12px; filter: drop-shadow(0 8px 25px var(--accent-glow)); }
         /* ===== HERO DA PÁGINA INÍCIO (largura total, sai do container) ===== */
-        .home-hero { position: relative; width: 100vw; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; height: 380px; overflow: hidden; margin-bottom: 40px; margin-top: -20px; }
+        .home-hero { position: relative; width: 100vw; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; height: 380px; overflow: hidden; margin-bottom: 40px; margin-top: 0; z-index: 1; }
         .home-hero-img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.65) saturate(1.15); animation: heroImgZoom 24s ease-in-out infinite alternate; }
         @keyframes heroImgZoom { from { transform: scale(1); } to { transform: scale(1.08); } }
         .home-hero-fade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(3,3,4,0.1) 0%, rgba(3,3,4,0.35) 45%, var(--bg-color) 100%), radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.5) 100%); }
@@ -55,9 +55,10 @@
         .home-hero-sub { color: #ddd; font-size: 0.95rem; letter-spacing: 1.5px; margin-top: 6px; text-shadow: 0 2px 10px rgba(0,0,0,0.9); max-width: 580px; }
         @media (max-width: 700px) { .home-hero { height: 260px; } .home-hero-title { font-size: 1.8rem; letter-spacing: 4px; } }
         .navbar {
-            background-color: rgba(10, 10, 13, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color);
-            display: flex; justify-content: center; align-items: center; padding: 15px; gap: 20px; position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            background-color: rgba(10, 10, 13, 0.75); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: center; align-items: center; padding: 9px 15px; gap: 14px; position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; box-shadow: 0 4px 18px rgba(0,0,0,0.45);
         }
+        .navbar .nav-btn, .navbar .btn-copy { padding: 6px 16px; font-size: 0.62rem; }
         /* MENU LATERAL K.M.P.S */
         .hamburger-btn { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); background: transparent; border: 1px solid var(--border-color); border-radius: 8px; width: 42px; height: 42px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: 0.25s; z-index: 5; }
         .hamburger-btn:hover { border-color: var(--accent-color); box-shadow: 0 0 12px var(--accent-glow); }
@@ -202,6 +203,16 @@
         /* ===== CABEÇALHO DE PAINEL SEM ÍCONE, ESTILO ÉPICO ===== */
         .home-panel-title { margin: 0; font-size: 1.05rem; color: var(--accent-color); font-family: 'Cinzel', serif; letter-spacing: 3px; font-weight: 600; text-transform: uppercase; position: relative; padding-bottom: 14px; }
         .home-panel-title::after { content: ''; position: absolute; bottom: 0; left: 0; width: 46px; height: 2px; background: linear-gradient(90deg, var(--accent-color), transparent); }
+        .home-panel-title-center::after { left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, transparent, var(--accent-color), transparent); }
+        /* ===== CANAIS DO YOUTUBE EM DESTAQUE ===== */
+        .home-channels-section { margin-top: 50px; animation: cardRiseIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.4s backwards; }
+        .channels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 22px; max-width: 980px; margin: 0 auto; }
+        .channel-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 26px 16px; background: linear-gradient(180deg, rgba(255,0,0,0.05), transparent); border: 1px solid var(--border-color); border-radius: 14px; transition: 0.25s; text-decoration: none; color: var(--text-main); }
+        .channel-card:hover { border-color: #ff0000; transform: translateY(-4px); box-shadow: 0 12px 28px rgba(255,0,0,0.18); }
+        .channel-avatar { width: 74px; height: 74px; border-radius: 50%; overflow: hidden; border: 2px solid #ff0000; display: flex; align-items: center; justify-content: center; background: #111; box-shadow: 0 0 16px rgba(255,0,0,0.3); font-size: 1.4rem; color: #ff3b3b; }
+        .channel-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .channel-name { font-family: 'Cinzel', serif; font-size: 0.92rem; letter-spacing: 0.5px; }
+        .channel-visit { font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase; color: #ff4444; font-weight: 700; }
         .home-grid .panel { animation: cardRiseIn 0.6s cubic-bezier(0.16,1,0.3,1) backwards; }
         .home-grid .panel:nth-child(1) { animation-delay: 0.05s; }
         .home-grid .panel:nth-child(2) { animation-delay: 0.15s; }
@@ -599,15 +610,13 @@
         <span class="live-badge-nav viewer-only" id="liveBadgeNav" title="Esta página atualiza sozinha em tempo real"><span class="live-dot"></span>AO VIVO</span>
         <button class="nav-btn active" id="navBtnHome" onclick="switchTab('page-home', this)">Início</button>
         <button class="nav-btn" id="navBtnMain" onclick="switchTab('page-main', this)">Torneio Atual</button>
-        <button class="nav-btn tourney-tab" onclick="switchTab('page-matches', this)">Tavernas of Mortals</button>
-        <button class="nav-btn tourney-tab" onclick="switchTab('page-bracket', this)">Demigods & Titans</button>
-        <button class="nav-btn tourney-tab" onclick="switchTab('page-maps', this); atualizarPainelMapas('Anatólia'); initHorizontalDrag();">Estatísticas de Mapas</button>
+        <button class="nav-btn tourney-tab" id="navBtnMatches" onclick="switchTab('page-matches', this)">Tavernas of Mortals</button>
+        <button class="nav-btn tourney-tab" id="navBtnBracket" onclick="switchTab('page-bracket', this)">Demigods & Titans</button>
+        <button class="nav-btn tourney-tab" id="navBtnMaps" onclick="switchTab('page-maps', this)">Estatísticas de Mapas</button>
         <div class="tourney-tab" style="width: 1px; height: 30px; background: var(--border-color); margin: 0 10px;"></div>
         <button class="nav-btn btn-save admin-only tourney-tab" onclick="saveTournament()">Salvar na Nuvem <span class="loader" id="saveLoader"></span></button>
         <button class="nav-btn btn-reset admin-only tourney-tab" onclick="resetTournament()">Resetar</button>
         <button class="btn-copy admin-only tourney-tab" onclick="copiarLinkPublico(this)" title="Copiar link para os espectadores">Link Público</button>
-        <button class="nav-btn btn-login viewer-only" onclick="abrirLoginAdmin()">Login Admin</button>
-        <button class="btn-copy admin-only" onclick="sairAdmin()" title="Sair do modo admin">Sair</button>
     </div>
     <!-- MENU LATERAL K.M.P.S -->
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="fecharMenuLateral()"></div>
@@ -679,6 +688,23 @@
                 <span class="sidebar-external-icon">↗</span>
             </a>
         </div>
+        <div class="sidebar-section-title">Conta</div>
+        <div class="sidebar-tournament-list">
+            <button class="sidebar-tournament-item viewer-only" onclick="abrirLoginAdmin(); fecharMenuLateral();">
+                🔑
+                <div>
+                    <div class="sidebar-tournament-name">Login Admin</div>
+                    <div class="sidebar-tournament-status">Entrar como administrador</div>
+                </div>
+            </button>
+            <button class="sidebar-tournament-item admin-only" onclick="sairAdmin(); fecharMenuLateral();">
+                🚪
+                <div>
+                    <div class="sidebar-tournament-name">Sair</div>
+                    <div class="sidebar-tournament-status">Encerrar sessão de admin</div>
+                </div>
+            </button>
+        </div>
         <div class="sidebar-footer">K.M.P.S — Kingdom Of Mortals &amp; Pro Society</div>
     </div>
     <!-- MODAL DE LOGIN ADMIN -->
@@ -746,6 +772,12 @@
                     <a id="igProfileLink" href="#" target="_blank" rel="noopener noreferrer" class="ig-follow-btn">Seguir no Instagram</a>
                 </div>
             </div>
+        </div>
+
+        <!-- CANAIS EM DESTAQUE -->
+        <div class="home-channels-section">
+            <h3 class="home-panel-title home-panel-title-center" style="text-align:center; padding-bottom:0; margin-bottom: 26px;">Canais em Destaque</h3>
+            <div class="channels-grid" id="canaisDestaqueList"></div>
         </div>
 
         <!-- RANKING ELO (conta em todos os torneios) -->
@@ -1996,13 +2028,32 @@
             else { content.style.display = 'none'; btn.innerText = 'Mostrar'; btn.classList.remove('active'); }
         }
         const PAGINAS_DO_TORNEIO = ['page-main', 'page-matches', 'page-bracket', 'page-maps'];
-        function switchTab(pageId, btn) {
+        const PAGE_CONFIG = {
+            'page-home':    { btnId: 'navBtnHome' },
+            'page-main':    { btnId: 'navBtnMain' },
+            'page-matches': { btnId: 'navBtnMatches' },
+            'page-bracket': { btnId: 'navBtnBracket', after: () => setTimeout(rolarAteConfrontoAtual, 150) },
+            'page-maps':    { btnId: 'navBtnMaps', after: () => { atualizarPainelMapas('Anatólia'); initHorizontalDrag(); } },
+            'page-trophy':  { btnId: null, after: () => { renderizarSalaDeTrofeus(); fecharMenuLateral(); } },
+        };
+        // Ponto único de troca de página: cuida da aba ativa, do menu minimalista e
+        // registra no histórico do navegador (pra "voltar"/"avançar" funcionarem de verdade).
+        function irParaPagina(pageId, pushHistory = true) {
+            const cfg = PAGE_CONFIG[pageId];
+            if (!cfg) return;
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.navbar .nav-btn:not(.btn-save):not(.btn-reset):not(.btn-copy)').forEach(b => b.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active'); btn.classList.add('active');
+            document.getElementById(pageId)?.classList.add('active');
+            if (cfg.btnId) document.getElementById(cfg.btnId)?.classList.add('active');
             document.body.classList.toggle('in-tournament-view', PAGINAS_DO_TORNEIO.includes(pageId));
-            if (pageId === 'page-bracket') setTimeout(rolarAteConfrontoAtual, 150);
+            if (pushHistory && location.hash !== '#' + pageId) history.pushState({ page: pageId }, '', '#' + pageId);
+            if (cfg.after) cfg.after();
         }
+        function switchTab(pageId) { irParaPagina(pageId); }
+        window.addEventListener('popstate', (e) => {
+            const pageId = (e.state && e.state.page) || (location.hash ? location.hash.slice(1) : 'page-home');
+            irParaPagina(pageId, false);
+        });
         // Rola a chave horizontalmente até o primeiro confronto "em foco" (pronto pra decidir).
         function rolarAteConfrontoAtual() {
             const alvo = document.querySelector('#winnersBracketDisplay .match-live-focus') || document.querySelector('#winnersBracketDisplay .b-match:not(.is-bye):not(.round-skipped)');
@@ -2026,13 +2077,7 @@
             switchTab('page-main', document.getElementById('navBtnMain'));
             fecharMenuLateral();
         }
-        function abrirSalaDeTrofeus() {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.navbar .nav-btn:not(.btn-save):not(.btn-reset):not(.btn-copy)').forEach(b => b.classList.remove('active'));
-            document.getElementById('page-trophy').classList.add('active');
-            renderizarSalaDeTrofeus();
-            fecharMenuLateral();
-        }
+        function abrirSalaDeTrofeus() { irParaPagina('page-trophy'); }
         // Monta a grade de troféus: o torneio ATUAL do site (detectado automaticamente pela Grande Final)
         // + os campeonatos arquivados manualmente, sempre com os finalizados aparecendo primeiro.
         function renderizarSalaDeTrofeus() {
@@ -3600,6 +3645,26 @@
                 </div>`;
             }).join('');
         }
+        // Canais do YouTube em destaque — edite/adicione aqui.
+        const canaisDestaque = [
+            { nome: 'Leonidas Baiano BR', handle: 'LeonidasBaianoBr' },
+            { nome: 'MilanoGods', handle: 'Milanogods' },
+            { nome: 'CaOK_PaiN', handle: 'CaOK_PaiN' },
+            { nome: 'Scoobymaniaco', handle: 'scoobymaniaco' },
+        ];
+        function renderizarCanaisDestaque() {
+            const lista = document.getElementById('canaisDestaqueList');
+            if (!lista) return;
+            lista.innerHTML = canaisDestaque.map(c => {
+                const url = `https://www.youtube.com/@${c.handle}`;
+                const avatar = `https://unavatar.io/youtube/${c.handle}`;
+                return `<a class="channel-card" href="${url}" target="_blank" rel="noopener noreferrer">
+                    <div class="channel-avatar"><img src="${avatar}" onerror="this.parentElement.innerHTML='▶'"></div>
+                    <div class="channel-name">${escapeHtml(c.nome)}</div>
+                    <span class="channel-visit">Ver canal ↗</span>
+                </a>`;
+            }).join('');
+        }
         // Outros sites criados por você — edite/adicione aqui.
         const meusSites = [
             { nome: 'Compêndio de Cartas', meta: 'album-carta.vercel.app', url: 'https://album-carta.vercel.app/' },
@@ -3630,7 +3695,12 @@
             if (label) label.textContent = '@' + INSTAGRAM_HANDLE;
             if (link) link.href = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
         }
-        window.onload = () => { renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); gerarPoeiraFlutuante(); carregarNovidadesAoM(); renderizarMeusSites(); configurarInstagramCard(); };
+        window.onload = () => {
+            renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); gerarPoeiraFlutuante(); carregarNovidadesAoM(); renderizarMeusSites(); configurarInstagramCard(); renderizarCanaisDestaque();
+            const hashPagina = location.hash ? location.hash.slice(1) : null;
+            if (hashPagina && PAGE_CONFIG[hashPagina]) irParaPagina(hashPagina, false);
+            else history.replaceState({ page: 'page-home' }, '', '#page-home');
+        };
     </script>
 </body>
 </html>
