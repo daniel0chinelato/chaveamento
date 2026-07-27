@@ -56,8 +56,8 @@
         /* ===== MARCA D'ÁGUA + LOGO FLUTUANTE ABAIXO DO HERO ===== */
         .kmps-watermark-wrap { position: relative; width: 100vw; left: 50%; margin-left: -50vw; height: 210px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .kmps-watermark-text { font-family: 'Cinzel', serif; font-weight: 700; font-size: 11rem; letter-spacing: 10px; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.06); white-space: nowrap; user-select: none; }
-        .home-logo-badge { position: relative; margin: -150px auto 30px; width: 130px; height: 130px; border-radius: 50%; z-index: 2; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #1a1006, #050302 75%); border: 2px solid var(--accent-color); box-shadow: 0 0 40px rgba(212,175,55,0.35), 0 15px 35px rgba(0,0,0,0.7); animation: goldPulseGlow 3s ease-in-out infinite; }
-        .home-logo-badge img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .home-logo-badge { position: relative; margin: -150px auto 30px; width: 200px; height: 200px; z-index: 2; display: flex; align-items: center; justify-content: center; background: transparent; border: none; animation: goldPulseGlow 3s ease-in-out infinite; }
+        .home-logo-badge img { width: 100%; height: 100%; object-fit: contain; border-radius: 0; border: none; background: transparent; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.7)); }
         .home-logo-badge span { font-family: 'Cinzel', serif; font-weight: 800; font-size: 1.6rem; color: var(--accent-color); letter-spacing: 1px; }
         @media (max-width: 700px) { .kmps-watermark-text { font-size: 5rem; } .kmps-watermark-wrap { height: 120px; } .home-logo-badge { margin-top: -90px; width: 100px; height: 100px; } }
         /* ===== CANAIS EM DESTAQUE (cards em degradê vinho, estilo referência) ===== */
@@ -102,14 +102,17 @@
         .home-bottom-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0%, var(--bg-color) 100%); }
         @media (max-width: 700px) { .home-hero { height: 380px; } .home-hero-title { font-size: 1.8rem; letter-spacing: 4px; } }
         .navbar {
-            background-color: rgba(0, 0, 0, 0.92); border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(16px) saturate(1.2);
+            -webkit-backdrop-filter: blur(16px) saturate(1.2);
+            border: 1.5px solid rgba(255, 255, 255, 0.55);
             clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
-            display: flex; justify-content: center; align-items: center; padding: 9px 15px; gap: 14px; position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; box-shadow: 0 4px 18px rgba(0,0,0,0.45); min-height: 64px;
+            display: flex; justify-content: center; align-items: center; padding: 9px 26px; gap: 14px; position: fixed; top: 28px; left: 50%; transform: translateX(-50%); z-index: 1000; flex-wrap: wrap; box-shadow: 0 4px 24px rgba(0,0,0,0.55); min-height: 56px; width: max-content; max-width: calc(100% - 140px);
         }
-        .navbar-logo-edge { position: absolute; left: 0; top: 0; height: 100%; width: auto; z-index: 2; pointer-events: none; }
+        .navbar-logo-edge { display: none; }
         .navbar .nav-btn, .navbar .btn-copy { padding: 6px 16px; font-size: 0.62rem; }
         /* MENU LATERAL K.M.P.S */
-        .hamburger-btn { position: absolute; left: 90px; top: 50%; transform: translateY(-50%); background: transparent; border: 1px solid var(--border-color); border-radius: 8px; width: 42px; height: 42px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: 0.25s; z-index: 5; }
+        .hamburger-btn { position: fixed; left: 34px; top: 34px; transform: none; background: transparent; border: 1px solid var(--border-color); border-radius: 8px; width: 42px; height: 42px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: 0.25s; z-index: 1001; }
         .hamburger-btn:hover { border-color: var(--accent-color); box-shadow: 0 0 12px var(--accent-glow); }
         .hamburger-btn span { display: block; width: 20px; height: 2px; background: var(--accent-color); border-radius: 2px; transition: 0.25s; }
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(2px); z-index: 4000; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }
@@ -211,7 +214,8 @@
         .match-card.chall-match .chall-sync-badge { top: 6px; left: 6px; }
         .loader { display: none; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid #fff; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .container { max-width: 1600px; margin: 0 auto; padding: 0 20px 60px 20px; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 110px 20px 60px 20px; }
+        #page-home.container { padding-top: 0; }
         .page { display: none; flex-direction: column; gap: 40px; }
         .page.active { display: flex; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -813,19 +817,6 @@
             <div class="kmps-tournaments-grid" id="kmpsTorneiosList"></div>
         </div>
 
-        <!-- RANKING ELO (conta em todos os torneios) -->
-        <div class="panel" style="margin-top: 50px; position: relative; z-index: 2;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
-                <h3 style="margin:0; font-size: 1.2rem; color: var(--accent-color); font-family: 'Cinzel', serif; letter-spacing: 2px; font-weight: 600;">🏆 Ranking ELO Geral</h3>
-            </div>
-            <div id="eloContent" style="margin-top: 15px; height: 700px; overflow-y: auto; padding-right: 5px;">
-                <table style="width: 100%; border-spacing: 0 4px;">
-                    <thead><tr><th style="width: 30px; text-align: center; padding: 8px 5px;">#</th><th style="text-align: left; padding: 8px 5px;">Jogador</th><th style="text-align: center; padding: 8px 5px;">Pts</th></tr></thead>
-                    <tbody id="eloTableBody"><tr><td colspan="3" style="text-align:center; color:var(--text-muted); font-style: italic; font-size: 0.8rem; padding: 15px;">Aguardando o início do torneio...</td></tr></tbody>
-                </table>
-            </div>
-        </div>
-
         <div class="home-bottom-art">
             <img src="footer.png" alt="" onerror="this.style.display='none'">
         </div>
@@ -873,6 +864,19 @@
                 <div id="mvpPontos" style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;"></div>
             </div>
         </div>
+        <!-- RANKING ELO (conta em todos os torneios) -->
+        <div class="panel" style="margin-top: 40px; position: relative; z-index: 2;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                <h3 style="margin:0; font-size: 1.2rem; color: var(--accent-color); font-family: 'Cinzel', serif; letter-spacing: 2px; font-weight: 600;">🏆 Ranking ELO Geral</h3>
+            </div>
+            <div id="eloContent" style="margin-top: 15px; height: 700px; overflow-y: auto; padding-right: 5px;">
+                <table style="width: 100%; border-spacing: 0 4px;">
+                    <thead><tr><th style="width: 30px; text-align: center; padding: 8px 5px;">#</th><th style="text-align: left; padding: 8px 5px;">Jogador</th><th style="text-align: center; padding: 8px 5px;">Pts</th></tr></thead>
+                    <tbody id="eloTableBody"><tr><td colspan="3" style="text-align:center; color:var(--text-muted); font-style: italic; font-size: 0.8rem; padding: 15px;">Aguardando o início do torneio...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- ESTATÍSTICAS GERAIS DE GODS (com filtro de mapa) -->
         <div class="panel" style="margin-top: 40px;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; flex-wrap:wrap; gap:10px;">
