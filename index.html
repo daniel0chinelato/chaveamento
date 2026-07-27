@@ -18,13 +18,13 @@
             --panel-surface: #111115;
             --border-color: rgba(255, 255, 255, 0.05);
             --border-highlight: rgba(196, 161, 83, 0.3);
-            --accent-color: #d4af37; 
+            --accent-color: #d4af37;
             --accent-glow: rgba(212, 175, 55, 0.15);
             --text-main: #f0f0f0;
             --text-muted: #888899;
             --danger-color: #ff4d4d;
         }
-        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -338,10 +338,10 @@
         .stream-controls { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 20; flex-wrap: wrap; justify-content: center; width: 80%; }
         .btn-share-result { opacity: 0.55; transition: 0.25s; }
         .btn-share-result:hover { opacity: 1; border-color: var(--accent-color); background: var(--accent-glow); transform: scale(1.08); }
-        .viewer-stream-link { 
-            --live-color: #ff3b3b; display: inline-flex; align-items: center; justify-content: center; gap: 4px; 
-            color: #fff; font-size: 0.58rem; text-decoration: none; font-weight: 700; letter-spacing: 0.5px; 
-            background: rgba(255,59,59,0.18); padding: 3px 8px; border-radius: 10px; border: 1px solid rgba(255,59,59,0.55); transition: 0.2s ease; text-transform: uppercase; 
+        .viewer-stream-link {
+            --live-color: #ff3b3b; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+            color: #fff; font-size: 0.58rem; text-decoration: none; font-weight: 700; letter-spacing: 0.5px;
+            background: rgba(255,59,59,0.18); padding: 3px 8px; border-radius: 10px; border: 1px solid rgba(255,59,59,0.55); transition: 0.2s ease; text-transform: uppercase;
         }
         .viewer-stream-link:hover { background: rgba(255,59,59,0.35); border-color: #ff3b3b; transform: scale(1.06); }
         .viewer-stream-link::before { content: ''; display: inline-block; width: 5px; height: 5px; background: var(--live-color); border-radius: 50%; animation: pulseLive 1.3s infinite; flex-shrink: 0; }
@@ -434,7 +434,7 @@
         .b-player.winner-slot .score-input { background: rgba(212, 175, 55, 0.2) !important; border-color: var(--accent-color) !important; color: var(--accent-color) !important; text-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
         .btn-advance { background: transparent; border: 1px solid var(--border-highlight); color: var(--text-muted); border-radius: 3px; cursor: pointer; padding: 1px 4px; font-weight: 600; font-size: 0.5rem; transition: all 0.2s; text-transform: uppercase; }
         .btn-advance:hover { border-color: var(--accent-color); color: var(--accent-color); }
-        .b-player.winner-slot .btn-advance { display: none; } 
+        .b-player.winner-slot .btn-advance { display: none; }
         .btn-loser { border-color: var(--danger-color); color: var(--danger-color); }
         .btn-loser:hover { background-color: var(--danger-color); color: #fff; }
         /* DEUSES NO MATA-MATA MENORES */
@@ -1112,7 +1112,7 @@
             storageBucket: "chaveamento-9e13f.firebasestorage.app",
             messagingSenderId: "650676573824",
             appId: "1:650676573824:web:0ffafe444b3694df28b865",
-            databaseURL: "https://chaveamento-9e13f-default-rtdb.firebaseio.com" 
+            databaseURL: "https://chaveamento-9e13f-default-rtdb.firebaseio.com"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -1213,18 +1213,6 @@
                 .replace(/'/g, '&#39;');
         }
         function getGodIconPath(nome) { if(!nome) return ''; let safeName = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); return safeName + '_icon.png'; }
-        // Lógica Inteligente para Imagens de Dicas JPG
-        function getMapHintPath(nomeDoMapa) {
-            const hintsEspeciais = {
-                "Coração de Tenochtitlán": "hint_coracao.jpg",
-                "Lago Fantasma": "hint_fantasma.jpg"
-            };
-            if(hintsEspeciais[nomeDoMapa]) return hintsEspeciais[nomeDoMapa];
-            let safeName = nomeDoMapa.toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove acentos
-                .trim();
-            return "hint_" + safeName + ".jpg";
-        }
         function renderizarGodGrid() {
             const grid = document.getElementById('godGrid'); grid.innerHTML = '';
             listaDeuses.forEach(deus => { grid.innerHTML += `<img src="${getGodIconPath(deus)}" class="god-grid-item" title="${deus}" alt="${deus}" onclick="selecionarDeus('${deus}', '${getGodIconPath(deus)}')">`; });
@@ -1663,13 +1651,13 @@
                     // Lógica dos Top Jogadores para o Hover
                     let playersArr = Object.keys(s.topPlayers).map(p => ({name: p, wins: s.topPlayers[p]}));
                     playersArr.sort((a,b) => b.wins - a.wins);
-                    let topPlayerHtml = playersArr.length > 0 
+                    let topPlayerHtml = playersArr.length > 0
                         ? playersArr.slice(0,3).map((p, idx) => `
                             <div class="mvp-row">
                                 <span class="mvp-rank-chip">${idx+1}</span>
                                 <span class="mvp-row-name">${escapeHtml(p.name)}</span>
                                 <span class="mvp-row-wins">${p.wins}V</span>
-                            </div>`).join('') 
+                            </div>`).join('')
                         : `<div class="mvp-empty">Nenhum registro ainda</div>`;
                     return `
                     <div class="podium-item ${tierClass}" onclick="this.classList.toggle('show-mvp')" title="Clique para ver os Especialistas">
@@ -1867,7 +1855,7 @@
                 let gameIdx = toggle.dataset.game;
                 let mapSelect = matchCard.querySelector(`.map-select[data-game="${gameIdx}"]`);
                 let gameMap = mapSelect ? mapSelect.value : "";
-                if(mapFilter !== 'ALL' && gameMap !== mapFilter) return; 
+                if(mapFilter !== 'ALL' && gameMap !== mapFilter) return;
                 const allTogglesThisGame = matchCard.querySelectorAll(`.win-toggle[data-game="${gameIdx}"]`);
                 let gameResolved = false; let thisWon = toggle.classList.contains('is-winner'); let oppWon = false;
                 allTogglesThisGame.forEach(t => {
@@ -1902,7 +1890,7 @@
             const card = btn.closest('.match-card') || btn.closest('.b-match');
             let streams = []; try { streams = JSON.parse(card.getAttribute('data-streams') || "[]"); } catch(e) {}
             const input = prompt(`Adicionar link de transmissão (Twitch, YouTube).\nPara apagar tudo, digite "limpar".`);
-            if(input === null) return; 
+            if(input === null) return;
             if(input.trim().toLowerCase() === 'limpar') { streams = []; }
             else if(input.trim() !== "") {
                 let url = input.trim();
@@ -1913,7 +1901,7 @@
                 streams.push(url);
             }
             card.setAttribute('data-streams', JSON.stringify(streams));
-            renderStreamLinks(); saveTournament(); 
+            renderStreamLinks(); saveTournament();
         }
         function renderStreamLinks() {
             document.querySelectorAll('.match-card, .b-match').forEach(card => {
@@ -1927,13 +1915,13 @@
                         const links = JSON.parse(streamData);
                         links.forEach((streamUrl, idx) => {
                             if(streamUrl && streamUrl.trim() !== "" && /^https?:\/\//i.test(streamUrl.trim())) {
-                                let iconHtml = 'AO VIVO', color = '#ff3b3b'; 
+                                let iconHtml = 'AO VIVO', color = '#ff3b3b';
                                 if(streamUrl.toLowerCase().includes('twitch.tv')) {
                                     iconHtml = `<svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg> AO VIVO`;
-                                    color = '#9146FF'; 
+                                    color = '#9146FF';
                                 } else if (streamUrl.toLowerCase().includes('youtu')) {
                                     iconHtml = `<svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> AO VIVO`;
-                                    color = '#ff3b3b'; 
+                                    color = '#ff3b3b';
                                 }
                                 const a = document.createElement('a'); a.href = streamUrl; a.target = '_blank';
                                 a.className = 'viewer-stream-link'; a.innerHTML = iconHtml; a.style.setProperty('--live-color', color);
@@ -2076,7 +2064,7 @@
         }
         function toggleStats() {
             const content = document.getElementById('statsContent'), btn = document.getElementById('btnToggleStats');
-            if (content.style.display === 'none') { content.style.display = 'block'; btn.innerText = 'Recolher'; btn.classList.add('active'); } 
+            if (content.style.display === 'none') { content.style.display = 'block'; btn.innerText = 'Recolher'; btn.classList.add('active'); }
             else { content.style.display = 'none'; btn.innerText = 'Mostrar'; btn.classList.remove('active'); }
         }
         const PAGINAS_DO_TORNEIO = ['page-main', 'page-matches', 'page-bracket', 'page-maps'];
@@ -2406,14 +2394,14 @@
             matchCards.forEach(card => {
                 const s1 = parseInt(card.querySelector('.score-p1').value) || 0, s2 = parseInt(card.querySelector('.score-p2').value) || 0;
                 if (s1 > 0 || s2 > 0) {
-                    if(s1 > s2) { tally[card.dataset.p1].v++; tally[card.dataset.p2].d++; } 
+                    if(s1 > s2) { tally[card.dataset.p1].v++; tally[card.dataset.p2].d++; }
                     else if(s2 > s1) { tally[card.dataset.p2].v++; tally[card.dataset.p1].d++; }
                 }
             });
             rows.forEach(row => {
                 const pName = row.dataset.player;
                 if(tally[pName]) {
-                    row.querySelector('.cell-v').innerText = tally[pName].v; 
+                    row.querySelector('.cell-v').innerText = tally[pName].v;
                     row.querySelector('.cell-d').innerText = tally[pName].d;
                     row.querySelector('.cell-pts').innerText = tally[pName].v * 3;
                 }
@@ -2458,7 +2446,7 @@
                             let selectedMap = state && state.maps && state.maps[g] ? state.maps[g] : "";
                             if(state && state.gState[g]) {
                                 let gData = state.gState[g];
-                                if(state.reversed) { god1 = gData.god2; win1Class = gData.win2 ? 'is-winner' : ''; god2 = gData.god1; win2Class = gData.win1 ? 'is-winner' : ''; } 
+                                if(state.reversed) { god1 = gData.god2; win1Class = gData.win2 ? 'is-winner' : ''; god2 = gData.god1; win2Class = gData.win1 ? 'is-winner' : ''; }
                                 else { god1 = gData.god1; win1Class = gData.win1 ? 'is-winner' : ''; god2 = gData.god2; win2Class = gData.win2 ? 'is-winner' : ''; }
                             }
                             let bg1 = god1 ? `background-image: url('${getGodIconPath(god1)}'); border-style: solid;` : "";
@@ -2608,8 +2596,8 @@
                 let players = match.querySelectorAll('.p-name');
                 if(players.length < 2) return;
                 let p1 = players[0].innerText.trim(), p2 = players[1].innerText.trim();
-                if ((p1 === "BYE" && p2 !== "BYE" && p2 !== "TBD" && !p2.startsWith("Perd.") && !p2.startsWith("Venc.")) || 
-                    (p2 === "BYE" && p1 !== "BYE" && p1 !== "TBD" && !p1.startsWith("Perd.") && !p1.startsWith("Venc.")) || 
+                if ((p1 === "BYE" && p2 !== "BYE" && p2 !== "TBD" && !p2.startsWith("Perd.") && !p2.startsWith("Venc.")) ||
+                    (p2 === "BYE" && p1 !== "BYE" && p1 !== "TBD" && !p1.startsWith("Perd.") && !p1.startsWith("Venc.")) ||
                     (p1 === "BYE" && p2 === "BYE")) {
                     match.classList.add('bye-processed');
                     match.classList.add('is-bye');
@@ -2617,7 +2605,7 @@
                     let winnerIdx = 0;
                     if (p1 === "BYE" && p2 !== "BYE") winnerIdx = 1;
                     if (p2 === "BYE" && p1 !== "BYE") winnerIdx = 0;
-                    resolverPartida(match, winnerIdx, true); 
+                    resolverPartida(match, winnerIdx, true);
                     changed = true;
                 }
             });
@@ -2663,9 +2651,9 @@
                 select.appendChild(newOpt);
             }
             select.value = neededSize;
-            select.style.display = 'inline-block'; 
+            select.style.display = 'inline-block';
             gerarChave(finalArray);
-            setTimeout(processByes, 200); 
+            setTimeout(processByes, 200);
         }
         // Arrastar-e-soltar na chave do mata-mata: troca os NOMES (e seed, se ambos tiverem)
         // entre dois slots. Não mexe em placar, bans, picks ou estrutura da chave.
@@ -2795,7 +2783,7 @@
                 wContainer.appendChild(roundDiv);
             }
             // --- LOSERS BRACKET ---
-            let roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1; 
+            let roundsL = (roundsW > 1) ? (roundsW * 2) - 2 : 1;
             for(let i=0; i < roundsL; i++) {
                 let matchesNum = size / Math.pow(2, Math.floor(i/2) + 2);
                 if (matchesNum < 1) matchesNum = 1;
@@ -2892,8 +2880,8 @@
                         }
                     }
                 });
-                wrapper.addEventListener('mouseleave', () => { 
-                    document.querySelectorAll('.glow-box, .glow-outgoing, .glow-drop').forEach(el => el.classList.remove('glow-box', 'glow-outgoing', 'glow-drop')); 
+                wrapper.addEventListener('mouseleave', () => {
+                    document.querySelectorAll('.glow-box, .glow-outgoing, .glow-drop').forEach(el => el.classList.remove('glow-box', 'glow-outgoing', 'glow-drop'));
                 });
             });
         }
@@ -2957,14 +2945,14 @@
                 if (r === 0) moveTo('L', 0, Math.floor(m / 2), m % 2, loserName);
                 else {
                     const lRound = r * 2 - 1; let matchesInRound = size / Math.pow(2, r + 1);
-                    let crossM = (matchesInRound - 1) - m; if (crossM < 0 || isNaN(crossM)) crossM = m; 
+                    let crossM = (matchesInRound - 1) - m; if (crossM < 0 || isNaN(crossM)) crossM = m;
                     moveTo('L', lRound, crossM, 0, loserName);
                 }
             } else if (bracket === 'L') {
                 if (r < roundsL - 1) {
                     if (r % 2 === 0) moveTo('L', r + 1, m, 1, winnerName);
                     else moveTo('L', r + 1, Math.floor(m / 2), m % 2, winnerName);
-                } else moveTo('F', 0, 0, 1, winnerName); 
+                } else moveTo('F', 0, 0, 1, winnerName);
             } else if (bracket === 'F') {
                 if (!isAutoBye) dispararConfete();
             }
@@ -3083,13 +3071,13 @@
                         tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted); font-style: italic; font-size: 0.8rem; padding: 15px;">Aguardando geração dos grupos...</td></tr>`;
                     } else {
                         eloArray.forEach((p, index) => {
-                            let statusBadge = p.isSeed 
-                                ? '<span style="color:var(--accent-color); font-size:0.55rem; letter-spacing: 0.5px; text-transform: uppercase;">Cabeça de Chave</span>' 
+                            let statusBadge = p.isSeed
+                                ? '<span style="color:var(--accent-color); font-size:0.55rem; letter-spacing: 0.5px; text-transform: uppercase;">Cabeça de Chave</span>'
                                 : '<span style="color:var(--text-muted); font-size:0.55rem; letter-spacing: 0.5px; text-transform: uppercase;">Regular</span>';
                             let posColor = "var(--text-main)";
-                            if(index === 0) posColor = "#FFD700"; 
-                            else if (index === 1) posColor = "#C0C0C0"; 
-                            else if (index === 2) posColor = "#CD7F32"; 
+                            if(index === 0) posColor = "#FFD700";
+                            else if (index === 1) posColor = "#C0C0C0";
+                            else if (index === 2) posColor = "#CD7F32";
                             tbody.innerHTML += `
                             <tr style="transition: 0.3s; background-color: var(--panel-surface);">
                                 <td style="font-weight:bold; font-size:1.1rem; color:${posColor}; text-align: center; border-radius: 6px 0 0 6px; padding: 8px 5px;">${index + 1}º</td>
@@ -3204,11 +3192,11 @@
         // do Modo Ao Vivo (listener contínuo, só ativo para quem não está logado).
         function aplicarDadosCarregados(data, isLiveUpdate = false) {
             if (!data) return;
-            if(data.seeds) document.getElementById('seedsInput').value = data.seeds; 
+            if(data.seeds) document.getElementById('seedsInput').value = data.seeds;
             if(data.regulars) document.getElementById('regularsInput').value = data.regulars;
             if(data.playersPerGroup) document.getElementById('playersPerGroup').value = data.playersPerGroup;
             if(data.groupsDisplay) document.getElementById('groupsDisplay').innerHTML = data.groupsDisplay;
-            if(data.groupsSectionVisible) document.getElementById('groupsSection').style.display = data.groupsSectionVisible; 
+            if(data.groupsSectionVisible) document.getElementById('groupsSection').style.display = data.groupsSectionVisible;
             if(data.godsTable) document.getElementById('godsTable').innerHTML = data.godsTable;
             if(data.matchesGroupsContainer) document.getElementById('matchesGroupsContainer').innerHTML = data.matchesGroupsContainer;
             if(data.winnersDisplay) document.getElementById('winnersBracketDisplay').innerHTML = data.winnersDisplay;
