@@ -204,6 +204,7 @@
         .trophy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; max-width: 1000px; margin: 0 auto; padding: 0 20px 60px; position: relative; z-index: 1; }
         @keyframes cardRiseIn { from { opacity: 0; transform: translateY(28px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .trophy-card { position: relative; background: linear-gradient(180deg, #14120a 0%, #0a0a0c 100%); border: 1px solid var(--accent-color); border-radius: 16px; padding: 40px 24px; text-align: center; overflow: hidden; transition: transform 0.15s ease, box-shadow 0.3s ease; animation: cardRiseIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: calc(var(--card-i, 0) * 0.09s); }
+        .trophy-card-highlight { border-color: var(--hover-color) !important; box-shadow: 0 0 0 3px var(--hover-glow), 0 14px 34px rgba(0,0,0,0.6) !important; }
         .trophy-card:not(.trophy-empty):not(.trophy-add-card) { box-shadow: 0 0 0 1px rgba(212,175,55,0.15), 0 15px 40px rgba(0,0,0,0.5); }
         @keyframes rayRotate { from { transform: translateX(-50%) rotate(0deg); } to { transform: translateX(-50%) rotate(360deg); } }
         .trophy-card-rays { position: absolute; top: -10%; left: 50%; width: 340px; height: 340px; transform: translateX(-50%); background: conic-gradient(from 0deg, transparent 0deg, rgba(212,175,55,0.16) 8deg, transparent 20deg, transparent 160deg, rgba(212,175,55,0.12) 172deg, transparent 190deg, transparent 340deg, rgba(212,175,55,0.14) 352deg, transparent 360deg); animation: rayRotate 14s linear infinite; pointer-events: none; z-index: 0; }
@@ -328,8 +329,8 @@
         .news-item .news-date { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         /* ===== CABEÇALHO DE PAINEL SEM ÍCONE, ESTILO ÉPICO ===== */
         .home-panel-title { margin: 0; font-size: var(--title-size-lg); color: var(--title-color); font-family: 'Cinzel', serif; letter-spacing: 3px; font-weight: 600; text-transform: uppercase; position: relative; padding-bottom: 14px; }
-        .home-panel-title::after { content: ''; position: absolute; bottom: 0; left: 0; width: 46px; height: 2px; background: linear-gradient(90deg, var(--accent-color), transparent); }
-        .home-panel-title-center::after { left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, transparent, var(--accent-color), transparent); }
+        .home-panel-title::after { content: ''; position: absolute; bottom: 0; left: 0; width: 46px; height: 2px; background: linear-gradient(90deg, var(--title-color), transparent); }
+        .home-panel-title-center::after { left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, transparent, var(--title-color), transparent); }
         /* ===== CANAIS DO YOUTUBE EM DESTAQUE ===== */
         .home-channels-section { margin-top: 50px; animation: cardRiseIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.4s backwards; }
         .channels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 22px; max-width: 980px; margin: 0 auto; }
@@ -732,7 +733,7 @@
     <div class="navbar">
         <img src="KMPS_v2.png" alt="KMPS" class="navbar-logo-edge" onerror="this.style.display='none'">
         <button class="nav-btn active" id="navBtnHome" onclick="switchTab('page-home', this)">Início</button>
-        <button class="nav-btn" id="navBtnMain" onclick="switchTab('page-main', this)">Torneios</button>
+        <button class="nav-btn" id="navBtnMain" onclick="switchTab('page-tournaments-list', this)">Torneios</button>
         <button class="nav-btn" id="navBtnNews" onclick="irParaSecaoHome('secaoAtualizacoes', this)">Atualizações</button>
         <button class="nav-btn" id="navBtnProdutos" onclick="irParaSecaoHome('secaoProdutos', this)">Nossos Produtos</button>
         <button class="nav-btn" id="navBtnCanais" onclick="irParaSecaoHome('secaoCanais', this)">Canais</button>
@@ -896,7 +897,7 @@
             <div class="home-tourney-footer-content">
                 <!-- TORNEIOS KMPS -->
                 <div>
-                    <h3 class="home-panel-title" style="padding-bottom:0; margin-bottom: 26px;">Torneios KMPS</h3>
+                    <h3 class="home-panel-title home-panel-title-center" style="text-align:center; padding-bottom:0; margin-bottom: 26px;">Torneios KMPS</h3>
                     <div class="kmps-tournaments-grid" id="kmpsTorneiosList"></div>
                 </div>
 
@@ -911,6 +912,11 @@
                 </div>
             </div>
         </div>
+    </div>
+    <!-- LISTA DE TORNEIOS -->
+    <div id="page-tournaments-list" class="container page">
+        <h2 class="home-panel-title home-panel-title-center" style="text-align:center; padding-bottom:0; margin: 20px 0 30px;">Torneios KMPS</h2>
+        <div class="kmps-tournaments-grid" id="listaTorneiosCompleta" style="margin-bottom: 60px;"></div>
     </div>
     <!-- TORNEIO ATUAL -->
     <div id="page-main" class="container page">
@@ -2149,7 +2155,8 @@
         const PAGINAS_DO_TORNEIO = ['page-main', 'page-matches', 'page-bracket', 'page-maps'];
         const PAGE_CONFIG = {
             'page-home':    { btnId: 'navBtnHome' },
-            'page-main':    { btnId: 'navBtnMain' },
+            'page-tournaments-list': { btnId: 'navBtnMain', after: () => renderizarListaTorneios() },
+            'page-main':    { btnId: null },
             'page-matches': { btnId: 'navBtnMatches' },
             'page-bracket': { btnId: 'navBtnBracket', after: () => setTimeout(rolarAteConfrontoAtual, 150) },
             'page-maps':    { btnId: 'navBtnMaps', after: () => { atualizarPainelMapas('Anatólia'); initHorizontalDrag(); } },
@@ -2208,7 +2215,17 @@
             switchTab('page-main', document.getElementById('navBtnMain'));
             fecharMenuLateral();
         }
-        function abrirSalaDeTrofeus() { irParaPagina('page-trophy'); }
+        function abrirSalaDeTrofeus(idAlvo = null) {
+            irParaPagina('page-trophy');
+            if (!idAlvo) return;
+            setTimeout(() => {
+                const card = document.querySelector(`#trophyGrid [data-tournament-id="${idAlvo}"]`);
+                if (!card) return;
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                card.classList.add('trophy-card-highlight');
+                setTimeout(() => card.classList.remove('trophy-card-highlight'), 2200);
+            }, 200);
+        }
         // Monta a grade de troféus: o torneio ATUAL do site (detectado automaticamente pela Grande Final)
         // + os campeonatos arquivados manualmente, sempre com os finalizados aparecendo primeiro.
         function renderizarSalaDeTrofeus() {
@@ -2246,7 +2263,7 @@
             const finalizado = c.status === 'finalizado' && c.campeao;
             const editBtn = (!c.live && !isViewer) ? `<button class="trophy-edit-btn admin-only" onclick="event.stopPropagation(); abrirModalCampeonato('${c.id}')" title="Editar">✎</button>` : '';
             const imagemHtml = c.imagem ? `<img src="${c.imagem}" class="trophy-champion-photo">` : `<div class="trophy-icon">🏆</div>`;
-            return `<div class="trophy-card ${finalizado ? '' : 'trophy-pending'}" style="--card-i:${i};">
+            return `<div class="trophy-card ${finalizado ? '' : 'trophy-pending'}" style="--card-i:${i};" data-tournament-id="${escapeHtml(c.id)}">
                 ${editBtn}
                 <div class="trophy-card-rays"></div>
                 <div class="trophy-card-glow"></div>
@@ -3749,29 +3766,43 @@
                 else img.style.display = 'none';
             } catch (e) { /* silencioso: a home fica sem a notícia em destaque, sem quebrar o resto da página */ }
         }
-        function renderizarTorneiosKMPS() {
-            const lista = document.getElementById('kmpsTorneiosList');
-            if (!lista) return;
+        function montarListaTorneiosKMPS() {
             const finais = document.getElementById('grandFinalsDisplay');
             const campeaoEl = finais ? finais.querySelector('.winner-slot .p-name') : null;
             const nomeAtual = campeaoEl ? campeaoEl.textContent.trim() : '';
             const atualFinalizado = !!(nomeAtual && nomeAtual !== 'TBD' && nomeAtual !== '');
             const todos = [
-                { nome: 'Tavernas of Demigods & Titans', status: atualFinalizado ? 'finalizado' : 'andamento', campeao: nomeAtual, atual: true, imagem: 'tavernas-kmps.png' },
-                ...campeonatosArquivados.map(c => ({ nome: c.nome, status: c.status === 'finalizado' ? 'finalizado' : (c.status === 'em_breve' ? 'em_breve' : 'andamento'), campeao: c.campeao, atual: false, imagem: c.imagem || (/briga\s*de\s*bar/i.test(c.nome || '') ? 'briga-de-bar-kmps.png' : '') })),
+                { id: '__atual__', nome: 'Tavernas of Demigods & Titans', status: atualFinalizado ? 'finalizado' : 'andamento', campeao: nomeAtual, atual: true, imagem: 'tavernas-kmps.png' },
+                ...campeonatosArquivados.map(c => ({ id: c.id, nome: c.nome, status: c.status === 'finalizado' ? 'finalizado' : (c.status === 'em_breve' ? 'em_breve' : 'andamento'), campeao: c.campeao, atual: false, imagem: c.imagem || (/briga\s*de\s*bar/i.test(c.nome || '') ? 'briga-de-bar-kmps.png' : '') })),
             ];
             // Ordem sempre: Finalizado -> Em Andamento -> Em Breve
             const ordem = { finalizado: 0, andamento: 1, em_breve: 2 };
             todos.sort((a, b) => ordem[a.status] - ordem[b.status]);
-            const cards = todos.slice(0, 3).map(t => {
-                const acao = t.atual ? `document.querySelector('.nav-btn[onclick*=\\"page-bracket\\"]').click()` : `abrirSalaDeTrofeus()`;
-                const banner = t.imagem ? `<img src="${t.imagem}" alt="${escapeHtml(t.nome)}">` : '';
-                const label = t.imagem ? '' : `<span class="kt-label">${escapeHtml(t.nome)}</span>`;
-                const classeStatus = t.status === 'em_breve' ? ' em-breve' : '';
-                return `<div class="kmps-tournament-card${classeStatus}" style="cursor:pointer;" title="${escapeHtml(t.nome)}" onclick="${acao}">${banner}${label}</div>`;
-            });
+            return todos;
+        }
+        function montarCardTorneioKMPS(t) {
+            // Torneio atual (o que está com chaveamento ao vivo no site) -> abre direto o chaveamento dele.
+            // Torneios arquivados -> abrem a Sala de Troféus, onde ficam os dados desse campeonato encerrado.
+            const acao = t.atual ? `document.querySelector('.nav-btn[onclick*=\\"page-bracket\\"]').click()` : `abrirSalaDeTrofeus('${t.id || ''}')`;
+            const banner = t.imagem ? `<img src="${t.imagem}" alt="${escapeHtml(t.nome)}">` : '';
+            const label = t.imagem ? '' : `<span class="kt-label">${escapeHtml(t.nome)}</span>`;
+            const classeStatus = t.status === 'em_breve' ? ' em-breve' : '';
+            return `<div class="kmps-tournament-card${classeStatus}" style="cursor:pointer;" title="${escapeHtml(t.nome)}" onclick="${acao}">${banner}${label}</div>`;
+        }
+        function renderizarTorneiosKMPS() {
+            const lista = document.getElementById('kmpsTorneiosList');
+            if (!lista) return;
+            const todos = montarListaTorneiosKMPS();
+            const cards = todos.slice(0, 3).map(montarCardTorneioKMPS);
             while (cards.length < 3) cards.push(`<div class="kmps-tournament-card em-breve"><span class="kt-label">Em Breve</span></div>`);
             lista.innerHTML = cards.join('');
+        }
+        // Página "Torneios": lista TODOS os torneios publicados (atual + arquivados), sem cortar em 3.
+        function renderizarListaTorneios() {
+            const lista = document.getElementById('listaTorneiosCompleta');
+            if (!lista) return;
+            const todos = montarListaTorneiosKMPS();
+            lista.innerHTML = todos.map(montarCardTorneioKMPS).join('');
         }
         // Canais do YouTube em destaque — edite/adicione aqui.
         const canaisDestaque = [
