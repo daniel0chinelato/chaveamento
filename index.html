@@ -57,6 +57,7 @@
         /* ===== MARCA D'ÁGUA + LOGO FLUTUANTE ABAIXO DO HERO ===== */
         .kmps-watermark-wrap { position: relative; width: 100vw; left: 50%; margin-left: -50vw; height: 210px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .kmps-watermark-text { font-family: 'Cinzel', serif; font-weight: 700; font-size: 11rem; letter-spacing: 10px; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.06); white-space: nowrap; user-select: none; }
+        .kmps-watermark-img { height: 100%; width: auto; max-width: 92vw; object-fit: contain; user-select: none; pointer-events: none; }
         .home-logo-badge { position: relative; margin: -150px auto 30px; width: 200px; height: 200px; z-index: 2; display: flex; align-items: center; justify-content: center; background: transparent; border: none; }
         .home-logo-badge img { width: 100%; height: 100%; object-fit: contain; border-radius: 0; border: none; background: transparent; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.7)); }
         .home-logo-badge span { font-family: 'Cinzel', serif; font-weight: 800; font-size: 1.6rem; color: var(--accent-color); letter-spacing: 1px; }
@@ -130,7 +131,7 @@
 }
 .home-footer-bottom-group { text-align: center; }
 .home-sites-footer { text-align: center; margin-top: 0; }
-.home-footer-logo { width: 180px; height: 180px; object-fit: contain; display: block; margin: 0 auto 18px; }
+.home-footer-logo { width: 60px; height: 60px; object-fit: contain; display: block; margin: 0 auto 18px; }
 
 @media (max-width: 800px) { 
     .home-tourney-footer-wrap { height: auto; } 
@@ -845,7 +846,7 @@
             <img src="header.png" alt="K.M.P.S" class="home-hero-img" onerror="this.style.display='none'">
         </div>
 
-        <div class="kmps-watermark-wrap"><span class="kmps-watermark-text">KMPS</span></div>
+        <div class="kmps-watermark-wrap"><img src="Union.png" alt="KMPS" class="kmps-watermark-img" onerror="this.style.display='none'"></div>
         <div class="home-logo-badge"><img src="KMPS_v2.png" alt="KMPS" onerror="this.parentElement.innerHTML='&lt;span&gt;KMPS&lt;/span&gt;'"></div>
 
         <!-- CANAIS EM DESTAQUE -->
