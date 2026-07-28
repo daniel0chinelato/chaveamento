@@ -84,20 +84,22 @@
         @media (max-width: 800px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
         /* ===== TORNEIOS KMPS (cards grandes com imagem) ===== */
         .kmps-tournaments-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-        .kmps-tournament-card { position: relative; aspect-ratio: 16/11; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; text-decoration: none; color: var(--text-main); background: radial-gradient(ellipse at center, #16110a 0%, #0a0a0a 75%); transition: 0.25s; }
+        .kmps-tournament-card { position: relative; aspect-ratio: 12/5; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; text-decoration: none; color: var(--text-main); background: radial-gradient(ellipse at center, #16110a 0%, #0a0a0a 75%); transition: 0.25s; }
         .kmps-tournament-card:hover { border-color: var(--hover-color); transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.5); }
         .kmps-tournament-card img { width: 100%; height: 100%; object-fit: contain; object-position: center; position: absolute; inset: 0; padding: 10px; box-sizing: border-box; }
         .kmps-tournament-card .kt-label { position: relative; z-index: 1; font-family: 'Cinzel', serif; font-size: 1.1rem; text-align: center; padding: 20px; }
         .kmps-tournament-card.em-breve { color: var(--text-muted); font-style: italic; }
         @media (max-width: 800px) { .kmps-tournaments-grid { grid-template-columns: 1fr; } }
         /* ===== TORNEIOS + RODAPÉ, TUDO SOBREPOSTO À IMAGEM pain_YT.png ===== */
-        .home-tourney-footer-wrap { position: relative; width: 100vw; left: 50%; margin-left: -50vw; margin-top: 60px; overflow: hidden; z-index: 1; min-height: 1000px; }
+        .home-tourney-footer-wrap { position: relative; width: 100vw; left: 50%; margin-left: -50vw; margin-top: 60px; overflow: hidden; z-index: 1; height: 850px; }
         .home-tourney-footer-wrap::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, var(--bg-color) 0%, transparent 16%); pointer-events: none; }
-        .home-tourney-footer-wrap::after { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, transparent 78%, var(--bg-color) 100%); pointer-events: none; }
+        .home-tourney-footer-wrap::after { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, transparent 82%, var(--bg-color) 100%); pointer-events: none; }
         .home-tourney-footer-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
-        .home-tourney-footer-content { position: relative; z-index: 2; width: 100%; max-width: 1600px; margin: 0 auto; padding: -60px 20px 40px; box-sizing: border-box; }
-        .home-sites-footer { text-align: center; margin-top: 280px; }
+        .home-tourney-footer-content { position: relative; z-index: 2; width: 100%; max-width: 1600px; height: 100%; margin: 0 auto; padding: 18px 20px 26px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; }
+        .home-footer-bottom-group { text-align: center; }
+        .home-sites-footer { text-align: center; margin-top: 0; }
         .home-footer-logo { width: 60px; height: 60px; object-fit: contain; display: block; margin: 0 auto 18px; }
+        @media (max-width: 800px) { .home-tourney-footer-wrap { height: auto; } .home-tourney-footer-content { height: auto; display: block; padding-top: 24px; } .home-footer-bottom-group { margin-top: 40px; } .kmps-tournament-card { aspect-ratio: 16/9; } }
         .home-sites-footer-title { font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
         .home-sites-footer-links { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; }
         .home-sites-footer-links a { color: var(--accent-color); font-size: 0.75rem; letter-spacing: 1px; text-decoration: none; }
@@ -837,13 +839,15 @@
                     <div class="kmps-tournaments-grid" id="kmpsTorneiosList"></div>
                 </div>
 
-                <!-- ACESSE NOSSOS SITES -->
-                <div class="home-sites-footer">
-                    <img src="KMPS_v2.png" alt="KMPS" class="home-footer-logo" onerror="this.style.display='none'">
-                    <div class="home-sites-footer-title">Acesse nossos sites</div>
-                    <div class="home-sites-footer-links" id="meusSitesList"></div>
+                <!-- ACESSE NOSSOS SITES (grudado no rodapé da imagem) -->
+                <div class="home-footer-bottom-group">
+                    <div class="home-sites-footer">
+                        <img src="KMPS_v2.png" alt="KMPS" class="home-footer-logo" onerror="this.style.display='none'">
+                        <div class="home-sites-footer-title">Acesse nossos sites</div>
+                        <div class="home-sites-footer-links" id="meusSitesList"></div>
+                    </div>
+                    <div class="footer">DESENVOLVIDO POR K.M.P.S</div>
                 </div>
-                <div class="footer">DESENVOLVIDO POR K.M.P.S</div>
             </div>
         </div>
     </div>
