@@ -1116,6 +1116,11 @@
                     <option value="andamento">Em andamento</option>
                 </select>
             </div>
+            <div class="login-field">
+                <label>Link do Torneio (opcional)</label>
+                <input type="text" id="campeonatoLink" placeholder="Ex: briga-de-bar.html#page-main">
+                <small style="color: var(--text-muted); font-size: 0.7rem;">Se preenchido, o card desse torneio na Home leva direto pra essa URL, em vez de abrir a Sala de Troféus.</small>
+            </div>
             <div class="login-field" id="campoCampeaoNome">
                 <label>Nome do Campeão</label>
                 <input type="text" id="campeonatoCampeao" placeholder="Ex: NomeDoJogador">
@@ -2291,6 +2296,7 @@
                 document.getElementById('campeonatoNome').value = c.nome;
                 document.getElementById('campeonatoStatus').value = c.status;
                 document.getElementById('campeonatoCampeao').value = c.campeao || '';
+                document.getElementById('campeonatoLink').value = c.link || '';
                 if(c.imagem) { preview.src = c.imagem; preview.style.display = 'block'; }
                 document.getElementById('btnExcluirCampeonato').style.display = 'block';
             } else {
@@ -2298,6 +2304,7 @@
                 document.getElementById('campeonatoNome').value = '';
                 document.getElementById('campeonatoStatus').value = 'finalizado';
                 document.getElementById('campeonatoCampeao').value = '';
+                document.getElementById('campeonatoLink').value = '';
                 document.getElementById('btnExcluirCampeonato').style.display = 'none';
             }
             atualizarCamposStatusModal();
@@ -2336,11 +2343,12 @@
             const id = document.getElementById('campeonatoEditId').value || ('camp_' + Date.now());
             const status = document.getElementById('campeonatoStatus').value;
             const campeao = document.getElementById('campeonatoCampeao').value.trim();
+            const link = document.getElementById('campeonatoLink').value.trim();
             const preview = document.getElementById('campeonatoImagemPreview');
             const existente = campeonatosArquivados.find(x => x.id === id);
             const imagem = preview.getAttribute('data-base64') || (existente ? existente.imagem : '') || '';
-            if(existente) Object.assign(existente, { nome, status, campeao, imagem });
-            else campeonatosArquivados.push({ id, nome, status, campeao, imagem });
+            if(existente) Object.assign(existente, { nome, status, campeao, imagem, link });
+            else campeonatosArquivados.push({ id, nome, status, campeao, imagem, link });
             renderizarSalaDeTrofeus();
             fecharModalCampeonato();
             saveTournament();
@@ -3773,7 +3781,7 @@
             const atualFinalizado = !!(nomeAtual && nomeAtual !== 'TBD' && nomeAtual !== '');
             const todos = [
                 { id: '__atual__', nome: 'Tavernas of Demigods & Titans', status: atualFinalizado ? 'finalizado' : 'andamento', campeao: nomeAtual, atual: true, imagem: 'tavernas-kmps.png' },
-                ...campeonatosArquivados.map(c => ({ id: c.id, nome: c.nome, status: c.status === 'finalizado' ? 'finalizado' : (c.status === 'em_breve' ? 'em_breve' : 'andamento'), campeao: c.campeao, atual: false, imagem: c.imagem || (/briga\s*de\s*bar/i.test(c.nome || '') ? 'briga-de-bar-kmps.png' : '') })),
+                ...campeonatosArquivados.map(c => ({ id: c.id, nome: c.nome, status: c.status === 'finalizado' ? 'finalizado' : (c.status === 'em_breve' ? 'em_breve' : 'andamento'), campeao: c.campeao, atual: false, imagem: c.imagem || (/briga\s*de\s*bar/i.test(c.nome || '') ? 'briga-de-bar-kmps.png' : ''), link: c.link || '' })),
             ];
             // Ordem sempre: Finalizado -> Em Andamento -> Em Breve
             const ordem = { finalizado: 0, andamento: 1, em_breve: 2 };
@@ -3783,7 +3791,7 @@
         function montarCardTorneioKMPS(t) {
             // Torneio atual (o que está com chaveamento ao vivo no site) -> abre direto o chaveamento dele.
             // Torneios arquivados -> abrem a Sala de Troféus, onde ficam os dados desse campeonato encerrado.
-            const acao = t.atual ? `document.querySelector('.nav-btn[onclick*=\\"page-bracket\\"]').click()` : `abrirSalaDeTrofeus('${t.id || ''}')`;
+            const acao = t.atual ? `switchTab('page-main')` : (t.link ? `window.location.href='${t.link}'` : `abrirSalaDeTrofeus('${t.id || ''}')`);
             const banner = t.imagem ? `<img src="${t.imagem}" alt="${escapeHtml(t.nome)}">` : '';
             const label = t.imagem ? '' : `<span class="kt-label">${escapeHtml(t.nome)}</span>`;
             const classeStatus = t.status === 'em_breve' ? ' em-breve' : '';
