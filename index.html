@@ -3605,9 +3605,10 @@
         }
         function renderizarGruposChallonge(gruposPorId, maps, mapaAntigo) {
             const container = document.getElementById('groupsDisplay'); container.innerHTML = '';
-            document.getElementById('groupsSection').style.display = 'block';
             const matchesContainer = document.getElementById('matchesGroupsContainer'); matchesContainer.innerHTML = '';
             const idsOrdenados = Object.keys(gruposPorId).map(Number).sort((a, b) => a - b);
+            // Se o torneio no Challonge não tem fase de grupos, escondemos a tabela em vez de mostrar vazia.
+            document.getElementById('groupsSection').style.display = idsOrdenados.length ? 'block' : 'none';
             let casados = 0, total = 0;
             idsOrdenados.forEach((groupId, idx) => {
                 const matches = gruposPorId[groupId];
@@ -3739,6 +3740,13 @@
                 const maps = construirMapasDeParticipantes(participantsRaw);
                 const { grupos, winners, losers, finais } = classificarPartidasChallonge(matchesRaw);
                 const mapaAntigo = extrairDadosLocaisPorPar();
+                // Preenche a lista de "Jogadores Regulares" automaticamente com todos os participantes do Challonge
+                const nomesParticipantes = participantsRaw
+                    .map(p => p.participant)
+                    .sort((a, b) => (a.seed || 999) - (b.seed || 999))
+                    .map(p => p.name);
+                const regularsEl = document.getElementById('regularsInput');
+                if (regularsEl) regularsEl.value = nomesParticipantes.join('\n');
                 const resultadoGrupos = renderizarGruposChallonge(grupos, maps, mapaAntigo);
                 const resultadoChave = renderizarChaveChallonge(winners, losers, finais, maps, mapaAntigo);
                 attachHoverEvents(); calcularEloGeral(); renderizarFiltrosDeMapas(); initDragToScroll(); renderStreamLinks(); atualizarFocoChave();
@@ -3746,7 +3754,7 @@
                 const totalCasados = resultadoGrupos.casados + resultadoChave.casados;
                 const totalPartidas = resultadoGrupos.total + resultadoChave.total;
                 fecharMenuLateral();
-                showToast(`Sincronizado! ${totalPartidas} partidas importadas, ${totalCasados} com gods/bans recuperados do site antigo.`, 'success', 8000);
+                showToast(`Sincronizado! ${totalPartidas} partidas e ${nomesParticipantes.length} participantes importados, ${totalCasados} com gods/bans recuperados do site antigo.`, 'success', 8000);
             } catch (e) {
                 showToast('Erro ao sincronizar com o Challonge: ' + e.message, 'error', 8000);
             } finally {
