@@ -3779,7 +3779,7 @@
             const atualFinalizado = !!(nomeAtual && nomeAtual !== 'TBD' && nomeAtual !== '');
             const todos = [
                 { id: '__atual__', nome: 'Briga de Bar - Demigods & Titans', status: atualFinalizado ? 'finalizado' : 'andamento', campeao: nomeAtual, atual: true, imagem: 'briga-de-bar-kmps.png' },
-                ...campeonatosArquivados.map(c => ({ id: c.id, nome: c.nome, status: c.status === 'finalizado' ? 'finalizado' : (c.status === 'em_breve' ? 'em_breve' : 'andamento'), campeao: c.campeao, atual: false, imagem: c.imagem || (/briga\s*de\s*bar/i.test(c.nome || '') ? 'briga-de-bar-kmps.png' : '') })),
+                ...campeonatosArquivados.map(c => ({ id: c.id, nome: c.nome, status: c.status === 'finalizado' ? 'finalizado' : (c.status === 'em_breve' ? 'em_breve' : 'andamento'), campeao: c.campeao, atual: false, imagem: (/briga\s*de\s*bar/i.test(c.nome || '') ? 'briga-de-bar-kmps.png' : '') || c.imagem || '' })),
             ];
             // Ordem sempre: Finalizado -> Em Andamento -> Em Breve
             const ordem = { finalizado: 0, andamento: 1, em_breve: 2 };
