@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tavernas | Chaveamento</title>
+    <title>K.M.P.S | Comunidade de Torneios de Age of Mythology</title>
+    <meta name="description" content="K.M.P.S — comunidade de torneios de Age of Mythology: Retold. Acompanhe os torneios, chaveamentos, ranking ELO, canais parceiros e produtos oficiais.">
     <link rel="icon" type="image/jpeg" href="favicon.jpeg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -240,6 +241,7 @@
             background: transparent; border: 1px solid transparent; color: var(--text-muted);
             padding: 8px 20px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
             transition: all 0.3s ease; font-weight: 600; font-size: 0.7rem; border-radius: 6px; font-family: 'Montserrat', sans-serif;
+            text-decoration: none; display: inline-block;
         }
         /* Menu minimalista: as abas do torneio (e as ações de admin ligadas a elas) só
            aparecem depois que o usuário entra em "Torneio Atual". */
@@ -732,11 +734,11 @@
     </button>
     <div class="navbar">
         <img src="KMPS_v2.png" alt="KMPS" class="navbar-logo-edge" onerror="this.style.display='none'">
-        <button class="nav-btn active" id="navBtnHome" onclick="switchTab('page-home', this)">Início</button>
-        <button class="nav-btn" id="navBtnMain" onclick="switchTab('page-tournaments-list', this)">Torneios</button>
-        <button class="nav-btn" id="navBtnNews" onclick="irParaSecaoHome('secaoAtualizacoes', this)">Atualizações</button>
-        <button class="nav-btn" id="navBtnProdutos" onclick="irParaSecaoHome('secaoProdutos', this)">Nossos Produtos</button>
-        <button class="nav-btn" id="navBtnCanais" onclick="irParaSecaoHome('secaoCanais', this)">Canais</button>
+        <a class="nav-btn active" id="navBtnHome" href="index.html">Início</a>
+        <a class="nav-btn" id="navBtnMain" href="torneios.html">Torneios</a>
+        <a class="nav-btn" id="navBtnNews" href="index.html#secaoAtualizacoes" onclick="if(document.getElementById('page-home').classList.contains('active')){irParaSecaoHome('secaoAtualizacoes', this); return false;}">Atualizações</a>
+        <a class="nav-btn" id="navBtnProdutos" href="produtos.html">Nossos Produtos</a>
+        <a class="nav-btn" id="navBtnCanais" href="index.html#secaoCanais" onclick="if(document.getElementById('page-home').classList.contains('active')){irParaSecaoHome('secaoCanais', this); return false;}">Canais</a>
     </div>
     <!-- SUBMENU DO TORNEIO: aparece somente dentro das páginas do torneio, para navegar só entre elas -->
     <div class="tournament-submenu tourney-tab">
@@ -3799,7 +3801,7 @@
         function montarCardTorneioKMPS(t) {
             // Torneio atual (o que está com chaveamento ao vivo no site) -> abre direto o chaveamento dele.
             // Torneios arquivados -> abrem a Sala de Troféus, onde ficam os dados desse campeonato encerrado.
-            const acao = t.atual ? `switchTab('page-main')` : (t.link ? `window.location.href='${t.link}'` : `abrirSalaDeTrofeus('${t.id || ''}')`);
+            const acao = t.atual ? `window.location.href='tavernas.html#page-main'` : (t.link ? `window.location.href='${t.link}'` : `abrirSalaDeTrofeus('${t.id || ''}')`);
             const banner = t.imagem ? `<img src="${t.imagem}" alt="${escapeHtml(t.nome)}">` : '';
             const label = t.imagem ? '' : `<span class="kt-label">${escapeHtml(t.nome)}</span>`;
             const classeStatus = t.status === 'em_breve' ? ' em-breve' : '';
@@ -3886,7 +3888,10 @@
             renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); gerarPoeiraFlutuante(); carregarNovidadesAoM(); renderizarMeusSites(); configurarInstagramCard(); renderizarCanaisDestaque(); renderizarProdutos();
             const hashPagina = location.hash ? location.hash.slice(1) : null;
             if (hashPagina && PAGE_CONFIG[hashPagina]) irParaPagina(hashPagina, false);
-            else history.replaceState({ page: 'page-home' }, '', '#page-home');
+            else {
+                history.replaceState({ page: 'page-home' }, '', '#page-home');
+                if (hashPagina) { const sec = document.getElementById(hashPagina); if (sec) setTimeout(() => sec.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350); }
+            }
         };
     </script>
 </body>
