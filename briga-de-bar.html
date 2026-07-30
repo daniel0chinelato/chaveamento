@@ -107,7 +107,8 @@
 
 /* ===== CARROSSEL "TORNEIOS KMPS" DA HOME (navegação manual por setas) ===== */
 .kmps-carousel-wrap { position: relative; }
-.kmps-carousel-track { display: flex !important; gap: 18px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+.kmps-carousel-track { display: flex !important; gap: 18px; overflow-x: auto; overflow-y: hidden; padding: 8px 2px; scroll-snap-type: x mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+.kmps-carousel-track .kmps-tournament-card:hover { transform: scale(1.015); }
 .kmps-carousel-track::-webkit-scrollbar { display: none; }
 .kmps-carousel-track .kmps-tournament-card { flex: 0 0 calc((100% - 36px) / 3); scroll-snap-align: start; }
 @media (max-width: 800px) { .kmps-carousel-track .kmps-tournament-card { flex: 0 0 88%; } }
