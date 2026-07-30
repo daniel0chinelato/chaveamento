@@ -106,6 +106,17 @@
 .kmps-tournament-card.em-breve { color: var(--text-muted); font-style: italic; }
 @media (max-width: 800px) { .kmps-tournaments-grid { grid-template-columns: 1fr; } }
 
+/* ===== CARROSSEL "TORNEIOS KMPS" DA HOME (navegação manual por setas) ===== */
+.kmps-carousel-wrap { position: relative; }
+.kmps-carousel-track { display: flex !important; gap: 18px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+.kmps-carousel-track::-webkit-scrollbar { display: none; }
+.kmps-carousel-track .kmps-tournament-card { flex: 0 0 calc((100% - 36px) / 3); scroll-snap-align: start; }
+@media (max-width: 800px) { .kmps-carousel-track .kmps-tournament-card { flex: 0 0 88%; } }
+.kmps-carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--hover-color); background: rgba(0,0,0,0.6); color: var(--text-main); font-size: 1.2rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.kmps-carousel-arrow:hover { background: var(--hover-color); }
+.kmps-carousel-arrow.prev { left: 4px; }
+.kmps-carousel-arrow.next { right: 4px; }
+
 /* ===== TORNEIOS + RODAPÉ, TUDO SOBREPOSTO À IMAGEM pain_YT.png ===== */
 .home-tourney-footer-wrap { 
     position: relative; 
@@ -128,7 +139,10 @@
     object-fit: cover; 
     object-position: center 165px; /* AJUSTE NO ENQUADRAMENTO DA IMAGEM PARA FOCAR O TOPO/MEIO */
     z-index: 0; 
+    opacity: 0;
+    transition: opacity 1.6s ease-in-out;
 }
+.home-tourney-footer-bg.active { opacity: 1; }
 
 .home-tourney-footer-content { 
     position: relative; 
@@ -893,14 +907,18 @@
             <div style="text-align:center; margin-top:20px;"><a href="#" id="produtosVerMaisLink" target="_blank" rel="noopener noreferrer" style="color:#ff5555; font-size:0.75rem; letter-spacing:1.5px; text-transform:uppercase; font-weight:700; text-decoration:none;">Ver mais +</a></div>
         </div>
 
-        <!-- TORNEIOS + RODAPÉ, SOBREPOSTOS À IMAGEM pain_YT.png -->
+        <!-- TORNEIOS + RODAPÉ, SOBREPOSTOS À IMAGEM pain_YT.png (carrossel automático com dissolve) -->
         <div class="home-tourney-footer-wrap">
-            <img src="pain_YT.png" alt="" class="home-tourney-footer-bg" onerror="this.style.display='none'">
+            <div id="footerBgCarousel"></div>
             <div class="home-tourney-footer-content">
-                <!-- TORNEIOS KMPS -->
+                <!-- TORNEIOS KMPS (carrossel manual, comporta quantos torneios forem publicados) -->
                 <div>
                     <h3 class="home-panel-title home-panel-title-center" style="text-align:center; padding-bottom:0; margin-bottom: 26px;">Torneios KMPS</h3>
-                    <div class="kmps-tournaments-grid" id="kmpsTorneiosList"></div>
+                    <div class="kmps-carousel-wrap">
+                        <button class="kmps-carousel-arrow prev" onclick="scrollarCarrossel('kmpsTorneiosList', -1)" aria-label="Torneio anterior">‹</button>
+                        <div class="kmps-tournaments-grid kmps-carousel-track" id="kmpsTorneiosList"></div>
+                        <button class="kmps-carousel-arrow next" onclick="scrollarCarrossel('kmpsTorneiosList', 1)" aria-label="Próximo torneio">›</button>
+                    </div>
                 </div>
 
                 <!-- ACESSE NOSSOS SITES (grudado no rodapé da imagem) -->
@@ -3875,6 +3893,36 @@
             if (INSTAGRAM_HANDLE) links.push(`<a href="https://www.instagram.com/${INSTAGRAM_HANDLE}/" target="_blank" rel="noopener noreferrer">@${INSTAGRAM_HANDLE} (Instagram)</a>`);
             lista.innerHTML = links.join('');
         }
+        // ===== CARROSSEL "TORNEIOS KMPS" (manual, por setas) =====
+        // Comporta qualquer quantidade de torneios sem precisar mexer em nada quando adicionar mais.
+        function scrollarCarrossel(id, direcao) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const card = el.querySelector('.kmps-tournament-card');
+            const gap = 18;
+            const distancia = card ? (card.getBoundingClientRect().width + gap) : 320;
+            el.scrollBy({ left: direcao * distancia, behavior: 'smooth' });
+        }
+        // ===== CARROSSEL AUTOMÁTICO DO RODAPÉ (dissolve entre imagens) =====
+        // Adicione mais nomes de arquivo aqui quando tiver mais artes pro rodapé — o carrossel
+        // já passa a girar entre elas sozinho. Com 1 imagem só, ele fica parado normalmente.
+        const footerCarouselImages = ['pain_YT.png'];
+        function iniciarCarrosselFooter() {
+            const wrap = document.getElementById('footerBgCarousel');
+            if (!wrap || !footerCarouselImages.length) return;
+            wrap.innerHTML = footerCarouselImages.map((src, i) =>
+                `<img src="${src}" class="home-tourney-footer-bg${i === 0 ? ' active' : ''}" alt="" onerror="this.style.display='none'">`
+            ).join('');
+            if (footerCarouselImages.length < 2) return;
+            let atual = 0;
+            setInterval(() => {
+                const imgs = wrap.querySelectorAll('.home-tourney-footer-bg');
+                if (!imgs.length) return;
+                imgs[atual].classList.remove('active');
+                atual = (atual + 1) % imgs.length;
+                imgs[atual].classList.add('active');
+            }, 6000);
+        }
         // Troque pelo @ real do perfil (sem o @) quando tiver a informação.
         const INSTAGRAM_HANDLE = 'mdre.mandarecurso';
         function configurarInstagramCard() {
@@ -3885,7 +3933,7 @@
             if (link) link.href = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
         }
         window.onload = () => {
-            renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); gerarPoeiraFlutuante(); carregarNovidadesAoM(); renderizarMeusSites(); configurarInstagramCard(); renderizarCanaisDestaque(); renderizarProdutos();
+            renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); gerarPoeiraFlutuante(); carregarNovidadesAoM(); renderizarMeusSites(); configurarInstagramCard(); renderizarCanaisDestaque(); renderizarProdutos(); iniciarCarrosselFooter();
             const hashPagina = location.hash ? location.hash.slice(1) : null;
             if (hashPagina && PAGE_CONFIG[hashPagina]) irParaPagina(hashPagina, false);
             else {
