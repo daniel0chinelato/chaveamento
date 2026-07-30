@@ -107,16 +107,16 @@
 @media (max-width: 800px) { .kmps-tournaments-grid { grid-template-columns: 1fr; } }
 
 /* ===== CARROSSEL "TORNEIOS KMPS" DA HOME (navegação manual por setas) ===== */
-.kmps-carousel-wrap { position: relative; }
+.kmps-carousel-wrap { position: relative; padding: 0 46px; }
 .kmps-carousel-track { display: flex !important; gap: 18px; overflow-x: auto; overflow-y: hidden; padding: 8px 2px; scroll-snap-type: x mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
 .kmps-carousel-track .kmps-tournament-card:hover { transform: scale(1.015); }
 .kmps-carousel-track::-webkit-scrollbar { display: none; }
 .kmps-carousel-track .kmps-tournament-card { flex: 0 0 calc((100% - 36px) / 3); scroll-snap-align: start; }
-@media (max-width: 800px) { .kmps-carousel-track .kmps-tournament-card { flex: 0 0 88%; } }
+@media (max-width: 800px) { .kmps-carousel-track .kmps-tournament-card { flex: 0 0 88%; } .kmps-carousel-wrap { padding: 0 30px; } .kmps-carousel-arrow { width: 28px; height: 28px; font-size: 1rem; } }
 .kmps-carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--hover-color); background: rgba(0,0,0,0.6); color: var(--text-main); font-size: 1.2rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
 .kmps-carousel-arrow:hover { background: var(--hover-color); }
-.kmps-carousel-arrow.prev { left: 4px; }
-.kmps-carousel-arrow.next { right: 4px; }
+.kmps-carousel-arrow.prev { left: 0; }
+.kmps-carousel-arrow.next { right: 0; }
 
 /* ===== TORNEIOS + RODAPÉ, TUDO SOBREPOSTO À IMAGEM pain_YT.png ===== */
 .home-tourney-footer-wrap { 
