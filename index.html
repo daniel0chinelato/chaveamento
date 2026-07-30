@@ -108,7 +108,8 @@
 
 /* ===== CARROSSEL "TORNEIOS KMPS" DA HOME (navegação manual por setas) ===== */
 .kmps-carousel-wrap { position: relative; }
-.kmps-carousel-track { display: flex !important; gap: 18px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+.kmps-carousel-track { display: flex !important; gap: 18px; overflow-x: auto; overflow-y: hidden; padding: 8px 2px; scroll-snap-type: x mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+.kmps-carousel-track .kmps-tournament-card:hover { transform: scale(1.015); }
 .kmps-carousel-track::-webkit-scrollbar { display: none; }
 .kmps-carousel-track .kmps-tournament-card { flex: 0 0 calc((100% - 36px) / 3); scroll-snap-align: start; }
 @media (max-width: 800px) { .kmps-carousel-track .kmps-tournament-card { flex: 0 0 88%; } }
@@ -251,6 +252,9 @@
         #trophyEmbers { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
         @keyframes emberRise { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: 0.8; } 90% { opacity: 0.5; } 100% { transform: translateY(-620px) translateX(var(--drift, 20px)); opacity: 0; } }
         .ember { position: absolute; bottom: -20px; width: 4px; height: 4px; border-radius: 50%; background: radial-gradient(circle, #ffe9b0, var(--accent-color)); box-shadow: 0 0 8px 2px rgba(212,175,55,0.6); animation: emberRise linear infinite; }
+        /* ===== PARTÍCULAS VERMELHAS — SOMENTE NA HOME ===== */
+        #homeEmbers { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 5; }
+        .home-ember { position: absolute; bottom: -20px; width: 4px; height: 4px; border-radius: 50%; background: radial-gradient(circle, #ff8a8a, var(--hover-color)); box-shadow: 0 0 8px 2px rgba(161,61,61,0.6); animation: emberRise linear infinite; }
         .nav-btn {
             background: transparent; border: 1px solid transparent; color: var(--text-muted);
             padding: 8px 20px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
@@ -872,6 +876,7 @@
     </div>
     <!-- INÍCIO -->
     <div id="page-home" class="container page active">
+        <div id="homeEmbers"></div>
         <div class="home-hero">
             <div class="home-hero-img-wrap">
                 <img src="header.png" alt="K.M.P.S" class="home-hero-img" onerror="this.style.display='none'">
@@ -3893,6 +3898,22 @@
             if (INSTAGRAM_HANDLE) links.push(`<a href="https://www.instagram.com/${INSTAGRAM_HANDLE}/" target="_blank" rel="noopener noreferrer">@${INSTAGRAM_HANDLE} (Instagram)</a>`);
             lista.innerHTML = links.join('');
         }
+        // ===== PARTÍCULAS VERMELHAS DA HOME (somente nesta página; as outras URLs não têm isso) =====
+        function gerarBrasasHome() {
+            const layer = document.getElementById('homeEmbers');
+            if (!layer) return;
+            layer.innerHTML = '';
+            for (let i = 0; i < 26; i++) {
+                const e = document.createElement('div');
+                e.className = 'home-ember';
+                e.style.left = Math.random() * 100 + '%';
+                e.style.setProperty('--drift', (Math.random() * 60 - 30) + 'px');
+                e.style.animationDuration = (7 + Math.random() * 7) + 's';
+                e.style.animationDelay = (Math.random() * 9) + 's';
+                e.style.width = e.style.height = (2 + Math.random() * 3) + 'px';
+                layer.appendChild(e);
+            }
+        }
         // ===== CARROSSEL "TORNEIOS KMPS" (manual, por setas) =====
         // Comporta qualquer quantidade de torneios sem precisar mexer em nada quando adicionar mais.
         function scrollarCarrossel(id, direcao) {
@@ -3933,7 +3954,7 @@
             if (link) link.href = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
         }
         window.onload = () => {
-            renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); gerarPoeiraFlutuante(); carregarNovidadesAoM(); renderizarMeusSites(); configurarInstagramCard(); renderizarCanaisDestaque(); renderizarProdutos(); iniciarCarrosselFooter();
+            renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); gerarPoeiraFlutuante(); carregarNovidadesAoM(); renderizarMeusSites(); configurarInstagramCard(); renderizarCanaisDestaque(); renderizarProdutos(); iniciarCarrosselFooter(); gerarBrasasHome();
             const hashPagina = location.hash ? location.hash.slice(1) : null;
             if (hashPagina && PAGE_CONFIG[hashPagina]) irParaPagina(hashPagina, false);
             else {
