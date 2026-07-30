@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Torneios KMPS | Lista Completa de Torneios</title>
-    <meta name="description" content="Veja todos os torneios de Age of Mythology promovidos pelo K.M.P.S — o atual, os arquivados e seus campeões.">
+    <title>Tavernas of Demigods &amp; Titans | Torneio K.M.P.S</title>
+    <meta name="description" content="Acompanhe o torneio Tavernas of Demigods & Titans: fase de grupos, chaveamento ao vivo, ranking ELO e estatísticas de mapas — K.M.P.S.">
     <link rel="icon" type="image/jpeg" href="favicon.jpeg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -109,7 +109,7 @@
 /* ===== CARROSSEL "TORNEIOS KMPS" DA HOME (navegação manual por setas) ===== */
 .kmps-carousel-wrap { position: relative; padding: 0 46px; }
 .kmps-carousel-track { display: flex !important; gap: 18px; overflow-x: auto; overflow-y: hidden; padding: 8px 2px; scroll-snap-type: x mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
-.kmps-carousel-track .kmps-tournament-card:hover { transform: scale(1.015); }
+.kmps-carousel-track .kmps-tournament-card:hover { transform: none; box-shadow: 0 0 0 1px var(--hover-color), 0 10px 24px rgba(0,0,0,0.5); }
 .kmps-carousel-track::-webkit-scrollbar { display: none; }
 .kmps-carousel-track .kmps-tournament-card { flex: 0 0 calc((100% - 36px) / 3); scroll-snap-align: start; }
 @media (max-width: 800px) { .kmps-carousel-track .kmps-tournament-card { flex: 0 0 88%; } .kmps-carousel-wrap { padding: 0 30px; } .kmps-carousel-arrow { width: 28px; height: 28px; font-size: 1rem; } }
@@ -3932,8 +3932,9 @@
         }
         window.onload = () => {
             renderizarGodGrid(); renderizarFiltrosDeMapas(); preloadMapImages(); loadTournament(); gerarPoeiraFlutuante(); carregarNovidadesAoM(); renderizarMeusSites(); configurarInstagramCard(); renderizarCanaisDestaque(); renderizarProdutos(); iniciarCarrosselFooter();
-            const hashPagina = location.hash ? location.hash.slice(1) : 'page-tournaments-list';
+            const hashPagina = location.hash ? location.hash.slice(1) : 'page-main';
             if (hashPagina && PAGE_CONFIG[hashPagina]) irParaPagina(hashPagina, false);
+            else if (PAGE_CONFIG['page-main']) irParaPagina('page-main', false);
             else history.replaceState({ page: 'page-home' }, '', '#page-home');
         };
     </script>
