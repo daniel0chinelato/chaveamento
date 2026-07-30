@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Troque "https://SEU-DOMINIO-AQUI" pelo domínio real do site antes de subir este arquivo.
-  Depois, envie esse sitemap no Google Search Console (Sitemaps) pra acelerar a indexação.
+  Sitemap já configurado com o domínio https://chaveamento-taupe.vercel.app
+  Envie esse arquivo no Google Search Console (aba "Sitemaps") pra acelerar a indexação.
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://SEU-DOMINIO-AQUI/index.html</loc>
+        <loc>https://chaveamento-taupe.vercel.app/index.html</loc>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://SEU-DOMINIO-AQUI/torneios.html</loc>
+        <loc>https://chaveamento-taupe.vercel.app/torneios.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://SEU-DOMINIO-AQUI/tavernas.html</loc>
+        <loc>https://chaveamento-taupe.vercel.app/tavernas.html</loc>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://SEU-DOMINIO-AQUI/briga-de-bar.html</loc>
+        <loc>https://chaveamento-taupe.vercel.app/briga-de-bar.html</loc>
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://SEU-DOMINIO-AQUI/produtos.html</loc>
+        <loc>https://chaveamento-taupe.vercel.app/produtos.html</loc>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
     </url>
